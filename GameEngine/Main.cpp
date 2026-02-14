@@ -5,18 +5,16 @@
 #include <vld.h>
 #endif
 
-#include "Minigin.h"
-#include "SceneManager.h"
-#include "ResourceManager.h"
-#include "TextObject.h"
-#include "Scene.h"
+#include "GameEngine.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
 
-static void load()
+using namespace dae;
+
+static void LoadEngine()
 {
-	auto& scene = dae::SceneManager::GetInstance().CreateScene();
+	/*auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 	auto go = std::make_unique<dae::GameObject>();
 	go->SetTexture("background.png");
@@ -31,19 +29,20 @@ static void load()
 	auto to = std::make_unique<dae::TextObject>("Programming 4 Assignment", font);
 	to->SetColor({ 255, 255, 0, 255 });
 	to->SetPosition(292, 20);
-	scene.Add(std::move(to));
+	scene.Add(std::move(to));*/
 }
 
-int main(int, char*[]) 
+int main(int, char* [])
 {
 #if __EMSCRIPTEN__
 	fs::path data_location = "";
 #else
-	fs::path data_location = "./Data/";
-	if(!fs::exists(data_location))
-		data_location = "../Data/";
+	fs::path data_location = "./resources/";
+	if (!fs::exists(data_location))
+		data_location = "../resources/";
 #endif
-	dae::Minigin engine(data_location);
-	engine.Run(load);
-    return 0;
+	GameEngine engine(data_location);
+	engine.Run(LoadEngine);
+	return 0;
 }
+
