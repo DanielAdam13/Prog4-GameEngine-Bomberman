@@ -59,12 +59,18 @@ GameEngine::GameEngine(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
 
+	// ---------------------------
+	// SDL Initialization
+	// ----------------------------
 	if (!SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
 		SDL_Log("Renderer error: %s", SDL_GetError());
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 	}
 
+	// ---------------------------
+	// SDL Window Creation
+	// ----------------------------
 	g_window = SDL_CreateWindow(
 		"GameObject/Component Assignment Week 1",
 		1024,
@@ -76,6 +82,9 @@ GameEngine::GameEngine(const std::filesystem::path& dataPath)
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
 
+	// ---------------------------
+	// Resource Managerr Initialization
+	// ----------------------------
 	Renderer::GetInstance().Init(g_window);
 	ResourceManager::GetInstance().Init(dataPath);
 }
@@ -88,10 +97,11 @@ GameEngine::~GameEngine()
 	SDL_Quit();
 }
 
-void GameEngine::Run(const std::function<void()>& load)
+void GameEngine::Run(const std::function<void()>& engineStart)
 {
-	load();
+	engineStart();
 
+	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
 	while (!m_quit)
 	{

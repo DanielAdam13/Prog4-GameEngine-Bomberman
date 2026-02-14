@@ -5,8 +5,8 @@ using namespace ge;
 
 void Scene::Add(std::unique_ptr<GameObject> object)
 {
-	//assert(object != nullptr && "Cannot add a null GameObject to the scene.");
-	m_objects.emplace_back(std::move(object));
+	assert(object != nullptr && "Cannot add a null GameObject to the scene.");
+	m_objects.push_back(std::move(object));
 }
 
 void Scene::Remove(const GameObject& object)
@@ -40,5 +40,20 @@ void Scene::Render() const
 	{
 		object->Render();
 	}
+}
+
+GameObject* ge::Scene::FindObjectByName(const std::string& goName) const
+{
+	auto objId{ std::find_if(m_objects.begin(), m_objects.end(), [&goName](const std::unique_ptr<GameObject>& obj) 
+		{
+			return obj->GetName() == goName;
+		}) };
+
+	if (objId != m_objects.end())
+	{
+		return objId->get();
+	}
+	
+	return nullptr;
 }
 

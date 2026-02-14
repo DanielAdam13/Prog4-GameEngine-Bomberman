@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include "Singleton.h"
+#include <utility>
 
 namespace ge
 {
@@ -20,7 +21,10 @@ namespace ge
 	private:
 		// For GetInstance()
 		friend class Singleton<ResourceManager>;
+
 		ResourceManager() = default;
+
+		// Resources folder path
 		std::filesystem::path m_dataPath;
 
 		void UnloadUnusedResources();

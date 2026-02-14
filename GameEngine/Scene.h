@@ -22,11 +22,13 @@ namespace ge
 		Scene& operator=(const Scene& other) = delete;
 		Scene& operator=(Scene&& other) = delete;
 
+		GameObject* FindObjectByName(const std::string& goName) const;
+
 	private:
 		friend class SceneManager;
 		explicit Scene() = default;
 
-		std::vector < std::unique_ptr<GameObject>> m_objects{};
+		std::vector <std::unique_ptr<GameObject>> m_objects{};
 	};
 
 }

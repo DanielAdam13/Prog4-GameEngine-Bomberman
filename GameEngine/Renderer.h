@@ -24,6 +24,10 @@ namespace ge
 		const SDL_Color& GetBackgroundColor() const { return m_clearColor; }
 		void SetBackgroundColor(const SDL_Color& color) { m_clearColor = color; }
 
+		std::pair<int, int> GetWindowSize() const;
+
+		void SetWindowSize(int w, int h);
+
 	private:
 		SDL_Renderer* m_renderer{};
 		SDL_Window* m_window{};

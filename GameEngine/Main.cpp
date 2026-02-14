@@ -10,14 +10,38 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#include <utility>
+
 #include "SceneManager.h"
 #include "GameObject.h"
+#include "Scene.h"
+#include "Image.h"
+#include "ResourceManager.h"
+#include "Renderer.h"
 
 using namespace ge;
 
-static void LoadEngine()
+static void LoadScenes()
 {
-	//auto& scene = ge::SceneManager::GetInstance().CreateScene();
+	Scene& scene{ ge::SceneManager::GetInstance().CreateScene() };
+
+	// Texture Resources
+	auto backgroundTexture{ ResourceManager::GetInstance().LoadTexture("background.png") };
+	auto daeTexture{ ResourceManager::GetInstance().LoadTexture("logo.png") };
+
+	auto backgroundGO = std::make_unique<GameObject>("GO_Background");
+	backgroundGO->AddComponent<Image>()->SetTexture(backgroundTexture);
+	scene.Add(std::move(backgroundGO));
+
+	auto daeLogoGO = std::make_unique<GameObject>("GO_DaeLogo");
+	daeLogoGO->AddComponent<Image>()->SetTexture(daeTexture);
+	scene.Add(std::move(daeLogoGO));
+
+	auto windowSize{ Renderer::GetInstance().GetWindowSize() };
+
+	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") }; 
+	if (daeLogo)
+		daeLogo->GetComponent<Transform>()->SetPosition({ windowSize.first / 2, windowSize.second / 2, 0.f });
 
 	/*auto go = std::make_unique<ge::GameObject>();
 	go->SetTexture("background.png");
@@ -45,7 +69,7 @@ int main(int, char* [])
 		data_location = "../resources/";
 #endif
 	GameEngine engine(data_location);
-	engine.Run(LoadEngine);
+	engine.Run(LoadScenes);
 	return 0;
 }
 

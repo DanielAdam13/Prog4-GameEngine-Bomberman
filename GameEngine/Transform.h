@@ -1,0 +1,30 @@
+#pragma once
+#include "Component.h"
+
+namespace ge
+{
+	class Transform : public Component
+	{
+	public:
+		// ---- TYPE IDENTIFIER ----
+		// Every Transform Instance shares the same component type ID
+		static constexpr ComponentTypeID StaticTypeID{ 1 };
+
+		const glm::vec3& GetPosition() const { return m_Position; }
+		void SetPosition(float x, float y, float z = 0);
+		void SetPosition(const glm::vec3& position);
+
+		const glm::vec3& GetRotation() const { return m_Rotation; }
+		void SetRotation(float x, float y, float z = 0);
+		void SetRotation(const glm::vec3& rotation);
+
+		const glm::vec3& GetScale() const { return m_Scale; }
+		void SetScale(float x = 1, float y = 1, float z = 1);
+		void SetScale(const glm::vec3& scale);
+
+	private:
+		glm::vec3 m_Position{};
+		glm::vec3 m_Rotation{};
+		glm::vec3 m_Scale{ 1.f, 1.f, 1.f };
+	};
+}

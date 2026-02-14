@@ -2,10 +2,12 @@
 #include <cstring>
 #include <iostream>
 #include "Renderer.h"
-//#include "SceneManager.h"
+#include "SceneManager.h"
 #include "Texture2D.h"
 
-void ge::Renderer::Init(SDL_Window* window)
+using namespace ge;
+
+void Renderer::Init(SDL_Window* window)
 {
 	m_window = window;
 
@@ -24,18 +26,18 @@ void ge::Renderer::Init(SDL_Window* window)
 	}
 }
 
-void ge::Renderer::Render() const
+void Renderer::Render() const
 {
 	const auto& color = GetBackgroundColor();
 	SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderClear(m_renderer);
 
-	//SceneManager::GetInstance().Render();
+	SceneManager::GetInstance().Render();
 
 	SDL_RenderPresent(m_renderer);
 }
 
-void ge::Renderer::Destroy()
+void Renderer::Destroy()
 {
 	if (m_renderer != nullptr)
 	{
@@ -44,7 +46,7 @@ void ge::Renderer::Destroy()
 	}
 }
 
-void ge::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y) const
+void Renderer::RenderTexture(const Texture2D& texture, const float x, const float y) const
 {
 	SDL_FRect dst{};
 	dst.x = x;
@@ -53,7 +55,7 @@ void ge::Renderer::RenderTexture(const Texture2D& texture, const float x, const 
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 
-void ge::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height) const
+void Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height) const
 {
 	SDL_FRect dst{};
 	dst.x = x;
@@ -61,4 +63,19 @@ void ge::Renderer::RenderTexture(const Texture2D& texture, const float x, const 
 	dst.w = width;
 	dst.h = height;
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
+}
+
+std::pair<int, int> ge::Renderer::GetWindowSize() const
+{
+	int w{}, h{};
+	SDL_GetWindowSize(m_window, &w, &h);
+	return std::pair<int, int>(w, h);
+}
+
+void ge::Renderer::SetWindowSize(int w, int h)
+{
+	if (w < 50 && h < 50)
+		return;
+
+	SDL_SetWindowSize(m_window, w, h);
 }

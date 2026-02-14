@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <glm/vec2.hpp>
 #include <string>
+#include "Component.h"
 
 struct SDL_Texture;
 namespace ge
