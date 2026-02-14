@@ -10,7 +10,14 @@
 #include <SDL3/SDL.h>
 //#include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
+
 #include "GameEngine.h"
+using namespace ge;
+
+#include "Renderer.h"
+#include "ResourceManager.h"
+#include "InputManager.h"
+#include "SceneManager.h"
 
 SDL_Window* g_window{};
 
@@ -30,13 +37,11 @@ void LogSDLVersion(const std::string& message, int major, int minor, int patch)
 
 void LoopCallback(void* arg)
 {
-	static_cast<dae::Minigin*>(arg)->RunOneFrame();
+	static_cast<ge::Minigin*>(arg)->RunOneFrame();
 }
 #endif
 
-// Why bother with this? Because sometimes students have a different SDL version installed on their pc.
-// That is not a problem unless for some reason the dll's from this project are not copied next to the exe.
-// These entries in the debug output help to identify that issue.
+// Helper function to identify SDL version errors
 void PrintSDLVersion()
 {
 	LogSDLVersion("Compiled with SDL", SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_MICRO_VERSION);
@@ -50,7 +55,7 @@ void PrintSDLVersion()
 	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version), SDL_VERSIONNUM_MICRO(version));
 }
 
-dae::GameEngine::GameEngine(const std::filesystem::path& dataPath)
+GameEngine::GameEngine(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
 
@@ -61,7 +66,7 @@ dae::GameEngine::GameEngine(const std::filesystem::path& dataPath)
 	}
 
 	g_window = SDL_CreateWindow(
-		"Programming 4 assignment",
+		"GameObject/Component Assignment Week 1",
 		1024,
 		576,
 		SDL_WINDOW_OPENGL
@@ -71,21 +76,35 @@ dae::GameEngine::GameEngine(const std::filesystem::path& dataPath)
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
 
-	dataPath;
-
-	//Renderer::GetInstance().Init(g_window);
-	//ResourceManager::GetInstance().Init(dataPath);
+	Renderer::GetInstance().Init(g_window);
+	ResourceManager::GetInstance().Init(dataPath);
 }
 
-dae::GameEngine::~GameEngine()
+GameEngine::~GameEngine()
 {
+	Renderer::GetInstance().Destroy();
+	SDL_DestroyWindow(g_window);
+	g_window = nullptr;
+	SDL_Quit();
 }
 
-void dae::GameEngine::Run(const std::function<void()>& load)
+void GameEngine::Run(const std::function<void()>& load)
 {
 	load();
+
+#ifndef __EMSCRIPTEN__
+	while (!m_quit)
+	{
+		RunOneFrame();
+	}
+#else
+	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
+#endif
 }
 
-void dae::GameEngine::RunOneFrame()
+void GameEngine::RunOneFrame()
 {
+	m_quit = !InputManager::GetInstance().ProcessInput();
+	SceneManager::GetInstance().Update();
+	Renderer::GetInstance().Render();
 }

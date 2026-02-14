@@ -3,7 +3,7 @@
 #include <functional>
 #include <filesystem>
 
-namespace dae
+namespace ge
 {
 	class GameEngine final
 	{
@@ -19,7 +19,7 @@ namespace dae
 		GameEngine& operator=(GameEngine&& other) = delete;
 
 	private:
-		bool m_quit{};
+		bool m_quit{ false };
 	
 	};
 }
