@@ -37,7 +37,7 @@ void LogSDLVersion(const std::string& message, int major, int minor, int patch)
 
 void LoopCallback(void* arg)
 {
-	static_cast<ge::Minigin*>(arg)->RunOneFrame();
+	static_cast<GameEngine*>(arg)->RunOneFrame();
 }
 #endif
 

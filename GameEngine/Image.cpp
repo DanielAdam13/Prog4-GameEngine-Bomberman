@@ -10,6 +10,7 @@ Image::~Image()
 
 void Image::RenderComponent(const glm::vec3 transformPos) const
 {
+	// Has to use Renderer Singleton
 	Renderer::GetInstance().RenderTexture(*this->GetTexture(), transformPos.x, transformPos.y);
 }
 

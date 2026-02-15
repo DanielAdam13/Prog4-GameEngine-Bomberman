@@ -18,7 +18,7 @@ GameObject::~GameObject()
 
 void GameObject::Update() 
 {
-	// Updates Transform Seperately
+	// Update Transform Seperately
 	//m_Transform->SetPosition({ m_Transform->GetPosition().x + 1.f, 0.f, 0.f});
 
 	// Update ALL components except Transform

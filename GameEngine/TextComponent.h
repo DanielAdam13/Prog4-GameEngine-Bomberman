@@ -13,7 +13,7 @@ namespace ge
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
-		// Every Transform Instance shares the same component type ID
+		// Every Text Component Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 2 };
 
 		TextComponent(const std::string& text, Font* font, const SDL_Color& color = { 255, 255, 255, 255 });
@@ -23,6 +23,7 @@ namespace ge
 		TextComponent& operator=(const TextComponent& other) = delete;
 		TextComponent& operator=(TextComponent&& other) = delete;
 
+		// Needs to override both
 		virtual void UpdateComponent() override;
 		virtual void RenderComponent(const glm::vec3 transformPos) const override;
 
@@ -31,10 +32,10 @@ namespace ge
 
 	private:
 		std::string m_Text;
-		Font* m_TextFont;
+		Font* m_TextFont; // Doesn't own
 		SDL_Color m_TextColor;
 
-		// A Text Component OWNS the generated texture since it is unique only for the object, hence ResourceManager doesn't own it
+		// A Text Component OWNS the generated texture since it is unique for the object => ResourceManager doesn't own it
 		std::unique_ptr<Texture2D> m_pTextTexture;
 
 		bool m_ShouldUpdate{ true };

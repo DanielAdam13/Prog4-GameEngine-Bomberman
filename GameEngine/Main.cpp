@@ -35,7 +35,7 @@ static void LoadScenes()
 	auto backgroundGO = std::make_unique<GameObject>("GO_Background");
 	backgroundGO->AddComponent<Image>()->SetTexture(backgroundTexture);
 	scene.Add(std::move(backgroundGO));
-	
+
 
 	auto daeLogoGO = std::make_unique<GameObject>("GO_DaeLogo");
 	daeLogoGO->AddComponent<Image>()->SetTexture(daeTexture);
@@ -46,7 +46,17 @@ static void LoadScenes()
 	// For test purposes
 	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") }; 
 	if (daeLogo)
-		daeLogo->GetComponent<Transform>()->SetPosition({ windowSize.first / 2, windowSize.second / 2, 0.f });
+	{
+		auto daeImageComponent{ daeLogo->GetComponent<Image>() };
+		glm::vec2 imageSize{ daeImageComponent->GetTexture()->GetSize() };
+		daeLogo->GetComponent<Transform>()->SetPosition(
+			{ 
+			windowSize.first / 2 - imageSize.x / 2, 
+			windowSize.second / 2 - imageSize.y / 2, 
+			0.f
+			});
+	}
+		
 
 	auto font = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 	

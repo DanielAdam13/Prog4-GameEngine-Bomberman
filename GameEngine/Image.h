@@ -9,18 +9,19 @@ namespace ge
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
-		// Every Transform Instance shares the same component type ID
+		// Every Image Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 1 };
 
 		Image() = default;
 		virtual ~Image() override;
 
+		// Texture is renderer INSIDE an individual Image component
 		virtual void RenderComponent(const glm::vec3 transformPos) const override;
 
 		void SetTexture(Texture2D* textureRef);
 		Texture2D* GetTexture() const { return m_pTexture; }
 
 	private:
-		Texture2D* m_pTexture{ nullptr };
+		Texture2D* m_pTexture{ nullptr }; // Doesn't own
 	};
 }
