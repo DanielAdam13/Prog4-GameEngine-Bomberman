@@ -18,12 +18,13 @@ namespace fs = std::filesystem;
 #include "Image.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
+#include "Transform.h"
 
 using namespace ge;
 
 static void LoadScenes()
 {
-	Scene& scene{ ge::SceneManager::GetInstance().CreateScene() };
+	Scene& scene{ SceneManager::GetInstance().CreateScene() };
 
 	// Texture Resources
 	auto backgroundTexture{ ResourceManager::GetInstance().LoadTexture("background.png") };
@@ -39,21 +40,14 @@ static void LoadScenes()
 
 	auto windowSize{ Renderer::GetInstance().GetWindowSize() };
 
+	// For test purposes
 	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") }; 
 	if (daeLogo)
 		daeLogo->GetComponent<Transform>()->SetPosition({ windowSize.first / 2, windowSize.second / 2, 0.f });
 
-	/*auto go = std::make_unique<ge::GameObject>();
-	go->SetTexture("background.png");
-	scene.Add(std::move(go));
-
-	go = std::make_unique<ge::GameObject>();
-	go->SetTexture("logo.png");
-	go->SetPosition(358, 180);
-	scene.Add(std::move(go));
-
-	auto font = ge::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	auto to = std::make_unique<ge::TextObject>("Programming 4 Assignment", font);
+	auto font = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+	font;
+	/*auto to = std::make_unique<ge::TextObject>("Programming 4 Assignment", font);
 	to->SetColor({ 255, 255, 0, 255 });
 	to->SetPosition(292, 20);
 	scene.Add(std::move(to));*/

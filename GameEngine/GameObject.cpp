@@ -14,7 +14,9 @@ GameObject::GameObject(const std::string& name)
 	m_Transform = GetComponent<Transform>();
 }
 
-GameObject::~GameObject() = default;
+GameObject::~GameObject()
+{
+}
 
 void GameObject::Update() 
 {

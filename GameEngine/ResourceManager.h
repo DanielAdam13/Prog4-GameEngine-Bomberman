@@ -5,6 +5,8 @@
 #include <map>
 #include "Singleton.h"
 #include <utility>
+#include "Texture2D.h"
+#include "Font.h"
 
 namespace ge
 {
@@ -15,8 +17,8 @@ namespace ge
 	{
 	public:
 		void Init(const std::filesystem::path& data);
-		std::shared_ptr<Texture2D> LoadTexture(const std::string& file);
-		std::shared_ptr<Font> LoadFont(const std::string& file, uint8_t size);
+		Texture2D* LoadTexture(const std::string& file);
+		Font* LoadFont(const std::string& file, uint8_t size);
 
 	private:
 		// For GetInstance()
@@ -29,8 +31,8 @@ namespace ge
 
 		void UnloadUnusedResources();
 
-		std::map<std::string, std::shared_ptr<Texture2D>> m_loadedTextures;
-		std::map<std::pair<std::string, uint8_t>, std::shared_ptr<Font>> m_loadedFonts;
+		std::map<std::string, std::unique_ptr<Texture2D>> m_loadedTextures;
+		std::map<std::pair<std::string, uint8_t>, std::unique_ptr<Font>> m_loadedFonts;
 
 	};
 }

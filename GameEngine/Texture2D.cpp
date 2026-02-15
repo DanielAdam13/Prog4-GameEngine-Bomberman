@@ -3,12 +3,14 @@
 #include "Renderer.h"
 #include <stdexcept>
 
-SDL_Texture* ge::Texture2D::GetSDLTexture() const
+using namespace ge;
+
+SDL_Texture* Texture2D::GetSDLTexture() const
 {
     return m_texture;
 }
 
-ge::Texture2D::Texture2D(const std::string& fullPath)
+Texture2D::Texture2D(const std::string& fullPath)
 {
     SDL_Surface* surface = SDL_LoadPNG(fullPath.c_str());
     if (!surface)
@@ -33,17 +35,17 @@ ge::Texture2D::Texture2D(const std::string& fullPath)
     }
 }
 
-ge::Texture2D::Texture2D(SDL_Texture* texture) : m_texture{ texture }
+Texture2D::Texture2D(SDL_Texture* texture) : m_texture{ texture }
 {
     assert(m_texture != nullptr);
 }
 
-ge::Texture2D::~Texture2D()
+Texture2D::~Texture2D()
 {
 	SDL_DestroyTexture(m_texture);
 }
 
-glm::vec2 ge::Texture2D::GetSize() const
+glm::vec2 Texture2D::GetSize() const
 {
     float w{}, h{};
     SDL_GetTextureSize(m_texture, &w, &h);

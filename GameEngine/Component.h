@@ -7,7 +7,7 @@ namespace ge
 	// Type alias used for Unique IDs for each component TYPE
 	using ComponentTypeID = uint32_t;
 
-	class Component abstract
+	class Component
 	{
 	public:
 		Component() = default;

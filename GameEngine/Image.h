@@ -12,13 +12,13 @@ namespace ge
 		// Every Transform Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 2 };
 
-		//Image() = default;
-		//virtual ~Image() override = default;
+		Image() = default;
+		virtual ~Image() override;
 
-		void SetTexture(std::shared_ptr<Texture2D> texture);
-		Texture2D* GetTexture() const { return m_Texture.get(); }
+		void SetTexture(Texture2D* textureRef);
+		Texture2D* GetTexture() const { return m_Texture; }
 
 	private:
-		std::shared_ptr<Texture2D> m_Texture{};
+		Texture2D* m_Texture{ nullptr };
 	};
 }

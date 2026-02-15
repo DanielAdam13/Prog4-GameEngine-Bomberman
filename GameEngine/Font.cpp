@@ -2,11 +2,15 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include "Font.h"
 
-TTF_Font* ge::Font::GetFont() const {
+using namespace ge;
+
+TTF_Font* Font::GetFont() const 
+{
 	return m_font;
 }
 
-ge::Font::Font(const std::string& fullPath, float size) : m_font(nullptr)
+Font::Font(const std::string& fullPath, float size) 
+	:m_font{ nullptr }
 {
 	m_font = TTF_OpenFont(fullPath.c_str(), size);
 	if (m_font == nullptr) 
@@ -15,7 +19,8 @@ ge::Font::Font(const std::string& fullPath, float size) : m_font(nullptr)
 	}
 }
 
-ge::Font::~Font()
+Font::~Font()
 {
 	TTF_CloseFont(m_font);
+	m_font = nullptr;
 }
