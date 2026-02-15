@@ -6,6 +6,7 @@ if(EMSCRIPTEN)
 endif()
 
 if(EMSCRIPTEN)
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")  # MUST be before add_executable
   set(TARGET_NAME gameEngine_web)
   set(TARGET_PARAM )
 else()
