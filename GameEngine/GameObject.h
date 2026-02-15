@@ -22,8 +22,9 @@ namespace ge
 		void Update();
 		void Render() const;
 
-		template<typename T>
-		T* AddComponent()
+		// Args for passing constructors on component adding
+		template<typename T, typename... Args>
+		T* AddComponent(Args&&... args)
 		{
 			constexpr ComponentTypeID id{ T::StaticTypeID };
 
@@ -31,7 +32,8 @@ namespace ge
 			if (m_Components[id] != nullptr)
 				return static_cast<T*> (m_Components[id]);
 			
-			m_Components[id] = new T();
+			// forwarding reference
+			m_Components[id] = new T(std::forward<Args>(args)...);
 			return static_cast<T*> (m_Components[id]);
 		}
 

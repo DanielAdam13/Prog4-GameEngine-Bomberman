@@ -2,6 +2,20 @@
 
 using namespace ge;
 
+Transform::Transform()
+	:m_Position{},
+	m_Rotation{},
+	m_Scale{ 1.f, 1.f, 1.f }
+{
+}
+
+Transform::Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale)
+	:m_Position{ pos },
+	m_Rotation{ rot },
+	m_Scale{ scale }
+{
+}
+
 void Transform::SetPosition(float x, float y, float z)
 {
 	m_Position.x = x;

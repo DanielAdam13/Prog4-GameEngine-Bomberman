@@ -17,5 +17,9 @@ namespace ge
 		Component(Component&& other) = delete;
 		Component& operator=(const Component& other) = delete;
 		Component& operator=(Component&& other) = delete;
+
+		// Every Component which Updates/Renders HAS TO override:
+		virtual void UpdateComponent() {};
+		virtual void RenderComponent(const glm::vec3) const {};
 	};
 }

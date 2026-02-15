@@ -20,6 +20,8 @@ namespace fs = std::filesystem;
 #include "Renderer.h"
 #include "Transform.h"
 
+#include "TextComponent.h"
+
 using namespace ge;
 
 static void LoadScenes()
@@ -33,6 +35,7 @@ static void LoadScenes()
 	auto backgroundGO = std::make_unique<GameObject>("GO_Background");
 	backgroundGO->AddComponent<Image>()->SetTexture(backgroundTexture);
 	scene.Add(std::move(backgroundGO));
+	
 
 	auto daeLogoGO = std::make_unique<GameObject>("GO_DaeLogo");
 	daeLogoGO->AddComponent<Image>()->SetTexture(daeTexture);
@@ -46,11 +49,10 @@ static void LoadScenes()
 		daeLogo->GetComponent<Transform>()->SetPosition({ windowSize.first / 2, windowSize.second / 2, 0.f });
 
 	auto font = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
-	font;
-	/*auto to = std::make_unique<ge::TextObject>("Programming 4 Assignment", font);
-	to->SetColor({ 255, 255, 0, 255 });
-	to->SetPosition(292, 20);
-	scene.Add(std::move(to));*/
+	
+	auto textGO = std::make_unique<GameObject>("GO_TextObject");
+	textGO->AddComponent<TextComponent>("AHAHA", font, SDL_Color{128, 0, 128, 255});
+	scene.Add(std::move(textGO));
 }
 
 int main(int, char* [])

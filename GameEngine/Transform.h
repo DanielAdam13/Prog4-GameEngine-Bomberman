@@ -3,12 +3,15 @@
 
 namespace ge
 {
-	class Transform : public Component
+	class Transform final : public Component
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Transform Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 1 };
+		static constexpr ComponentTypeID StaticTypeID{ 0 };
+
+		Transform();
+		Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale = { 1.f, 1.f, 1.f });
 
 		const glm::vec3& GetPosition() const { return m_Position; }
 		void SetPosition(float x, float y, float z = 0);
@@ -23,8 +26,8 @@ namespace ge
 		void SetScale(const glm::vec3& scale);
 
 	private:
-		glm::vec3 m_Position{};
-		glm::vec3 m_Rotation{};
-		glm::vec3 m_Scale{ 1.f, 1.f, 1.f };
+		glm::vec3 m_Position;
+		glm::vec3 m_Rotation;
+		glm::vec3 m_Scale;
 	};
 }

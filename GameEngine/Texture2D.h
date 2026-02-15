@@ -21,9 +21,10 @@ namespace ge
 
 		Texture2D(const Texture2D &) = delete;
 		Texture2D(Texture2D &&) = delete;
-		Texture2D & operator= (const Texture2D &) = delete;
-		Texture2D & operator= (const Texture2D &&) = delete;
+		Texture2D & operator= (const Texture2D&) = delete;
+		Texture2D & operator= (Texture2D&& other) noexcept;
+
 	private:
-		SDL_Texture* m_texture;
+		SDL_Texture* m_pTexture;
 	};
 }
