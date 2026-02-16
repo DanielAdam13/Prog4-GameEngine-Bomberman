@@ -43,7 +43,11 @@ Texture2D::Texture2D(SDL_Texture* texture)
 
 Texture2D::~Texture2D()
 {
-	SDL_DestroyTexture(m_pTexture);
+    if (m_pTexture)
+    {
+        SDL_DestroyTexture(m_pTexture);
+        m_pTexture = nullptr;
+    }
 }
 
 glm::vec2 Texture2D::GetSize() const

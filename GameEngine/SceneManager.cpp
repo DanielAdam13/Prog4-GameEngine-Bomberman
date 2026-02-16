@@ -5,7 +5,7 @@ using namespace ge;
 
 void SceneManager::Update()
 {
-	for(auto& scene : m_scenes)
+	for(auto& scene : m_Scenes)
 	{
 		scene->Update();
 	}
@@ -13,7 +13,7 @@ void SceneManager::Update()
 
 void SceneManager::Render()
 {
-	for (const auto& scene : m_scenes)
+	for (const auto& scene : m_Scenes)
 	{
 		scene->Render();
 	}
@@ -21,6 +21,6 @@ void SceneManager::Render()
 
 Scene& SceneManager::CreateScene()
 {
-	m_scenes.emplace_back(new Scene());
-	return *m_scenes.back();
+	m_Scenes.emplace_back(new Scene());
+	return *m_Scenes.back();
 }

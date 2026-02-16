@@ -50,11 +50,9 @@ static void LoadScenes()
 		auto daeImageComponent{ daeLogo->GetComponent<Image>() };
 		glm::vec2 imageSize{ daeImageComponent->GetTexture()->GetSize() };
 		daeLogo->GetComponent<Transform>()->SetPosition(
-			{ 
-			windowSize.first / 2 - imageSize.x / 2, 
+			{ windowSize.first / 2 - imageSize.x / 2, 
 			windowSize.second / 2 - imageSize.y / 2, 
-			0.f
-			});
+			0.f });
 	}
 		
 

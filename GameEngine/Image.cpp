@@ -3,11 +3,6 @@
 
 using namespace ge;
 
-Image::~Image()
-{
-	m_pTexture = nullptr;
-}
-
 void Image::RenderComponent(const glm::vec3 transformPos) const
 {
 	// Has to use Renderer Singleton

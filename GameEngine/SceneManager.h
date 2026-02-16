@@ -21,6 +21,6 @@ namespace ge
 		// For GetInstance()
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
-		std::vector<std::unique_ptr<Scene>> m_scenes{};
+		std::vector<std::unique_ptr<Scene>> m_Scenes{};
 	};
 }

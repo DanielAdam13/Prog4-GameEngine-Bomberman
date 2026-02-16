@@ -19,19 +19,19 @@ namespace ge
 		void RenderTexture(const Texture2D& texture, float x, float y) const;
 		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height) const;
 
-		SDL_Renderer* GetSDLRenderer() const { return m_renderer; };
+		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; };
 
-		const SDL_Color& GetBackgroundColor() const { return m_clearColor; }
-		void SetBackgroundColor(const SDL_Color& color) { m_clearColor = color; }
+		const SDL_Color& GetBackgroundColor() const { return m_ClearColor; }
+		void SetBackgroundColor(const SDL_Color& color) { m_ClearColor = color; }
 
 		std::pair<int, int> GetWindowSize() const;
 
 		void SetWindowSize(int w, int h);
 
 	private:
-		SDL_Renderer* m_renderer{};
-		SDL_Window* m_window{};
-		SDL_Color m_clearColor{};	
+		SDL_Renderer* m_Renderer{};
+		SDL_Window* m_Window{}; // Doesn't own
+		SDL_Color m_ClearColor{};	
 	
 	};
 }
