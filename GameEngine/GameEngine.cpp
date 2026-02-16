@@ -2,6 +2,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <thread>
+
 #if WIN32
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>
@@ -101,20 +103,37 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 {
 	engineStart();
 
+	constexpr auto targetFrameRate{ std::chrono::duration<float>(1.f / 60.f) };
+	m_LastTime = std::chrono::high_resolution_clock::now();
+
 	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
-	while (!m_quit)
+	while (!m_Quit)
 	{
-		RunOneFrame();
+		const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
+
+		const float deltaTime{ std::chrono::duration<float>(frameStartTime - m_LastTime).count() };
+		m_LastTime = frameStartTime;
+
+		RunOneFrame(deltaTime);
+
+		const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
+		const auto frameDuration{ frameEndTime - frameStartTime };
+
+		if (frameDuration < targetFrameRate)
+			std::this_thread::sleep_for(targetFrameRate - frameDuration);
+
+		//const auto threadSleepTime{ frameStartTime + frameDuration - std::chrono::high_resolution_clock::now() };
+		//std::this_thread::sleep_for(threadSleepTime);
 	}
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
 #endif
 }
 
-void GameEngine::RunOneFrame()
+void GameEngine::RunOneFrame(const float deltaTime)
 {
-	m_quit = !InputManager::GetInstance().ProcessInput();
-	SceneManager::GetInstance().Update();
+	m_Quit = !InputManager::GetInstance().ProcessInput();
+	SceneManager::GetInstance().Update(deltaTime);
 	Renderer::GetInstance().Render();
 }

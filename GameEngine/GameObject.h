@@ -19,10 +19,10 @@ namespace ge
 		GameObject& operator=(const GameObject& other) = delete;
 		GameObject& operator=(GameObject&& other) = delete;
 		
-		void Update();
+		void Update(float deltaTime);
 		void Render() const;
 
-		// Args for passing constructors on component adding
+		// Args for passing constructors on component addition
 		template<typename T, typename... Args>
 		T* AddComponent(Args&&... args)
 		{
@@ -31,12 +31,12 @@ namespace ge
 			if (m_Components[id] != nullptr) // Early out component if already existing
 				return static_cast<T*> (m_Components[id].get());
 			
-			auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
+			// --- Custom Component constructors are executed ONLY if component doesn't exist already ---
+			auto newComponent{ std::make_unique<T>(std::forward<Args>(args)...) }; // forwarding reference
 
 			T* storedRawPtr{ newComponent.get() };
 
-			// --- Custom Component constructors are executed ONLY if component doesn't exist already ---
-			m_Components[id] = std::move(newComponent); // forwarding reference
+			m_Components[id] = std::move(newComponent); 
 			return storedRawPtr;
 		}
 

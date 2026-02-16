@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <filesystem>
+#include <chrono>
 
 namespace ge
 {
@@ -11,7 +12,7 @@ namespace ge
 		explicit GameEngine(const std::filesystem::path& dataPath);
 		~GameEngine();
 		void Run(const std::function<void()>& load);
-		void RunOneFrame();
+		void RunOneFrame(const float deltaTime);
 
 		GameEngine(const GameEngine& other) = delete;
 		GameEngine(GameEngine&& other) = delete;
@@ -19,7 +20,8 @@ namespace ge
 		GameEngine& operator=(GameEngine&& other) = delete;
 
 	private:
-		bool m_quit{ false };
-	
+		bool m_Quit{ false };
+		
+		std::chrono::steady_clock::time_point m_LastTime{};
 	};
 }

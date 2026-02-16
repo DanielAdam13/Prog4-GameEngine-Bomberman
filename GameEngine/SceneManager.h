@@ -14,7 +14,7 @@ namespace ge
 	public:
 		Scene& CreateScene();
 
-		void Update();
+		void Update(float deltaTime);
 		void Render();
 
 	private:
