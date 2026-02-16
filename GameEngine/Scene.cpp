@@ -6,29 +6,29 @@ using namespace ge;
 void Scene::Add(std::unique_ptr<GameObject> object)
 {
 	assert(object != nullptr && "Cannot add a null GameObject to the scene.");
-	m_objects.push_back(std::move(object));
+	m_Objects.push_back(std::move(object));
 }
 
 void Scene::Remove(const GameObject& object)
 {
-	m_objects.erase(
+	m_Objects.erase(
 		std::remove_if(
-			m_objects.begin(),
-			m_objects.end(),
+			m_Objects.begin(),
+			m_Objects.end(),
 			[&object](const auto& ptr) { return ptr.get() == &object; }
 		),
-		m_objects.end()
+		m_Objects.end()
 	);
 }
 
 void Scene::RemoveAll()
 {
-	m_objects.clear();
+	m_Objects.clear();
 }
 
 void Scene::Update()
 {
-	for(auto& object : m_objects)
+	for(auto& object : m_Objects)
 	{
 		object->Update();
 	}
@@ -36,7 +36,7 @@ void Scene::Update()
 
 void Scene::Render() const
 {
-	for (const auto& object : m_objects)
+	for (const auto& object : m_Objects)
 	{
 		object->Render();
 	}
@@ -44,12 +44,12 @@ void Scene::Render() const
 
 GameObject* ge::Scene::FindObjectByName(const std::string& goName) const
 {
-	auto objId{ std::find_if(m_objects.begin(), m_objects.end(), [&goName](const std::unique_ptr<GameObject>& obj) 
+	auto objId{ std::find_if(m_Objects.begin(), m_Objects.end(), [&goName](const std::unique_ptr<GameObject>& obj) 
 		{
 			return obj->GetName() == goName;
 		}) };
 
-	if (objId != m_objects.end())
+	if (objId != m_Objects.end())
 	{
 		return objId->get();
 	}

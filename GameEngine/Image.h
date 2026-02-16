@@ -13,7 +13,7 @@ namespace ge
 		static constexpr ComponentTypeID StaticTypeID{ 1 };
 
 		Image() = default;
-		virtual ~Image() override;
+		virtual ~Image() override = default;
 
 		// Texture is renderer INSIDE an individual Image component
 		virtual void RenderComponent(const glm::vec3 transformPos) const override;

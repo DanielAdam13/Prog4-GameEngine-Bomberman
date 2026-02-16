@@ -19,7 +19,7 @@ using namespace ge;
 #include "InputManager.h"
 #include "SceneManager.h"
 
-SDL_Window* g_window{};
+SDL_Window* g_Window{};
 
 void LogSDLVersion(const std::string& message, int major, int minor, int patch)
 {
@@ -71,13 +71,13 @@ GameEngine::GameEngine(const std::filesystem::path& dataPath)
 	// ---------------------------
 	// SDL Window Creation
 	// ----------------------------
-	g_window = SDL_CreateWindow(
+	g_Window = SDL_CreateWindow(
 		"GameObject/Component Assignment Week 1",
 		1024,
 		576,
 		SDL_WINDOW_OPENGL
 	);
-	if (g_window == nullptr)
+	if (g_Window == nullptr)
 	{
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
@@ -85,15 +85,15 @@ GameEngine::GameEngine(const std::filesystem::path& dataPath)
 	// ---------------------------
 	// Resource Managerr Initialization
 	// ----------------------------
-	Renderer::GetInstance().Init(g_window);
+	Renderer::GetInstance().Init(g_Window);
 	ResourceManager::GetInstance().Init(dataPath);
 }
 
 GameEngine::~GameEngine()
 {
 	Renderer::GetInstance().Destroy();
-	SDL_DestroyWindow(g_window);
-	g_window = nullptr;
+	SDL_DestroyWindow(g_Window);
+	g_Window = nullptr;
 	SDL_Quit();
 }
 

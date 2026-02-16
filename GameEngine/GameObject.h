@@ -29,28 +29,32 @@ namespace ge
 			constexpr ComponentTypeID id{ T::StaticTypeID };
 
 			if (m_Components[id] != nullptr) // Early out component if already existing
-				return static_cast<T*> (m_Components[id]);
+				return static_cast<T*> (m_Components[id].get());
 			
+			auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
+
+			T* storedRawPtr{ newComponent.get() };
+
 			// --- Custom Component constructors are executed ONLY if component doesn't exist already ---
-			m_Components[id] = new T(std::forward<Args>(args)...); // forwarding reference
-			return static_cast<T*> (m_Components[id]);
+			m_Components[id] = std::move(newComponent); // forwarding reference
+			return storedRawPtr;
 		}
 
 		template<typename T>
 		T* GetComponent() const
 		{
-			return static_cast<T*>(m_Components[T::StaticTypeID]);
+			return static_cast<T*>(m_Components[T::StaticTypeID].get());
 		}
 
 		const std::string GetName() const { return m_GameObjectName; }
 
 	private:
-		Transform* m_Transform;
+		Transform* m_pTransform;
 
 		// Main way to identify a game object
 		const std::string m_GameObjectName;
 
-		std::array<Component*, MAX_GO_COMPONENTS> m_Components{};
+		std::array<std::unique_ptr<Component>, MAX_GO_COMPONENTS> m_Components{};
 
 	};
 }

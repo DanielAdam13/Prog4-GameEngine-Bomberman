@@ -11,9 +11,9 @@ using namespace ge;
 
 TextComponent::TextComponent(const std::string& text, Font* font, const SDL_Color& color)
 	:m_Text{ text },
-	m_TextFont{ font },
+	m_pTextFont{ font },
 	m_TextColor{ color },
-	m_pTextTexture{ nullptr },
+	m_TextTexture{ nullptr },
 	m_ShouldUpdate{ true }
 {
 }
@@ -22,7 +22,7 @@ void TextComponent::UpdateComponent()
 {
 	if (m_ShouldUpdate)
 	{
-		const auto textSurface = TTF_RenderText_Blended(m_TextFont->GetFont(), m_Text.c_str(), m_Text.length(), m_TextColor);
+		const auto textSurface = TTF_RenderText_Blended(m_pTextFont->GetFont(), m_Text.c_str(), m_Text.length(), m_TextColor);
 		if (textSurface == nullptr)
 		{
 			throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
@@ -37,13 +37,13 @@ void TextComponent::UpdateComponent()
 		SDL_DestroySurface(textSurface);
 
 		// Assign a new SDL Texture via the Texture2D wrapper
-		if (!m_pTextTexture)
+		if (!m_TextTexture)
 		{
-			m_pTextTexture = std::make_unique<Texture2D>(texture);
+			m_TextTexture = std::make_unique<Texture2D>(texture);
 		}
 		else
 		{
-			*m_pTextTexture = Texture2D(texture); // Move assingment
+			*m_TextTexture = Texture2D(texture); // Move assingment
 		}
 
 		m_ShouldUpdate = false;
@@ -52,9 +52,9 @@ void TextComponent::UpdateComponent()
 
 void TextComponent::RenderComponent(const glm::vec3 transformPos) const
 {
-	if (m_pTextTexture != nullptr)
+	if (m_TextTexture != nullptr)
 	{
-		Renderer::GetInstance().RenderTexture(*m_pTextTexture.get(), transformPos.x, transformPos.y);
+		Renderer::GetInstance().RenderTexture(*m_TextTexture.get(), transformPos.x, transformPos.y);
 	}
 }
 

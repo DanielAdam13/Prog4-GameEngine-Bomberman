@@ -17,7 +17,7 @@ namespace ge
 		static constexpr ComponentTypeID StaticTypeID{ 2 };
 
 		TextComponent(const std::string& text, Font* font, const SDL_Color& color = { 255, 255, 255, 255 });
-		virtual ~TextComponent() = default;
+		virtual ~TextComponent() override = default;
 		TextComponent(const TextComponent& other) = delete;
 		TextComponent(TextComponent&& other) = delete;
 		TextComponent& operator=(const TextComponent& other) = delete;
@@ -32,11 +32,11 @@ namespace ge
 
 	private:
 		std::string m_Text;
-		Font* m_TextFont; // Doesn't own
+		Font* m_pTextFont; // Doesn't own
 		SDL_Color m_TextColor;
 
 		// A Text Component OWNS the generated texture since it is unique for the object => ResourceManager doesn't own it
-		std::unique_ptr<Texture2D> m_pTextTexture;
+		std::unique_ptr<Texture2D> m_TextTexture;
 
 		bool m_ShouldUpdate{ true };
 	};
