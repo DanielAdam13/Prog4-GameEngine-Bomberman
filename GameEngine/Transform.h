@@ -13,6 +13,10 @@ namespace ge
 		Transform();
 		Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale = { 1.f, 1.f, 1.f });
 
+		virtual void FixedUpdateComponent(float) override {};
+		virtual void UpdateComponent(float) override {};
+		virtual void RenderComponent(const glm::vec3&) const override {};
+
 		const glm::vec3& GetPosition() const noexcept { return m_Position; }
 		void SetPosition(float x, float y, float z = 0);
 		void SetPosition(const glm::vec3& position);

@@ -18,9 +18,9 @@ namespace ge
 		Component& operator=(const Component& other) = delete;
 		Component& operator=(Component&& other) = delete;
 
-		// Every Component CAN override if they need:
-		virtual void FixedUpdateComponent(float) {};
-		virtual void UpdateComponent(float) {};
-		virtual void RenderComponent(const glm::vec3&) const {};
+		// Every Component HAS to override:
+		virtual void FixedUpdateComponent(float) = 0;
+		virtual void UpdateComponent(float) = 0;
+		virtual void RenderComponent(const glm::vec3&) const = 0;
 	};
 }
