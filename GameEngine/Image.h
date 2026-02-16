@@ -16,10 +16,10 @@ namespace ge
 		virtual ~Image() override = default;
 
 		// Texture is renderer INSIDE an individual Image component
-		virtual void RenderComponent(const glm::vec3 transformPos) const override;
+		virtual void RenderComponent(const glm::vec3& transformPos) const override;
 
 		void SetTexture(Texture2D* textureRef);
-		Texture2D* GetTexture() const { return m_pTexture; }
+		Texture2D* GetTexture() const noexcept { return m_pTexture; }
 
 	private:
 		Texture2D* m_pTexture{ nullptr }; // Doesn't own

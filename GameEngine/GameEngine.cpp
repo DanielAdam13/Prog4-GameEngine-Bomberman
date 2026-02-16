@@ -58,6 +58,9 @@ void PrintSDLVersion()
 }
 
 GameEngine::GameEngine(const std::filesystem::path& dataPath)
+	: m_Quit{ false },
+	m_FixedTimeStep{ 0.02f },
+	m_CurrentFPS{ 0.f }
 {
 	PrintSDLVersion();
 
@@ -104,7 +107,11 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 	engineStart();
 
 	constexpr auto targetFrameRate{ std::chrono::duration<float>(1.f / 60.f) };
-	m_LastTime = std::chrono::high_resolution_clock::now();
+	auto lastTime{ std::chrono::high_resolution_clock::now() };
+
+	float lag{ 0.f };
+	float fpsTimer{ 0.f };
+	int frameCount{ 0 };
 
 	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
@@ -112,28 +119,49 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 	{
 		const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
 
-		const float deltaTime{ std::chrono::duration<float>(frameStartTime - m_LastTime).count() };
-		m_LastTime = frameStartTime;
+		const float deltaTime{ std::chrono::duration<float>(frameStartTime - lastTime).count() };
+		lastTime = frameStartTime;
 
-		RunOneFrame(deltaTime);
+		RunOneFrame(deltaTime, lag);
+
+		ComputeFPS(deltaTime, fpsTimer, frameCount);
 
 		const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
 		const auto frameDuration{ frameEndTime - frameStartTime };
 
 		if (frameDuration < targetFrameRate)
 			std::this_thread::sleep_for(targetFrameRate - frameDuration);
-
-		//const auto threadSleepTime{ frameStartTime + frameDuration - std::chrono::high_resolution_clock::now() };
-		//std::this_thread::sleep_for(threadSleepTime);
 	}
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
 #endif
 }
 
-void GameEngine::RunOneFrame(const float deltaTime)
+void GameEngine::RunOneFrame(const float deltaTime, float& lag)
 {
 	m_Quit = !InputManager::GetInstance().ProcessInput();
+
+	lag += deltaTime;
+	while (lag >= m_FixedTimeStep)
+	{
+		SceneManager::GetInstance().FixedUpdate(m_FixedTimeStep);
+		lag -= m_FixedTimeStep;
+	}
+
 	SceneManager::GetInstance().Update(deltaTime);
 	Renderer::GetInstance().Render();
+}
+
+void GameEngine::ComputeFPS(float deltaTime, float& fpsTimer, int& frameCount)
+{
+	fpsTimer += deltaTime;
+	++frameCount;
+
+	if (fpsTimer >= 1.f)
+	{
+		m_CurrentFPS = static_cast<float>(frameCount) / fpsTimer;
+
+		frameCount = 0;
+		fpsTimer = 0.f;
+	}
 }

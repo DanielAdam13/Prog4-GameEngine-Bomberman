@@ -14,6 +14,7 @@ namespace ge
 	public:
 		Scene& CreateScene();
 
+		void FixedUpdate(const float fixedTimeStep);
 		void Update(float deltaTime);
 		void Render();
 

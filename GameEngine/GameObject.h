@@ -19,6 +19,7 @@ namespace ge
 		GameObject& operator=(const GameObject& other) = delete;
 		GameObject& operator=(GameObject&& other) = delete;
 		
+		void FixedUpdate(float fixedTimeStep);
 		void Update(float deltaTime);
 		void Render() const;
 

@@ -13,6 +13,7 @@ namespace ge
 		void Remove(const GameObject& object);
 		void RemoveAll();
 
+		void FixedUpdate(float fixedTimeStep);
 		void Update(float deltaTime);
 		void Render() const;
 

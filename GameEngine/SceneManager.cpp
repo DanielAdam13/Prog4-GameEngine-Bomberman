@@ -3,6 +3,14 @@
 
 using namespace ge;
 
+void SceneManager::FixedUpdate(const float fixedTimeStep)
+{
+	for (auto& scene : m_Scenes)
+	{
+		scene->FixedUpdate(fixedTimeStep);
+	}
+}
+
 void SceneManager::Update(float deltaTime)
 {
 	for(auto& scene : m_Scenes)

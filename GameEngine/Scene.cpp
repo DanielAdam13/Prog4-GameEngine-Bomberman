@@ -26,6 +26,14 @@ void Scene::RemoveAll()
 	m_Objects.clear();
 }
 
+void Scene::FixedUpdate(float fixedTimeStep)
+{
+	for (auto& object : m_Objects)
+	{
+		object->FixedUpdate(fixedTimeStep);
+	}
+}
+
 void Scene::Update(float deltaTime)
 {
 	for(auto& object : m_Objects)

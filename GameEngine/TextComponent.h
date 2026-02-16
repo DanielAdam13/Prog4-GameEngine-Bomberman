@@ -23,9 +23,9 @@ namespace ge
 		TextComponent& operator=(const TextComponent& other) = delete;
 		TextComponent& operator=(TextComponent&& other) = delete;
 
-		// Needs to override both
-		virtual void UpdateComponent() override;
-		virtual void RenderComponent(const glm::vec3 transformPos) const override;
+		// Needs to override Update and Renderer
+		virtual void UpdateComponent(float) override;
+		virtual void RenderComponent(const glm::vec3& transformPos) const override;
 
 		void SetText(const std::string& text);
 		void SetColor(const SDL_Color& color);
