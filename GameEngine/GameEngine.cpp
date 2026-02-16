@@ -2,6 +2,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <thread>
+
 #if WIN32
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>
@@ -18,6 +20,8 @@ using namespace ge;
 #include "ResourceManager.h"
 #include "InputManager.h"
 #include "SceneManager.h"
+
+#include "TextComponent.h"
 
 SDL_Window* g_Window{};
 
@@ -55,7 +59,7 @@ void PrintSDLVersion()
 	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version), SDL_VERSIONNUM_MICRO(version));
 }
 
-GameEngine::GameEngine(const std::filesystem::path& dataPath)
+void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
 
@@ -101,20 +105,64 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 {
 	engineStart();
 
+	constexpr auto targetFrameRate{ std::chrono::duration<float>(1.f / 60.f) };
+	auto lastTime{ std::chrono::high_resolution_clock::now() };
+
+	float lag{ 0.f };
+	float fpsTimer{ 0.f };
+	int frameCount{ 0 };
+
 	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
-	while (!m_quit)
+	while (!m_Quit)
 	{
-		RunOneFrame();
+		const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
+
+		const float deltaTime{ std::chrono::duration<float>(frameStartTime - lastTime).count() };
+		lastTime = frameStartTime;
+
+		RunOneFrame(deltaTime, lag);
+
+		ComputeFPS(deltaTime, fpsTimer, frameCount);
+
+		const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
+		const auto frameDuration{ frameEndTime - frameStartTime };
+
+		if (frameDuration < targetFrameRate)
+			std::this_thread::sleep_for(targetFrameRate - frameDuration);
 	}
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
 #endif
 }
 
-void GameEngine::RunOneFrame()
+void GameEngine::RunOneFrame(const float deltaTime, float& lag)
 {
-	m_quit = !InputManager::GetInstance().ProcessInput();
-	SceneManager::GetInstance().Update();
+	m_Quit = !InputManager::GetInstance().ProcessInput();
+
+	lag += deltaTime;
+	while (lag >= m_FixedTimeStep)
+	{
+		SceneManager::GetInstance().FixedUpdate(m_FixedTimeStep);
+		lag -= m_FixedTimeStep;
+	}
+
+	SceneManager::GetInstance().Update(deltaTime);
+	SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject")->GetComponent<TextComponent>()->SetText(std::to_string(m_CurrentFPS));
+
 	Renderer::GetInstance().Render();
+}
+
+void GameEngine::ComputeFPS(float deltaTime, float& fpsTimer, int& frameCount)
+{
+	fpsTimer += deltaTime;
+	++frameCount;
+
+	if (fpsTimer >= 1.f)
+	{
+		m_CurrentFPS = static_cast<float>(frameCount) / fpsTimer;
+
+		frameCount = 0;
+		fpsTimer = 0.f;
+	}
 }

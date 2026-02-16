@@ -3,11 +3,19 @@
 
 using namespace ge;
 
-void SceneManager::Update()
+void SceneManager::FixedUpdate(const float fixedTimeStep)
+{
+	for (auto& scene : m_Scenes)
+	{
+		scene->FixedUpdate(fixedTimeStep);
+	}
+}
+
+void SceneManager::Update(float deltaTime)
 {
 	for(auto& scene : m_Scenes)
 	{
-		scene->Update();
+		scene->Update(deltaTime);
 	}
 }
 
@@ -17,6 +25,12 @@ void SceneManager::Render()
 	{
 		scene->Render();
 	}
+}
+
+Scene* SceneManager::GetCurrentScene() const
+{
+	// Will change in the future
+	return m_Scenes[0].get();
 }
 
 Scene& SceneManager::CreateScene()

@@ -18,7 +18,7 @@ TextComponent::TextComponent(const std::string& text, Font* font, const SDL_Colo
 {
 }
 
-void TextComponent::UpdateComponent()
+void TextComponent::UpdateComponent(float)
 {
 	if (m_ShouldUpdate)
 	{
@@ -50,7 +50,7 @@ void TextComponent::UpdateComponent()
 	}
 }
 
-void TextComponent::RenderComponent(const glm::vec3 transformPos) const
+void TextComponent::RenderComponent(const glm::vec3& transformPos) const
 {
 	if (m_TextTexture != nullptr)
 	{

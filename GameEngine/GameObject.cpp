@@ -16,17 +16,24 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::Update() 
+void GameObject::FixedUpdate(float fixedTimeStep)
 {
-	// Update Transform Seperately
-	//m_pTransform->SetPosition({ m_pTransform->GetPosition().x + 1.f, 0.f, 0.f});
-
-	// Update ALL components except Transform
 	for (const auto& comp : m_Components)
 	{
-		if (comp && comp.get() != m_pTransform)
+		if (comp)
 		{
-			comp->UpdateComponent();
+			comp->FixedUpdateComponent(fixedTimeStep);
+		}
+	}
+}
+
+void GameObject::Update(float deltaTime)
+{
+	for (const auto& comp : m_Components)
+	{
+		if (comp)
+		{
+			comp->UpdateComponent(deltaTime);
 		}
 	}
 }

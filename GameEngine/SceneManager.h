@@ -14,8 +14,11 @@ namespace ge
 	public:
 		Scene& CreateScene();
 
-		void Update();
+		void FixedUpdate(const float fixedTimeStep);
+		void Update(float deltaTime);
 		void Render();
+
+		Scene* GetCurrentScene() const;
 
 	private:
 		// For GetInstance()

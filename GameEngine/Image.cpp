@@ -3,7 +3,7 @@
 
 using namespace ge;
 
-void Image::RenderComponent(const glm::vec3 transformPos) const
+void Image::RenderComponent(const glm::vec3& transformPos) const
 {
 	// Has to use Renderer Singleton
 	Renderer::GetInstance().RenderTexture(*this->GetTexture(), transformPos.x, transformPos.y);
