@@ -27,6 +27,12 @@ void SceneManager::Render()
 	}
 }
 
+Scene* SceneManager::GetCurrentScene() const
+{
+	// Will change in the future
+	return m_Scenes[0].get();
+}
+
 Scene& SceneManager::CreateScene()
 {
 	m_Scenes.emplace_back(new Scene());

@@ -54,12 +54,11 @@ static void LoadScenes()
 			windowSize.second / 2 - imageSize.y / 2, 
 			0.f });
 	}
-		
 
-	auto font = ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 36) };
 	
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
-	textGO->AddComponent<TextComponent>("AHAHA", font, SDL_Color{128, 0, 128, 255});
+	textGO->AddComponent<TextComponent>(std::to_string(GameEngine::GetInstance().GetFPS()), font, SDL_Color{128, 0, 128, 255});
 	scene.Add(std::move(textGO));
 }
 
@@ -72,8 +71,16 @@ int main(int, char* [])
 	if (!fs::exists(data_location))
 		data_location = "../resources/";
 #endif
-	GameEngine engine(data_location);
-	engine.Run(LoadScenes);
+	GameEngine::GetInstance().InitializeEngine(data_location);
+	GameEngine::GetInstance().Run(LoadScenes);
 	return 0;
 }
+
+//void UpdateGame(float deltaTime)
+//{
+//	auto fpsText{ SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject") };
+//	fpsText->GetComponent<TextComponent>()->SetText(std::to_string(GameEngine::GetInstance().GetFPS()));
+//	
+//	fpsText->GetComponent<Transform>()->SetPosition(fpsText->GetComponent<Transform>()->GetPosition() + glm::vec3{ 20.f, 0.f, 0.f } * deltaTime);
+//}
 

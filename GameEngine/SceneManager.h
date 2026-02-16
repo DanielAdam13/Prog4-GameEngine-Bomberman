@@ -18,6 +18,8 @@ namespace ge
 		void Update(float deltaTime);
 		void Render();
 
+		Scene* GetCurrentScene() const;
+
 	private:
 		// For GetInstance()
 		friend class Singleton<SceneManager>;

@@ -21,6 +21,8 @@ using namespace ge;
 #include "InputManager.h"
 #include "SceneManager.h"
 
+#include "TextComponent.h"
+
 SDL_Window* g_Window{};
 
 void LogSDLVersion(const std::string& message, int major, int minor, int patch)
@@ -57,10 +59,7 @@ void PrintSDLVersion()
 	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version), SDL_VERSIONNUM_MICRO(version));
 }
 
-GameEngine::GameEngine(const std::filesystem::path& dataPath)
-	: m_Quit{ false },
-	m_FixedTimeStep{ 0.02f },
-	m_CurrentFPS{ 0.f }
+void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
 
@@ -149,6 +148,8 @@ void GameEngine::RunOneFrame(const float deltaTime, float& lag)
 	}
 
 	SceneManager::GetInstance().Update(deltaTime);
+	SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject")->GetComponent<TextComponent>()->SetText(std::to_string(m_CurrentFPS));
+
 	Renderer::GetInstance().Render();
 }
 

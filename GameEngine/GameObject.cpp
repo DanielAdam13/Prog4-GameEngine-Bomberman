@@ -31,7 +31,7 @@ void GameObject::FixedUpdate(float fixedTimeStep)
 void GameObject::Update(float deltaTime)
 {
 	// Update Transform Seperately
-	m_pTransform->SetPosition(m_pTransform->GetPosition() + glm::vec3{20.f, 0.f, 0.f} * deltaTime);
+	//m_pTransform->SetPosition(m_pTransform->GetPosition() + glm::vec3{20.f, 0.f, 0.f} * deltaTime);
 
 	// Update ALL components except Transform
 	for (const auto& comp : m_Components)

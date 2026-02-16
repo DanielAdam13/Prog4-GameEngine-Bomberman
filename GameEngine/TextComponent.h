@@ -30,6 +30,8 @@ namespace ge
 		void SetText(const std::string& text);
 		void SetColor(const SDL_Color& color);
 
+		Font* GetFont() const { return m_pTextFont; }
+
 	private:
 		std::string m_Text;
 		Font* m_pTextFont; // Doesn't own
