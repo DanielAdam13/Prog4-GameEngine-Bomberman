@@ -21,7 +21,7 @@ namespace ge
 		GameEngine& operator=(const GameEngine& other) = delete;
 		GameEngine& operator=(GameEngine&& other) = delete;
 
-		const float GetFPS() const noexcept { return m_CurrentFPS; }
+		float GetFPS() const noexcept { return m_CurrentFPS; }
 
 	private:
 		GameEngine() = default;

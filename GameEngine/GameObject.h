@@ -37,6 +37,9 @@ namespace ge
 
 			T* storedRawPtr{ newComponent.get() };
 
+			// Assign owner pointer reference to every component
+			storedRawPtr->SetOwner(this);
+
 			m_Components[id] = std::move(newComponent); 
 			return storedRawPtr;
 		}
