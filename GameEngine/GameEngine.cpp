@@ -105,14 +105,14 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 {
 	engineStart();
 
+	// MAIN GAME LOOP
+#ifndef __EMSCRIPTEN__
 	// Local for Run
 	constexpr auto targetFrameRate{ std::chrono::duration<float>(1.f / 60.f) };
 	auto lastTime{ std::chrono::high_resolution_clock::now() };
 	float fpsTimer{ 0.f };
 	int frameCount{ 0 };
 
-	// MAIN GAME LOOP
-#ifndef __EMSCRIPTEN__
 	while (!m_Quit)
 	{
 		const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
