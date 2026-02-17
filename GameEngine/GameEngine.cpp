@@ -105,10 +105,9 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 {
 	engineStart();
 
+	// Local for Run
 	constexpr auto targetFrameRate{ std::chrono::duration<float>(1.f / 60.f) };
 	auto lastTime{ std::chrono::high_resolution_clock::now() };
-
-	float lag{ 0.f };
 	float fpsTimer{ 0.f };
 	int frameCount{ 0 };
 
@@ -118,12 +117,12 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 	{
 		const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
 
-		const float deltaTime{ std::chrono::duration<float>(frameStartTime - lastTime).count() };
+		m_DeltaTime = std::chrono::duration<float>(frameStartTime - lastTime).count();
 		lastTime = frameStartTime;
 
-		RunOneFrame(deltaTime, lag);
+		RunOneFrame();
 
-		ComputeFPS(deltaTime, fpsTimer, frameCount);
+		ComputeFPS(fpsTimer, frameCount);
 
 		const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
 		const auto frameDuration{ frameEndTime - frameStartTime };
@@ -136,18 +135,18 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 #endif
 }
 
-void GameEngine::RunOneFrame(const float deltaTime, float& lag)
+void GameEngine::RunOneFrame()
 {
 	m_Quit = !InputManager::GetInstance().ProcessInput();
 
-	lag += deltaTime;
-	while (lag >= m_FixedTimeStep)
+	m_FrameLag += m_DeltaTime;
+	while (m_FrameLag >= m_FixedTimeStep)
 	{
 		SceneManager::GetInstance().FixedUpdate(m_FixedTimeStep);
-		lag -= m_FixedTimeStep;
+		m_FrameLag -= m_FixedTimeStep;
 	}
 
-	SceneManager::GetInstance().Update(deltaTime);
+	SceneManager::GetInstance().Update(m_DeltaTime);
 
 	// wow!
 	/*SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject")->
@@ -156,9 +155,9 @@ void GameEngine::RunOneFrame(const float deltaTime, float& lag)
 	Renderer::GetInstance().Render();
 }
 
-void GameEngine::ComputeFPS(float deltaTime, float& fpsTimer, int& frameCount)
+void GameEngine::ComputeFPS(float& fpsTimer, int& frameCount)
 {
-	fpsTimer += deltaTime;
+	fpsTimer += m_DeltaTime;
 	++frameCount;
 
 	if (fpsTimer >= 1.f)
