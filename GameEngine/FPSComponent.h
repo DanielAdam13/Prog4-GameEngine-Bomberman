@@ -12,7 +12,7 @@ namespace ge
 		// Every Image Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 3 };
 
-		FPSComponent();
+		FPSComponent() = default;
 		~FPSComponent() override = default;
 
 		FPSComponent(const FPSComponent& other) = delete;
@@ -25,8 +25,8 @@ namespace ge
 		virtual void RenderComponent(const glm::vec3&) const override {};
 
 	private:
-		TextComponent* m_pTextComponent;
-		float m_ChangeTimer;
+		TextComponent* m_pTextComponent{ nullptr };
+		float m_ChangeTimer{ 0.f };
 
 		static constexpr float ChangeInterval{ 0.25f };
 	};

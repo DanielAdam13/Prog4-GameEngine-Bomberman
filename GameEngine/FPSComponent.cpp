@@ -3,13 +3,9 @@
 #include "GameEngine.h"
 #include "TextComponent.h"
 
-using namespace ge;
+#include <format>
 
-FPSComponent::FPSComponent()
-	:m_pTextComponent{ nullptr },
-	m_ChangeTimer{ 0.f }
-{
-}
+using namespace ge;
 
 void FPSComponent::UpdateComponent(float deltaTime)
 {
@@ -21,8 +17,11 @@ void FPSComponent::UpdateComponent(float deltaTime)
 	{
 		const float fps{ GameEngine::GetInstance().GetFPS() };
 
-		// Guard against nullptr TextComponent (GameObject doesn't have TextComponent)
+		// Guard against nullptr TextComponent (if GameObject doesn't have TextComponent)
 		if (m_pTextComponent)
-			m_pTextComponent->SetText("FPS: " + std::to_string(fps));
+		{
+			m_pTextComponent->SetText(std::format("{:.2f} FPS", fps));
+		}
+			
 	}
 }

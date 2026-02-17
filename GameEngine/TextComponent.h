@@ -34,6 +34,8 @@ namespace ge
 
 		Font* GetFont() const { return m_pTextFont; }
 
+		glm::vec2 GetTextureSize() const noexcept;
+
 	private:
 		std::string m_Text;
 		Font* m_pTextFont; // Doesn't own
@@ -41,6 +43,8 @@ namespace ge
 
 		// A Text Component OWNS the generated texture since it is unique for the object => ResourceManager doesn't own it
 		std::unique_ptr<Texture2D> m_TextTexture;
+
+		void UpdateTextureForText();
 
 		bool m_ShouldUpdate{ true };
 	};
