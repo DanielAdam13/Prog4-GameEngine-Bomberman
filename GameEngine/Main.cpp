@@ -15,12 +15,13 @@ namespace fs = std::filesystem;
 #include "SceneManager.h"
 #include "GameObject.h"
 #include "Scene.h"
-#include "Image.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
-#include "Transform.h"
 
+#include "Image.h"
+#include "Transform.h"
 #include "TextComponent.h"
+#include "FPSComponent.h"
 
 using namespace ge;
 
@@ -58,7 +59,8 @@ static void LoadScenes()
 	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 36) };
 	
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
-	textGO->AddComponent<TextComponent>(std::to_string(GameEngine::GetInstance().GetFPS()), font, SDL_Color{128, 0, 128, 255});
+	textGO->AddComponent<TextComponent>("FPS: 0", font, SDL_Color{128, 0, 128, 255});
+	textGO->AddComponent<FPSComponent>();
 	scene.Add(std::move(textGO));
 }
 

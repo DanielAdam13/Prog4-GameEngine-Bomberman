@@ -18,6 +18,7 @@ namespace ge
 
 		TextComponent(const std::string& text, Font* font, const SDL_Color& color = { 255, 255, 255, 255 });
 		virtual ~TextComponent() override = default;
+
 		TextComponent(const TextComponent& other) = delete;
 		TextComponent(TextComponent&& other) = delete;
 		TextComponent& operator=(const TextComponent& other) = delete;
