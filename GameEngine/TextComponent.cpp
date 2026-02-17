@@ -16,35 +16,14 @@ TextComponent::TextComponent(const std::string& text, Font* font, const SDL_Colo
 	m_TextTexture{ nullptr },
 	m_ShouldUpdate{ true }
 {
+	UpdateTextureForText();
 }
 
 void TextComponent::UpdateComponent(float)
 {
 	if (m_ShouldUpdate)
 	{
-		const auto textSurface = TTF_RenderText_Blended(m_pTextFont->GetFont(), m_Text.c_str(), m_Text.length(), m_TextColor);
-		if (textSurface == nullptr)
-		{
-			throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
-		}
-
-		// Create Resource in Renderer
-		auto texture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), textSurface);
-		if (texture == nullptr)
-		{
-			throw std::runtime_error(std::string("Create text texture from textSurface failed: ") + SDL_GetError());
-		}
-		SDL_DestroySurface(textSurface);
-
-		// Assign a new SDL Texture via the Texture2D wrapper
-		if (!m_TextTexture)
-		{
-			m_TextTexture = std::make_unique<Texture2D>(texture);
-		}
-		else
-		{
-			*m_TextTexture = Texture2D(texture); // Move assingment
-		}
+		UpdateTextureForText();
 
 		m_ShouldUpdate = false;
 	}
@@ -68,4 +47,34 @@ void TextComponent::SetColor(const SDL_Color& color)
 {
 	m_TextColor = color;
 	m_ShouldUpdate = true;
+}
+
+glm::vec2 TextComponent::GetTextureSize() const noexcept
+{
+	return m_TextTexture.get()->GetSize();
+}
+
+void TextComponent::UpdateTextureForText()
+{
+	const auto textSurface = TTF_RenderText_Blended(m_pTextFont->GetFont(), m_Text.c_str(), m_Text.length(), m_TextColor);
+	if (textSurface == nullptr)
+		throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
+
+	// Create Resource in Renderer
+	auto texture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), textSurface);
+	if (texture == nullptr)
+	{
+		throw std::runtime_error(std::string("Create text texture from textSurface failed: ") + SDL_GetError());
+	}
+	SDL_DestroySurface(textSurface);
+
+	// Assign a new SDL Texture via the Texture2D wrapper
+	if (!m_TextTexture)
+	{
+		m_TextTexture = std::make_unique<Texture2D>(texture);
+	}
+	else
+	{
+		*m_TextTexture = Texture2D(texture); // Move assingment
+	}
 }

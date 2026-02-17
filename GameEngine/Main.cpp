@@ -57,11 +57,20 @@ static void LoadScenes()
 	}
 
 	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 36) };
+	constexpr SDL_Color color{ SDL_Color{128, 128, 128, 255} };
 	
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
-	textGO->AddComponent<TextComponent>("FPS: 0", font, SDL_Color{128, 0, 128, 255});
+	textGO->AddComponent<TextComponent>("0.00 FPS", font, color);
 	textGO->AddComponent<FPSComponent>();
 	scene.Add(std::move(textGO));
+
+	auto prog4Assing = std::make_unique<GameObject>("GO_P4AssText");
+	prog4Assing->AddComponent<TextComponent>("Programming 4 Assignment", font, color);
+
+	prog4Assing->GetComponent<Transform>()->SetPosition({ 
+		windowSize.first / 2 - prog4Assing->GetComponent<TextComponent>()->GetTextureSize().x / 2,
+		0.f, 0.f });
+	scene.Add(std::move(prog4Assing));
 }
 
 int main(int, char* [])
