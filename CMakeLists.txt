@@ -29,7 +29,19 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   GameEngine/TextComponent.cpp
   GameEngine/Texture2D.cpp
   GameEngine/Transform.cpp
- "GameEngine/GameEngine.h" "GameEngine/GameEngine.cpp" "GameEngine/Singleton.h" "GameEngine/Renderer.cpp" "GameEngine/Renderer.h" "GameEngine/Texture2D.cpp" "GameEngine/Texture2D.h" "GameEngine/ResourceManager.cpp" "GameEngine/ResourceManager.h" "GameEngine/Font.cpp" "GameEngine/Font.h" "GameEngine/InputManager.cpp" "GameEngine/InputManager.h" "GameEngine/Scene.cpp" "GameEngine/Scene.h" "GameEngine/SceneManager.cpp" "GameEngine/SceneManager.h" "GameEngine/GameObject.h" "GameEngine/GameObject.cpp" "GameEngine/Transform.h" "GameEngine/Transform.cpp" "GameEngine/Component.h"   "GameEngine/Image.h" "GameEngine/Image.cpp" "GameEngine/TextComponent.h" "GameEngine/TextComponent.cpp")
+  #Minigin/Font.cpp
+  #Minigin/GameObject.cpp
+  #Minigin/InputManager.cpp
+  #Minigin/Main.cpp
+  #Minigin/Minigin.cpp
+  #Minigin/Renderer.cpp
+  #Minigin/ResourceManager.cpp
+  #Minigin/Scene.cpp
+  #Minigin/SceneManager.cpp
+  #Minigin/TextObject.cpp
+  #Minigin/Texture2D.cpp
+  #Minigin/Transform.cpp
+ "GameEngine/GameEngine.h" "GameEngine/GameEngine.cpp" "GameEngine/Singleton.h" "GameEngine/Renderer.cpp" "GameEngine/Renderer.h" "GameEngine/Texture2D.cpp" "GameEngine/Texture2D.h" "GameEngine/ResourceManager.cpp" "GameEngine/ResourceManager.h" "GameEngine/Font.cpp" "GameEngine/Font.h" "GameEngine/InputManager.cpp" "GameEngine/InputManager.h" "GameEngine/Scene.cpp" "GameEngine/Scene.h" "GameEngine/SceneManager.cpp" "GameEngine/SceneManager.h" "GameEngine/GameObject.h" "GameEngine/GameObject.cpp" "GameEngine/Transform.h" "GameEngine/Transform.cpp" "GameEngine/Component.h"   "GameEngine/Image.h" "GameEngine/Image.cpp" "GameEngine/TextComponent.h" "GameEngine/TextComponent.cpp" "GameEngine/FPSComponent.h" "GameEngine/FPSComponent.cpp")
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
