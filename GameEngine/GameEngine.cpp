@@ -148,6 +148,7 @@ void GameEngine::RunOneFrame(const float deltaTime, float& lag)
 	}
 
 	SceneManager::GetInstance().Update(deltaTime);
+
 	SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject")->GetComponent<TextComponent>()->SetText(std::to_string(m_CurrentFPS));
 
 	Renderer::GetInstance().Render();
