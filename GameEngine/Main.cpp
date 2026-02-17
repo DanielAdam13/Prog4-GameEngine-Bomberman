@@ -87,11 +87,3 @@ int main(int, char* [])
 	return 0;
 }
 
-//void UpdateGame(float deltaTime)
-//{
-//	auto fpsText{ SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject") };
-//	fpsText->GetComponent<TextComponent>()->SetText(std::to_string(GameEngine::GetInstance().GetFPS()));
-//	
-//	fpsText->GetComponent<Transform>()->SetPosition(fpsText->GetComponent<Transform>()->GetPosition() + glm::vec3{ 20.f, 0.f, 0.f } * deltaTime);
-//}
-

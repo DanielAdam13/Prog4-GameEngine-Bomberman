@@ -14,7 +14,7 @@ namespace ge
 		
 		~GameEngine();
 		void Run(const std::function<void()>& load);
-		void RunOneFrame(const float deltaTime, float& lag);
+		void RunOneFrame();
 
 		GameEngine(const GameEngine& other) = delete;
 		GameEngine(GameEngine&& other) = delete;
@@ -33,6 +33,9 @@ namespace ge
 		const float m_FixedTimeStep{ 0.02f };
 		float m_CurrentFPS{ 0 };
 
-		void ComputeFPS(float deltaTime, float& fpsTimer, int& frameCount);
+		void ComputeFPS(float& fpsTimer, int& frameCount);
+
+		float m_DeltaTime{ 0.f };
+		float m_FrameLag{ 0.f };
 	};
 }
