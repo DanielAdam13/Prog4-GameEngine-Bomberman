@@ -30,7 +30,9 @@ namespace ge
 		GameObject* GetOwner() const noexcept { return m_pOwner; }
 
 	protected:
-		// Reference to owner
+		
+	private:
+		// Private so derived classes cannot change, Initialized ONLY on construction
 		GameObject* m_pOwner; // Doesn't own
 	};
 }
