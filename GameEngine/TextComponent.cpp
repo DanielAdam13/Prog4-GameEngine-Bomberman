@@ -9,8 +9,9 @@
 
 using namespace ge;
 
-TextComponent::TextComponent(const std::string& text, Font* font, const SDL_Color& color)
-	:m_Text{ text },
+TextComponent::TextComponent(GameObject* pOwnerPtr, const std::string& text, Font* font, const SDL_Color& color)
+	: Component::Component(pOwnerPtr),
+	m_Text{ text },
 	m_pTextFont{ font },
 	m_TextColor{ color },
 	m_TextTexture{ nullptr },
@@ -18,6 +19,7 @@ TextComponent::TextComponent(const std::string& text, Font* font, const SDL_Colo
 {
 	UpdateTextureForText();
 }
+
 
 void TextComponent::UpdateComponent(float)
 {

@@ -5,6 +5,8 @@
 #include <array>
 #include "Component.h"
 
+#include <concepts>
+
 namespace ge
 {
 	static constexpr size_t MAX_GO_COMPONENTS{ 20 };
@@ -24,7 +26,7 @@ namespace ge
 		void Render() const;
 
 		// Args for passing constructors on component addition
-		template<typename T, typename... Args>
+		template<std::derived_from<Component> T, typename... Args>
 		T* AddComponent(Args&&... args)
 		{
 			constexpr ComponentTypeID id{ T::StaticTypeID };
@@ -37,14 +39,11 @@ namespace ge
 
 			T* storedRawPtr{ newComponent.get() };
 
-			// Assign owner pointer reference to every component
-			storedRawPtr->SetOwner(this);
-
 			m_Components[id] = std::move(newComponent); 
 			return storedRawPtr;
 		}
 
-		template<typename T>
+		template<std::derived_from<Component> T>
 		T* GetComponent() const
 		{
 			return static_cast<T*>(m_Components[T::StaticTypeID].get());

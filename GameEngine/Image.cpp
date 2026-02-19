@@ -3,6 +3,11 @@
 
 using namespace ge;
 
+Image::Image(GameObject* pOwnerPtr)
+	:Component::Component(pOwnerPtr)
+{
+}
+
 void Image::RenderComponent(const glm::vec3& transformPos) const
 {
 	// Has to use Renderer Singleton

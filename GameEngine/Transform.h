@@ -10,8 +10,8 @@ namespace ge
 		// Every Transform Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 0 };
 
-		Transform();
-		Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale = { 1.f, 1.f, 1.f });
+		Transform(GameObject* pOwnerPtr);
+		Transform(GameObject* pOwnerPtr, const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale = { 1.f, 1.f, 1.f });
 
 		virtual void FixedUpdateComponent(float) override {};
 		virtual void UpdateComponent(float) override {};

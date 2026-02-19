@@ -12,7 +12,7 @@ namespace ge
 		// Every Image Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 3 };
 
-		FPSComponent() = default;
+		FPSComponent(GameObject* pOwnerPtr);
 		~FPSComponent() override = default;
 
 		FPSComponent(const FPSComponent& other) = delete;

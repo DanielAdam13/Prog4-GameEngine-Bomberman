@@ -12,9 +12,11 @@ namespace ge
 	class Component
 	{
 	public:
-		Component() = default;
-		virtual ~Component() = default;
+		Component(GameObject* pOwnerPtr)
+			:m_pOwner{ pOwnerPtr }
+		{};
 
+		virtual ~Component() = default;
 		Component(const Component& other) = delete;
 		Component(Component&& other) = delete;
 		Component& operator=(const Component& other) = delete;
@@ -27,13 +29,8 @@ namespace ge
 
 		GameObject* GetOwner() const noexcept { return m_pOwner; }
 
-		void SetOwner(GameObject* p) { m_pOwner = p; }
-
 	protected:
 		// Reference to owner
-		GameObject* m_pOwner{ nullptr }; // Doesn't own
-
-		// Only GameObject assigns ownership
-		friend class GameObject;
+		GameObject* m_pOwner; // Doesn't own
 	};
 }

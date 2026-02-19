@@ -12,7 +12,7 @@ namespace ge
 		// Every Image Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 1 };
 
-		Image() = default;
+		Image(GameObject* pOwnerPtr);
 		virtual ~Image() override = default;
 
 		// Texture is renderer INSIDE an individual Image component

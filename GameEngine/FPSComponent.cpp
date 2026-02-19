@@ -7,6 +7,11 @@
 
 using namespace ge;
 
+FPSComponent::FPSComponent(GameObject* pOwnerPtr)
+	:Component::Component(pOwnerPtr)
+{
+}
+
 void FPSComponent::UpdateComponent(float deltaTime)
 {
 	if (!m_pTextComponent)

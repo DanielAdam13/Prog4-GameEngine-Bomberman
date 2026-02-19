@@ -8,7 +8,7 @@ GameObject::GameObject(const std::string& name)
 	:m_pTransform{ nullptr },
 	m_GameObjectName{ name }
 {
-	AddComponent<Transform>();
+	AddComponent<Transform>(this);
 	m_pTransform = GetComponent<Transform>();
 }
 

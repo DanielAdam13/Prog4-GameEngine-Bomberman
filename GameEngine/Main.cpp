@@ -34,12 +34,12 @@ static void LoadScenes()
 	auto daeTexture{ ResourceManager::GetInstance().LoadTexture("logo.png") };
 
 	auto backgroundGO = std::make_unique<GameObject>("GO_Background");
-	backgroundGO->AddComponent<Image>()->SetTexture(backgroundTexture);
+	backgroundGO->AddComponent<Image>(backgroundGO.get())->SetTexture(backgroundTexture);
 	scene.Add(std::move(backgroundGO));
 
 
 	auto daeLogoGO = std::make_unique<GameObject>("GO_DaeLogo");
-	daeLogoGO->AddComponent<Image>()->SetTexture(daeTexture);
+	daeLogoGO->AddComponent<Image>(daeLogoGO.get())->SetTexture(daeTexture);
 	scene.Add(std::move(daeLogoGO));
 
 	auto windowSize{ Renderer::GetInstance().GetWindowSize() };
@@ -60,12 +60,12 @@ static void LoadScenes()
 	constexpr SDL_Color color{ SDL_Color{128, 128, 128, 255} };
 	
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
-	textGO->AddComponent<TextComponent>("0.00 FPS", font, color);
-	textGO->AddComponent<FPSComponent>();
+	textGO->AddComponent<TextComponent>(textGO.get(), "0.00 FPS", font, color);
+	textGO->AddComponent<FPSComponent>(textGO.get());
 	scene.Add(std::move(textGO));
 
 	auto prog4Assing = std::make_unique<GameObject>("GO_P4AssText");
-	prog4Assing->AddComponent<TextComponent>("Programming 4 Assignment", font, color);
+	prog4Assing->AddComponent<TextComponent>(prog4Assing.get(), "Programming 4 Assignment", font, color);
 
 	prog4Assing->GetComponent<Transform>()->SetPosition({ 
 		windowSize.first / 2 - prog4Assing->GetComponent<TextComponent>()->GetTextureSize().x / 2,
