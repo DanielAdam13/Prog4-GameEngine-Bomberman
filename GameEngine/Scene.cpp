@@ -30,38 +30,96 @@ void Scene::FixedUpdate(float fixedTimeStep)
 {
 	for (auto& object : m_Objects)
 	{
-		object->FixedUpdate(fixedTimeStep);
+		if (object && !object->MarkedForDeletion())
+			object->FixedUpdate(fixedTimeStep);
 	}
+
+	CleanupDestroyedGameObjects();
 }
 
 void Scene::Update(float deltaTime)
 {
-	for(auto& object : m_Objects)
+	for (auto& object : m_Objects)
 	{
-		object->Update(deltaTime);
+		if (object && !object->MarkedForDeletion())
+			object->Update(deltaTime);
 	}
+
+	CleanupDestroyedGameObjects();
 }
 
 void Scene::Render() const
 {
 	for (const auto& object : m_Objects)
 	{
-		object->Render();
+		if (object && !object->MarkedForDeletion())
+			object->Render();
 	}
 }
 
 GameObject* ge::Scene::FindObjectByName(const std::string& goName) const
 {
-	auto objId{ std::find_if(m_Objects.begin(), m_Objects.end(), [&goName](const std::unique_ptr<GameObject>& obj) 
+	auto objId{ std::find_if(m_Objects.begin(), m_Objects.end(), [&goName](const std::unique_ptr<GameObject>& obj)
 		{
-			return obj->GetName() == goName;
+			return obj && !obj->MarkedForDeletion() && // Checks for lifetime availability
+				obj->GetName() == goName; // Finally, check for the name
 		}) };
 
 	if (objId != m_Objects.end())
 	{
 		return objId->get();
 	}
-	
+
 	return nullptr;
 }
 
+GameObject* ge::Scene::FindObjectByID(const size_t index) const
+{
+	if (index >= m_Objects.size())
+		return nullptr;
+
+	const auto& obj = m_Objects[index];
+
+	if (!obj || obj->MarkedForDeletion()) // Checks for lifetime availability
+		return nullptr;
+
+	return obj.get();
+}
+
+void Scene::RemoveObjectByName(const std::string& goName)
+{
+	auto it = std::find_if(
+		m_Objects.begin(),
+		m_Objects.end(),
+		[&goName](const std::unique_ptr<GameObject>& obj)
+		{
+			return obj && !obj->MarkedForDeletion() &&
+				obj->GetName() == goName;
+		});
+
+	if (it != m_Objects.end())
+	{
+		(*it)->MarkForDeletion(); // MARK
+	}
+}
+
+void Scene::RemoveObjectByID(const size_t index)
+{
+	if (index >= m_Objects.size())
+		return;
+
+	auto& obj{ m_Objects[index] };
+
+	if (obj && !obj->MarkedForDeletion())
+		obj->MarkForDeletion(); // MARK
+}
+
+void Scene::CleanupDestroyedGameObjects()
+{
+	m_Objects.erase(std::remove_if(m_Objects.begin(), m_Objects.end(),
+		[](const std::unique_ptr<GameObject>& go)
+		{
+			return !go || go->MarkedForDeletion(); // Remove if marked or nullptr
+		}),
+		m_Objects.end());
+}

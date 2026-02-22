@@ -31,7 +31,8 @@ namespace ge
 		{
 			constexpr ComponentTypeID id{ T::StaticTypeID };
 
-			if (m_Components[id] && !m_Components[id]->MarkedForDeletion()) // Early out component if already existing
+			// Early out component if already existing
+			if (m_Components[id] != nullptr && !m_Components[id]->MarkedForDeletion()) 
 				return static_cast<T*> (m_Components[id].get());
 			
 			// --- Custom Component constructors are executed ONLY if component doesn't exist already ---
@@ -48,7 +49,7 @@ namespace ge
 		{
 			auto* rawCompPtr{ m_Components[T::StaticTypeID].get() };
 
-			if (!rawCompPtr || rawCompPtr->MarkedForDeletion())
+			if (!rawCompPtr || rawCompPtr->MarkedForDeletion()) // Checks for lifetime availability
 				return nullptr;
 
 			return static_cast<T*>(rawCompPtr);
@@ -67,6 +68,8 @@ namespace ge
 
 		const std::string& GetName() const { return m_GameObjectName; }
 
+		void MarkForDeletion() { m_DeletionMark = true; }
+		bool MarkedForDeletion() const noexcept { return m_DeletionMark; }
 
 	private:
 		Transform* m_pTransform;
@@ -76,8 +79,9 @@ namespace ge
 
 		std::array<std::unique_ptr<Component>, MAX_GO_COMPONENTS> m_Components{};
 
-		void RemoveDestroyedComponents();
+		void CleanupDestroyedComponents();
 
+		bool m_DeletionMark;
 
 	};
 }

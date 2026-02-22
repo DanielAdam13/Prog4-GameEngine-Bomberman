@@ -6,7 +6,8 @@ using namespace ge;
 
 GameObject::GameObject(const std::string& name)
 	:m_pTransform{ nullptr },
-	m_GameObjectName{ name }
+	m_GameObjectName{ name },
+	m_DeletionMark{ false }
 {
 	AddComponent<Transform>(this);
 	m_pTransform = GetComponent<Transform>();
@@ -27,7 +28,7 @@ void GameObject::FixedUpdate(float fixedTimeStep)
 	}
 
 	// Destroy marked components
-	RemoveDestroyedComponents();
+	CleanupDestroyedComponents();
 }
 
 void GameObject::Update(float deltaTime)
@@ -41,7 +42,7 @@ void GameObject::Update(float deltaTime)
 	}
 
 	// Destroy marked components
-	RemoveDestroyedComponents();
+	CleanupDestroyedComponents();
 }
 
 void GameObject::Render() const
@@ -50,18 +51,18 @@ void GameObject::Render() const
 
 	for (const auto& comp : m_Components)
 	{
-		if (comp)
+		if (comp && !comp->MarkedForDeletion())
 		{
 			comp->RenderComponent(transformPos);
 		}
 	}
 }
 
-void GameObject::RemoveDestroyedComponents()
+void GameObject::CleanupDestroyedComponents()
 {
 	for (auto& comp : m_Components)
 	{
-		if (comp && comp->MarkedForDeletion())
+		if (!comp || comp->MarkedForDeletion())
 		{
 			comp.reset(); // Safely delete unique ptr
 		}

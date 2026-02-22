@@ -24,12 +24,18 @@ namespace ge
 		Scene& operator=(Scene&& other) = delete;
 
 		GameObject* FindObjectByName(const std::string& goName) const;
+		GameObject* FindObjectByID(const size_t index) const;
+
+		void RemoveObjectByName(const std::string& goName);
+		void RemoveObjectByID(const size_t index);
 
 	private:
 		friend class SceneManager;
 		explicit Scene() = default;
 
 		std::vector <std::unique_ptr<GameObject>> m_Objects{};
+
+		void CleanupDestroyedGameObjects();
 	};
 
 }
