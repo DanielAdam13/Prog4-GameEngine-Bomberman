@@ -20,22 +20,28 @@ void GameObject::FixedUpdate(float fixedTimeStep)
 {
 	for (const auto& comp : m_Components)
 	{
-		if (comp)
+		if (comp && !comp->MarkedForDeletion())
 		{
 			comp->FixedUpdateComponent(fixedTimeStep);
 		}
 	}
+
+	// Destroy marked components
+	RemoveDestroyedComponents();
 }
 
 void GameObject::Update(float deltaTime)
 {
 	for (const auto& comp : m_Components)
 	{
-		if (comp)
+		if (comp && !comp->MarkedForDeletion())
 		{
 			comp->UpdateComponent(deltaTime);
 		}
 	}
+
+	// Destroy marked components
+	RemoveDestroyedComponents();
 }
 
 void GameObject::Render() const
@@ -47,6 +53,17 @@ void GameObject::Render() const
 		if (comp)
 		{
 			comp->RenderComponent(transformPos);
+		}
+	}
+}
+
+void GameObject::RemoveDestroyedComponents()
+{
+	for (auto& comp : m_Components)
+	{
+		if (comp && comp->MarkedForDeletion())
+		{
+			comp.reset(); // Safely delete unique ptr
 		}
 	}
 }

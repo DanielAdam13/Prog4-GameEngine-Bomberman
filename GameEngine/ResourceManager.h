@@ -21,7 +21,6 @@ namespace ge
 		Font* LoadFont(const std::string& file, uint8_t size);
 
 	private:
-		// For GetInstance()
 		friend class Singleton<ResourceManager>;
 
 		ResourceManager() = default;

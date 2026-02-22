@@ -3,7 +3,8 @@
 #include "GameEngine.h"
 #include "TextComponent.h"
 
-#include <format>
+#include <sstream>
+#include <iomanip>
 
 using namespace ge;
 
@@ -25,7 +26,10 @@ void FPSComponent::UpdateComponent(float deltaTime)
 		// Guard against nullptr TextComponent (if GameObject doesn't have TextComponent)
 		if (m_pTextComponent)
 		{
-			m_pTextComponent->SetText(std::format("{:.2f} FPS", fps));
+			// No format because of emscripten
+			std::ostringstream ss;
+			ss << std::fixed << std::setprecision(2) << fps << " FPS";
+			m_pTextComponent->SetText(ss.str());
 		}
 			
 	}

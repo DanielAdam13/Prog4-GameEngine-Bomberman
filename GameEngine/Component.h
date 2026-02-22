@@ -13,7 +13,8 @@ namespace ge
 	{
 	public:
 		Component(GameObject* pOwnerPtr)
-			:m_pOwner{ pOwnerPtr }
+			:m_pOwner{ pOwnerPtr },
+			m_DeletionMark{ false }
 		{};
 
 		virtual ~Component() = default;
@@ -29,10 +30,15 @@ namespace ge
 
 		GameObject* GetOwner() const noexcept { return m_pOwner; }
 
+		void MarkForDeletion() { m_DeletionMark = true; }
+		bool MarkedForDeletion() const noexcept { return m_DeletionMark; }
+
 	protected:
 		
 	private:
 		// Private so derived classes cannot change, Initialized ONLY on construction
 		GameObject* m_pOwner; // Doesn't own
+
+		bool m_DeletionMark;
 	};
 }

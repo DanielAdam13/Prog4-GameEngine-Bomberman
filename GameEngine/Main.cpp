@@ -30,8 +30,8 @@ static void LoadScenes()
 	Scene& scene{ SceneManager::GetInstance().CreateScene() };
 
 	// Texture Resources
-	auto backgroundTexture{ ResourceManager::GetInstance().LoadTexture("background.png") };
-	auto daeTexture{ ResourceManager::GetInstance().LoadTexture("logo.png") };
+	const auto backgroundTexture{ ResourceManager::GetInstance().LoadTexture("background.png") };
+	const auto daeTexture{ ResourceManager::GetInstance().LoadTexture("logo.png") };
 
 	auto backgroundGO = std::make_unique<GameObject>("GO_Background");
 	backgroundGO->AddComponent<Image>(backgroundGO.get())->SetTexture(backgroundTexture);
@@ -42,7 +42,7 @@ static void LoadScenes()
 	daeLogoGO->AddComponent<Image>(daeLogoGO.get())->SetTexture(daeTexture);
 	scene.Add(std::move(daeLogoGO));
 
-	auto windowSize{ Renderer::GetInstance().GetWindowSize() };
+	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
 
 	// For test purposes
 	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") }; 
