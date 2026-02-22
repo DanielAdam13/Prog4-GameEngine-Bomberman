@@ -6,6 +6,9 @@
 #include "Component.h"
 
 #include <concepts>
+#include <stdexcept>
+
+#include <unordered_set>
 
 namespace ge
 {
@@ -34,6 +37,9 @@ namespace ge
 			// Early out component if already existing
 			if (m_Components[id] != nullptr && !m_Components[id]->MarkedForDeletion()) 
 				return static_cast<T*> (m_Components[id].get());
+
+			if (m_Components.size() == MAX_GO_COMPONENTS)
+				throw std::out_of_range("Reached component limit for game object!");
 			
 			// --- Custom Component constructors are executed ONLY if component doesn't exist already ---
 			auto newComponent{ std::make_unique<T>(std::forward<Args>(args)...) }; // forwarding reference
@@ -71,6 +77,11 @@ namespace ge
 		void MarkForDeletion() { m_DeletionMark = true; }
 		bool MarkedForDeletion() const noexcept { return m_DeletionMark; }
 
+		void SetParent(GameObject* newParent, bool keepWorldPos = true);
+
+		GameObject* GetChildByID(const unsigned int index) const;
+		GameObject* GetChildByName(const std::string& childName) const; // Slow - O(n)
+
 	private:
 		Transform* m_pTransform;
 
@@ -82,6 +93,16 @@ namespace ge
 		void CleanupDestroyedComponents();
 
 		bool m_DeletionMark;
+
+		// Parent/Child relationship variables
+		GameObject* m_Parent;
+		std::vector<GameObject*> m_Children; // for faster Updates and Render + index accessing
+
+		bool ContainsChild(GameObject* parent) const;
+		void AddChild(GameObject* child);
+		void RemoveChild(GameObject* child);
+
+		bool IsAncestor(const GameObject* obj) const;
 
 	};
 }

@@ -27,7 +27,7 @@ namespace ge
 		GameObject* FindObjectByID(const size_t index) const;
 
 		void RemoveObjectByName(const std::string& goName);
-		void RemoveObjectByID(const size_t index);
+		void RemoveObjectByID(const unsigned int index);
 
 	private:
 		friend class SceneManager;

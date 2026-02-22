@@ -103,7 +103,7 @@ void Scene::RemoveObjectByName(const std::string& goName)
 	}
 }
 
-void Scene::RemoveObjectByID(const size_t index)
+void Scene::RemoveObjectByID(const unsigned int index)
 {
 	if (index >= m_Objects.size())
 		return;
