@@ -62,10 +62,13 @@ static void LoadScenes()
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
 	textGO->AddComponent<TextComponent>(textGO.get(), "0.00 FPS", font, color);
 	textGO->AddComponent<FPSComponent>(textGO.get());
+
+	const bool TEST{ textGO->HasComponent<TextComponent>() };
+
 	scene.Add(std::move(textGO));
 
 	auto prog4Assing = std::make_unique<GameObject>("GO_P4AssText");
-	prog4Assing->AddComponent<TextComponent>(prog4Assing.get(), "Programming 4 Assignment", font, color);
+	prog4Assing->AddComponent<TextComponent>(prog4Assing.get(), (TEST) ? "Programming 4 Assignment" : "false", font, color);
 
 	prog4Assing->GetComponent<Transform>()->SetPosition({ 
 		windowSize.first / 2 - prog4Assing->GetComponent<TextComponent>()->GetTextureSize().x / 2,

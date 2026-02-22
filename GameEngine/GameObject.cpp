@@ -91,6 +91,7 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 {
 	// 1. Is new parent valid?
 	if (newParent == this || m_Parent == newParent || 
+		newParent->MarkedForDeletion() ||
 		this->ContainsChild(newParent)) // new parent is not a child of the current m_Parent
 		return;
 
@@ -136,7 +137,7 @@ GameObject* GameObject::GetChildByName(const std::string& childName) const
 {
 	for (auto* child : m_Children) // O(n)
 	{
-		if (child && child->GetName() == childName)
+		if (child && child->GetName() == childName && !child->MarkedForDeletion())
 			return child;
 	}
 
@@ -145,7 +146,7 @@ GameObject* GameObject::GetChildByName(const std::string& childName) const
 
 bool GameObject::ContainsChild(GameObject* parent) const
 {
-	if (!parent)
+	if (!parent || parent->MarkedForDeletion())
 		return false;
 
 	for (const auto& child : m_Children)
@@ -163,7 +164,7 @@ bool GameObject::ContainsChild(GameObject* parent) const
 
 void GameObject::AddChild(GameObject* child)
 {
-	if (!child || child == this)
+	if (!child || child == this || child->MarkedForDeletion())
 		return;
 	if (child->IsAncestor(m_Parent)) // Make sure CHILD is not a parent of the parent from which this is called 
 		return;
@@ -171,19 +172,19 @@ void GameObject::AddChild(GameObject* child)
 	// Make sure not already a child of current - not deeper child
 	for (const auto& ch : m_Children)
 	{
-		if (child == ch) // Direct child
+		if (child == ch || ch->MarkedForDeletion()) // Direct child
 			return;
 	}
 
 	// Set child's parent to THIS game object
 	child->m_Parent = this;
 
-	m_Children.push_back(child);
+	m_Children.push_back(child);  // O(1) if unordered_set (insert)
 }
 
 void GameObject::RemoveChild(GameObject* child)
 {
-	if (!child || child == this || child->IsAncestor(this))
+	if (!child || child == this || child->MarkedForDeletion() || child->IsAncestor(this))
 		return;
 
 	// Find index of child
@@ -192,7 +193,7 @@ void GameObject::RemoveChild(GameObject* child)
 	if (it != m_Children.end())
 	{
 		// Remove pointer from the vector
-		m_Children.erase(it);
+		m_Children.erase(it);  // O(1) if unordered_set
 
 		// Remove this object as parent from the child
 		if (child->m_Parent == this)
@@ -207,6 +208,8 @@ bool GameObject::IsAncestor(const GameObject* obj) const
 	// Loop to a parent of a parent that potentially == obj
 	while (currentParent)
 	{
+		if (currentParent->MarkedForDeletion())
+			return false; // skip deleted ancestors
 		if (currentParent == obj)
 			return true;
 

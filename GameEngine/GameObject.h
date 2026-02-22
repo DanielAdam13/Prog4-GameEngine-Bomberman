@@ -7,12 +7,11 @@
 
 #include <concepts>
 #include <stdexcept>
-
-#include <unordered_set>
+//#include <unordered_set>
 
 namespace ge
 {
-	static constexpr size_t MAX_GO_COMPONENTS{ 20 };
+	static constexpr size_t MAX_GO_COMPONENTS{ 40 };
 
 	class GameObject final
 	{
@@ -37,9 +36,6 @@ namespace ge
 			// Early out component if already existing
 			if (m_Components[id] != nullptr && !m_Components[id]->MarkedForDeletion()) 
 				return static_cast<T*> (m_Components[id].get());
-
-			if (m_Components.size() == MAX_GO_COMPONENTS)
-				throw std::out_of_range("Reached component limit for game object!");
 			
 			// --- Custom Component constructors are executed ONLY if component doesn't exist already ---
 			auto newComponent{ std::make_unique<T>(std::forward<Args>(args)...) }; // forwarding reference
@@ -72,6 +68,13 @@ namespace ge
 			m_Components[id]->MarkForDeletion();
 		}
 
+		template<std::derived_from<Component> T>
+		bool HasComponent() const noexcept
+		{
+			return m_Components[T::StaticTypeID] != nullptr &&
+				!m_Components[T::StaticTypeID]->MarkedForDeletion();
+		}
+
 		const std::string& GetName() const { return m_GameObjectName; }
 
 		void MarkForDeletion();
@@ -83,7 +86,7 @@ namespace ge
 		GameObject* GetChildByName(const std::string& childName) const; // Slow - O(n)
 
 	private:
-		Transform* m_pTransform;
+		Transform* m_pTransform; // just a reference to the first component
 
 		// Main way to identify a game object
 		const std::string m_GameObjectName;

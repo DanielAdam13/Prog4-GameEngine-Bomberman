@@ -21,8 +21,6 @@ using namespace ge;
 #include "InputManager.h"
 #include "SceneManager.h"
 
-#include "TextComponent.h"
-
 SDL_Window* g_Window{};
 
 void LogSDLVersion(const std::string& message, int major, int minor, int patch)
