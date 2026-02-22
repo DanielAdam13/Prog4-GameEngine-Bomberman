@@ -60,6 +60,33 @@ void GameObject::Render() const
 	}
 }
 
+void GameObject::MarkForDeletion()
+{
+	if (m_DeletionMark)
+		return;
+
+	// 1. Apply mark
+	m_DeletionMark = true;
+
+	// 2. Remove parent reference
+	if (m_Parent)
+	{
+		m_Parent->RemoveChild(this);
+		m_Parent = nullptr;
+	}
+
+	// 3. Mark ALL children
+	for (auto* child : m_Children)
+	{
+		// RECURSION, will call itself for child's children
+		if (child)
+			child->MarkForDeletion();
+	}
+
+	// 4. Clear vector
+	m_Children.clear();
+}
+
 void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 {
 	// 1. Is new parent valid?

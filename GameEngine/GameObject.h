@@ -74,7 +74,7 @@ namespace ge
 
 		const std::string& GetName() const { return m_GameObjectName; }
 
-		void MarkForDeletion() { m_DeletionMark = true; }
+		void MarkForDeletion();
 		bool MarkedForDeletion() const noexcept { return m_DeletionMark; }
 
 		void SetParent(GameObject* newParent, bool keepWorldPos = true);
@@ -101,7 +101,6 @@ namespace ge
 		bool ContainsChild(GameObject* parent) const;
 		void AddChild(GameObject* child);
 		void RemoveChild(GameObject* child);
-
 		bool IsAncestor(const GameObject* obj) const;
 
 	};
