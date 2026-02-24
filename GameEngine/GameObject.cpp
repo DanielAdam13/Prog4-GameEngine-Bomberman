@@ -120,6 +120,14 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 		m_Parent->AddChild(this);
 }
 
+GameObject* GameObject::GetParent() const
+{
+	if (!m_Parent || m_Parent->MarkedForDeletion())
+		return nullptr;
+
+	return m_Parent;
+}
+
 GameObject* GameObject::GetChildByID(const unsigned int index) const
 {
 	if (index >= m_Children.size())
@@ -142,6 +150,17 @@ GameObject* GameObject::GetChildByName(const std::string& childName) const
 	}
 
 	return nullptr;
+}
+
+int GameObject::GetChildCount() const
+{
+	int count{ 0 };
+	for (auto* child : m_Children)
+	{
+		if (child && !child->MarkedForDeletion())
+			++count;
+	}
+	return count;
 }
 
 bool GameObject::ContainsChild(GameObject* parent) const

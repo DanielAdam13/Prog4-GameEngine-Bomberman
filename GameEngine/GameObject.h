@@ -81,9 +81,11 @@ namespace ge
 		bool MarkedForDeletion() const noexcept { return m_DeletionMark; }
 
 		void SetParent(GameObject* newParent, bool keepWorldPos = true);
+		GameObject* GetParent() const;
 
-		GameObject* GetChildByID(const unsigned int index) const;
+		GameObject* GetChildByID(const unsigned int index) const; // O(1)
 		GameObject* GetChildByName(const std::string& childName) const; // Slow - O(n)
+		int GetChildCount() const;
 
 	private:
 		Transform* m_pTransform; // just a reference to the first component
@@ -99,7 +101,7 @@ namespace ge
 
 		// Parent/Child relationship variables
 		GameObject* m_Parent;
-		std::vector<GameObject*> m_Children; // for faster Updates and Render + index accessing
+		std::vector<GameObject*> m_Children; // vector for faster Updates and Render + index accessing
 
 		bool ContainsChild(GameObject* parent) const;
 		void AddChild(GameObject* child);
