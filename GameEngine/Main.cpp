@@ -50,7 +50,7 @@ static void LoadScenes()
 	{
 		auto daeImageComponent{ daeLogo->GetComponent<Image>() };
 		glm::vec2 imageSize{ daeImageComponent->GetTexture()->GetSize() };
-		daeLogo->GetComponent<Transform>()->SetPosition(
+		daeLogo->GetComponent<Transform>()->SetLocalPosition(
 			{ windowSize.first / 2 - imageSize.x / 2, 
 			windowSize.second / 2 - imageSize.y / 2, 
 			0.f });
@@ -70,7 +70,7 @@ static void LoadScenes()
 	auto prog4Assing = std::make_unique<GameObject>("GO_P4AssText");
 	prog4Assing->AddComponent<TextComponent>(prog4Assing.get(), (TEST) ? "Programming 4 Assignment" : "false", font, color);
 
-	prog4Assing->GetComponent<Transform>()->SetPosition({ 
+	prog4Assing->GetComponent<Transform>()->SetLocalPosition({ 
 		windowSize.first / 2 - prog4Assing->GetComponent<TextComponent>()->GetTextureSize().x / 2,
 		0.f, 0.f });
 	scene.Add(std::move(prog4Assing));

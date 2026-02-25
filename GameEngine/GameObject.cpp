@@ -49,7 +49,7 @@ void GameObject::Update(float deltaTime)
 
 void GameObject::Render() const
 {
-	const auto& transformPos = m_pTransform->GetPosition();
+	const auto& transformPos = m_pTransform->GetWorldPosition();
 
 	for (const auto& comp : m_Components)
 	{
@@ -95,17 +95,24 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 		this->ContainsChild(newParent)) // new parent is not a child of the current m_Parent
 		return;
 
+	auto transformComp{ this->GetComponent<Transform>() };
+
 	// 2. Handle Local and World pos:
 	if (newParent == nullptr)
 	{
 		// Local = World
+		transformComp->SetLocalPosition(transformComp->GetWorldPosition());
 	}
 	else
 	{
 		if (keepWorldPos)
 		{
 			// Update Local = World - parent.World
+			transformComp->SetLocalPosition(transformComp->GetWorldPosition() -
+				m_Parent->GetComponent<Transform>()->GetWorldPosition());
 		}
+			
+		transformComp->MarkDirty();
 	}
 
 	// 3. Remove itself as a child from the OLD parent
@@ -152,7 +159,7 @@ GameObject* GameObject::GetChildByName(const std::string& childName) const
 	return nullptr;
 }
 
-int GameObject::GetChildCount() const
+int GameObject::GetChildrenCount() const
 {
 	int count{ 0 };
 	for (auto* child : m_Children)

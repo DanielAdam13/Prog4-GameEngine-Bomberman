@@ -85,7 +85,7 @@ namespace ge
 
 		GameObject* GetChildByID(const unsigned int index) const; // O(1)
 		GameObject* GetChildByName(const std::string& childName) const; // Slow - O(n)
-		int GetChildCount() const;
+		int GetChildrenCount() const;
 
 	private:
 		Transform* m_pTransform; // just a reference to the first component

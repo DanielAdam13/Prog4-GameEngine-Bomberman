@@ -17,21 +17,41 @@ namespace ge
 		virtual void UpdateComponent(float) override {};
 		virtual void RenderComponent(const glm::vec3&) const override {};
 
-		const glm::vec3& GetPosition() const noexcept { return m_Position; }
-		void SetPosition(float x, float y, float z = 0);
-		void SetPosition(const glm::vec3& position);
+		const glm::vec3& GetLocalPosition() const noexcept { return m_LocalPosition; }
+		const glm::vec3& GetLocalRotation() const noexcept { return m_LocalRotation; }
+		const glm::vec3& GetLocalScale() const noexcept { return m_LocalScale; }
 
-		const glm::vec3& GetRotation() const noexcept { return m_Rotation; }
-		void SetRotation(float x, float y, float);
-		void SetRotation(const glm::vec3& rotation);
+		glm::vec3 GetWorldPosition();
+		glm::vec3 GetWorldRotation();
+		glm::vec3 GetWorldScale();
+		const glm::mat4x4& GetWorldMatrix();
 
-		const glm::vec3& GetScale() const noexcept { return m_Scale; }
-		void SetScale(float x = 1.f, float y = 1.f, float z = 1.f);
-		void SetScale(const glm::vec3& scale = {1.f, 1.f, 1.f});
+		void SetLocalPosition(float x, float y, float z = 0);
+		void SetLocalPosition(const glm::vec3& position);
+		
+		void SetLocalRotation(float x, float y, float);
+		void SetLocalRotation(const glm::vec3& rotation);
+		
+		void SetLocalScale(float x = 1.f, float y = 1.f, float z = 1.f);
+		void SetLocalScale(const glm::vec3& scale = {1.f, 1.f, 1.f});
+
+		void MarkDirty();
 
 	private:
-		glm::vec3 m_Position;
-		glm::vec3 m_Rotation;
-		glm::vec3 m_Scale;
+		glm::vec3 m_LocalPosition;
+		glm::vec3 m_LocalRotation;
+		glm::vec3 m_LocalScale;
+
+		glm::mat4x4 m_LocalMatrix{};
+		glm::mat4x4 m_WorldMatrix{};
+
+
+		bool m_DirtyFlag;
+
+		Transform* GetParentTransform() const;
+
+		// Called only when needed:
+		// At Getter functions
+		void RecomputeWorldMatrix();
 	};
 }
