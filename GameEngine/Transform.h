@@ -37,6 +37,8 @@ namespace ge
 
 		void MarkDirty();
 
+		void SetLocalFromMatrix(const glm::mat4& m);
+
 	private:
 		glm::vec3 m_LocalPosition;
 		glm::vec3 m_LocalRotation;
@@ -44,6 +46,10 @@ namespace ge
 
 		glm::mat4x4 m_LocalMatrix{};
 		glm::mat4x4 m_WorldMatrix{};
+
+		//glm::vec3 m_WorldPosition;
+		//glm::vec3 m_WorldRotation;
+		//glm::vec3 m_WorldScale;
 
 
 		bool m_DirtyFlag;

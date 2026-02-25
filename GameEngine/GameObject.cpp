@@ -93,36 +93,56 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 		this->ContainsChild(newParent)) // new parent is not a child of the current m_Parent
 		return;
 
-	auto transformComp{ this->GetComponent<Transform>() };
+	auto thisTransform{ this->GetComponent<Transform>() };
+
+	const glm::mat4 oldWorld{ thisTransform->GetWorldMatrix() };
 
 	// 2. Handle Local and World pos:
-	if (newParent == nullptr)
-	{
-		// Local = World
-		transformComp->SetLocalPosition(transformComp->GetWorldPosition());
-	}
-	else
-	{
-		if (keepWorldPos)
-		{
-			// Update Local = World - parent.World
-			transformComp->SetLocalPosition(transformComp->GetWorldPosition() -
-				m_Parent->GetComponent<Transform>()->GetWorldPosition());
-		}
-			
-		transformComp->MarkDirty();
-	}
+	//if (newParent == nullptr)
+	//{
+	//	// Local = World
+	//	thisTransform->SetLocalPosition(thisTransform->GetWorldPosition());
+	//}
+	//else
+	//{
+	//	if (keepWorldPos)
+	//	{
+	//		// Update Local = World - parent.World
+	//		thisTransform->SetLocalPosition(thisTransform->GetWorldPosition() -
+	//			newParent->GetComponent<Transform>()->GetWorldPosition());
+	//	}
+	//		
+	//	thisTransform->MarkDirty();
+	//}
 
-	// 3. Remove itself as a child from the OLD parent
+	// 2. Remove itself as a child from the OLD parent
 	if (m_Parent)
 		m_Parent->RemoveChild(this);
 
-	// 4. Set NEW parent to this parent
+	// 3. Set NEW parent to this parent
 	m_Parent = newParent;
 
-	// 5. Add itself as achild of the NEW parent
+	// 4. Add itself as achild of the NEW parent
 	if (m_Parent)
 		m_Parent->AddChild(this);
+
+
+	// 5. Handle Local and World pos
+	if (keepWorldPos)
+	{
+		// If parent is nullptr -> take the default identity
+		glm::mat4 parentWorld{ glm::mat4(1.f) };
+
+		// If parent is not nullptr -> take its existing world matrix
+		if (newParent)
+			parentWorld = newParent->GetComponent<Transform>()->GetWorldMatrix();
+
+		const glm::mat4 newLocal{ glm::inverse(parentWorld) * oldWorld };
+		thisTransform->SetLocalFromMatrix(newLocal);
+	}
+
+	// 6.Mark dirty
+	thisTransform->MarkDirty();
 }
 
 GameObject* GameObject::GetParent() const

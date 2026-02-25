@@ -5,7 +5,7 @@
 using namespace ge;
 
 Transform::Transform(GameObject* pOwnerPtr)
-	:Transform::Transform(pOwnerPtr, {}, {}, {})
+	:Transform::Transform(pOwnerPtr, {}, {}, {1.f, 1.f, 1.f})
 {
 }
 
@@ -27,7 +27,6 @@ glm::vec3 Transform::GetWorldPosition()
 glm::vec3 Transform::GetWorldRotation()
 {
 	RecomputeWorldMatrix();
-	// TODO: insert return statement here
 	return {};
 }
 
@@ -151,4 +150,14 @@ void Transform::RecomputeWorldMatrix()
 
 		m_DirtyFlag = false;
 	}
+}
+
+void Transform::SetLocalFromMatrix(const glm::mat4& m)
+{
+	// position
+	m_LocalPosition = glm::vec3(m[3]);
+
+	// rotation/scale ignored for now (as requested)
+
+	MarkDirty();
 }

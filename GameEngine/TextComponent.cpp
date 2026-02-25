@@ -39,7 +39,7 @@ void TextComponent::RenderComponent() const
 	if (m_TextTexture != nullptr)
 	{
 		auto pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
-		const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldRotation().y };
+		const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldPosition().y };
 
 		// Has to use Renderer
 		Renderer::GetInstance().RenderTexture(*m_TextTexture.get(), worldTransPos.x, worldTransPos.y);

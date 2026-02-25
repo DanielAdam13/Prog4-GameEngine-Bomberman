@@ -63,17 +63,34 @@ static void LoadScenes()
 	textGO->AddComponent<TextComponent>(textGO.get(), "0.00 FPS", font, color);
 	textGO->AddComponent<FPSComponent>(textGO.get());
 
+	// TEST:
+	/*textGO->SetParent(scene.FindObjectByID(1));
+
+	auto textTrans{ textGO->GetComponent<Transform>() };
+	textTrans->SetLocalPosition(textTrans->GetWorldPosition() + glm::vec3{100.f, 0.f, 0.f});
+
+	auto parentTrans{ scene.FindObjectByID(1)->GetComponent<Transform>() };
+	parentTrans->SetLocalPosition(parentTrans->GetLocalPosition() + glm::vec3{ 0.f, 150.f, 0.f });*/
+
 	const bool TEST{ textGO->HasComponent<TextComponent>() };
 
 	scene.Add(std::move(textGO));
 
-	auto prog4Assing = std::make_unique<GameObject>("GO_P4AssText");
-	prog4Assing->AddComponent<TextComponent>(prog4Assing.get(), (TEST) ? "Programming 4 Assignment" : "false", font, color);
+	auto prog4AssingGO = std::make_unique<GameObject>("GO_P4AssText");
+	prog4AssingGO->AddComponent<TextComponent>(prog4AssingGO.get(), (TEST) ? "Programming 4 Assignment" : "false", font, color);
 
-	prog4Assing->GetComponent<Transform>()->SetLocalPosition({ 
-		windowSize.first / 2 - prog4Assing->GetComponent<TextComponent>()->GetTextureSize().x / 2,
+	prog4AssingGO->GetComponent<Transform>()->SetLocalPosition({ 
+		windowSize.first / 2 - prog4AssingGO->GetComponent<TextComponent>()->GetTextureSize().x / 2,
 		0.f, 0.f });
-	scene.Add(std::move(prog4Assing));
+	scene.Add(std::move(prog4AssingGO));
+
+
+	// WEEK 2 - Rotation
+	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
+
+	auto BalloonGO = std::make_unique<GameObject>("GO_Ballon_0");
+	BalloonGO->AddComponent<Image>(BalloonGO.get())->SetTexture(balloonTexture);
+	scene.Add(std::move(BalloonGO));
 }
 
 int main(int, char* [])

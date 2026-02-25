@@ -13,7 +13,7 @@ Image::Image(GameObject* pOwnerPtr)
 void Image::RenderComponent() const
 {
 	auto pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
-	const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldRotation().y };
+	const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldPosition().y };
 
 	// Has to use Renderer
 	Renderer::GetInstance().RenderTexture(*this->GetTexture(), worldTransPos.x, worldTransPos.y);
