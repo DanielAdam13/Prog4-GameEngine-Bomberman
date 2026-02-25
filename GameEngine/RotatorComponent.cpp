@@ -25,7 +25,7 @@ void Rotator::UpdateComponent(float deltaTime)
 
 	if (pOwnerTransform->GetOwner()->GetParent())
 	{
-		// World needs to be Local if parent exists
+		// World to Local if parent exists
 		auto parentWorldMatrix{ pOwnerTransform->GetParentTransform()->GetWorldMatrix() };
 		
 		const glm::mat4 parentWorldInv{ glm::inverse(parentWorldMatrix) }; // For that we need the inverse of the parent's world

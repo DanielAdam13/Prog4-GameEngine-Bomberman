@@ -21,8 +21,6 @@ namespace ge
 		GameEngine& operator=(const GameEngine& other) = delete;
 		GameEngine& operator=(GameEngine&& other) = delete;
 
-		float GetFPS() const noexcept { return m_CurrentFPS; }
-
 	private:
 		GameEngine() = default;
 
@@ -30,9 +28,8 @@ namespace ge
 
 		bool m_Quit{ false };
 		const float m_FixedTimeStep{ 0.02f };
-		float m_CurrentFPS{ 0 };
 
-		void ComputeFPS(float& fpsTimer, int& frameCount);
+		static constexpr std::chrono::duration<float> targetFrameRate{ std::chrono::duration<float>(1.f / 65.f) };
 
 		float m_DeltaTime{ 0.f };
 		float m_FrameLag{ 0.f };

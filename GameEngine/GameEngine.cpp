@@ -105,11 +105,8 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 
 	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
-	// Local for Run
-	constexpr auto targetFrameRate{ std::chrono::duration<float>(1.f / 60.f) };
+	// Local Variables for Run()
 	auto lastTime{ std::chrono::high_resolution_clock::now() };
-	float fpsTimer{ 0.f };
-	int frameCount{ 0 };
 
 	while (!m_Quit)
 	{
@@ -119,8 +116,6 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 		lastTime = frameStartTime;
 
 		RunOneFrame();
-
-		ComputeFPS(fpsTimer, frameCount);
 
 		const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
 		const auto frameDuration{ frameEndTime - frameStartTime };
@@ -146,18 +141,4 @@ void GameEngine::RunOneFrame()
 
 	SceneManager::GetInstance().Update(m_DeltaTime);
 	Renderer::GetInstance().Render();
-}
-
-void GameEngine::ComputeFPS(float& fpsTimer, int& frameCount)
-{
-	fpsTimer += m_DeltaTime;
-	++frameCount;
-
-	if (fpsTimer >= 1.f)
-	{
-		m_CurrentFPS = static_cast<float>(frameCount) / fpsTimer;
-
-		frameCount = 0;
-		fpsTimer = 0.f;
-	}
 }

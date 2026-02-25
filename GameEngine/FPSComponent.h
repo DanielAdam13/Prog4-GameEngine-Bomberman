@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include <chrono>
 
 namespace ge
 {
@@ -29,5 +30,13 @@ namespace ge
 		float m_ChangeTimer{ 0.f };
 
 		static constexpr float ChangeInterval{ 0.25f };
+
+		// FPS Logic
+		
+		float m_FpsTimer{ 0.f };
+		int m_FrameCount{ 0 };
+		float m_CurrentFPS{ 0 };
+
+		void ComputeFPS(float deltaTime);
 	};
 }
