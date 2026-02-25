@@ -26,7 +26,6 @@ namespace ge
 	private:
 		GameEngine() = default;
 
-		// For GetInstance()
 		friend class Singleton<GameEngine>;
 
 		bool m_Quit{ false };

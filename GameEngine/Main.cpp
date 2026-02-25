@@ -22,6 +22,7 @@ namespace fs = std::filesystem;
 #include "Transform.h"
 #include "TextComponent.h"
 #include "FPSComponent.h"
+#include "RotatorComponent.h"
 
 using namespace ge;
 
@@ -80,7 +81,7 @@ static void LoadScenes()
 
 	scene.Add(std::move(textGO));
 
-	auto prog4AssingGO = std::make_unique<GameObject>("GO_P4AssText");
+	auto prog4AssingGO = std::make_unique<GameObject>("GO_P4AssignmentText");
 	prog4AssingGO->AddComponent<TextComponent>(prog4AssingGO.get(), (TEST) ? "Programming 4 Assignment" : "false", font, color);
 
 	prog4AssingGO->GetComponent<Transform>()->SetLocalPosition({ 
@@ -95,13 +96,16 @@ static void LoadScenes()
 	auto BalloonGO1 = std::make_unique<GameObject>("GO_Ballon_0");
 	BalloonGO1->AddComponent<Image>(BalloonGO1.get())->SetTexture(balloonTexture);
 	auto ballonTransform{ BalloonGO1->GetComponent<Transform>() };
+
 	ballonTransform->SetLocalScale({ 2.f, 2.f, 1.f });
-	ballonTransform->SetLocalPosition(ballonTransform->GetWorldPosition() + glm::vec3{ 100.f, 100.f, 0.f });
+	ballonTransform->SetLocalPosition(ballonTransform->GetWorldPosition() + glm::vec3{ 250.f, 350.f, 0.f });
+	BalloonGO1->AddComponent<Rotator>(BalloonGO1.get(), true, 30.f, 360.f);
 	scene.Add(std::move(BalloonGO1));
 
 	auto BalloonGO2 = std::make_unique<GameObject>("GO_Ballon_1");
 	BalloonGO2->AddComponent<Image>(BalloonGO2.get())->SetTexture(balloonTexture);
-	BalloonGO2->SetParent(scene.FindObjectByID(4), true);
+	BalloonGO2->SetParent(scene.FindObjectByID(4), false);
+	BalloonGO2->AddComponent<Rotator>(BalloonGO2.get(), false, 100.f, 360.f);
 	scene.Add(std::move(BalloonGO2));
 }
 

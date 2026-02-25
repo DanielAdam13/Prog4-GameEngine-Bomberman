@@ -3,6 +3,8 @@
 
 namespace ge
 {
+	class GameObject;
+
 	class Transform final : public Component
 	{
 	public:
@@ -37,6 +39,7 @@ namespace ge
 
 		void MarkDirty();
 
+		Transform* GetParentTransform() const;
 		void SetLocalFromMatrix(const glm::mat4& m);
 
 	private:
@@ -47,14 +50,7 @@ namespace ge
 		glm::mat4x4 m_LocalMatrix{};
 		glm::mat4x4 m_WorldMatrix{};
 
-		//glm::vec3 m_WorldPosition;
-		//glm::vec3 m_WorldRotation;
-		//glm::vec3 m_WorldScale;
-
-
 		bool m_DirtyFlag;
-
-		Transform* GetParentTransform() const;
 
 		// Called only when needed:
 		// At Getter functions

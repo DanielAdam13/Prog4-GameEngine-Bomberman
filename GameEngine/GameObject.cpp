@@ -1,6 +1,5 @@
 #include "GameObject.h"
 #include "Transform.h"
-#include "Image.h"
 
 using namespace ge;
 
@@ -87,9 +86,11 @@ void GameObject::MarkForDeletion()
 
 void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 {
-	// 1. Is new parent valid?
+	// 1. Validate parent
 	if (newParent == this || m_Parent == newParent || 
 		this->ContainsChild(newParent)) // new parent is not a child of the current m_Parent
+		return;
+	if (newParent && newParent->MarkedForDeletion())
 		return;
 
 	auto thisTransform{ this->GetComponent<Transform>() };
@@ -114,7 +115,7 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 		glm::mat4 parentWorld{ glm::mat4(1.f) };
 
 		// If parent is not nullptr -> take its existing world matrix
-		if (newParent && !newParent->MarkedForDeletion())
+		if (newParent)
 			parentWorld = newParent->GetComponent<Transform>()->GetWorldMatrix();
 
 		const glm::mat4 newLocal{ glm::inverse(parentWorld) * oldWorld };

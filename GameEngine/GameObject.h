@@ -88,9 +88,8 @@ namespace ge
 		int GetChildrenCount() const;
 
 	private:
-		Transform* m_pTransform; // just a reference to the first component
+		Transform* m_pTransform; // Reference to the transform component
 
-		// Main way to identify a game object
 		const std::string m_GameObjectName;
 
 		std::array<std::unique_ptr<Component>, MAX_GO_COMPONENTS> m_Components{};

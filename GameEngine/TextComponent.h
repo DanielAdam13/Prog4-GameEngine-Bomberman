@@ -8,6 +8,7 @@ namespace ge
 {
 	class Font;
 	class Texture2D;
+	class GameObject;
 
 	class TextComponent final : public Component
 	{

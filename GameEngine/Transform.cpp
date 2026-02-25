@@ -157,10 +157,17 @@ void Transform::RecomputeWorldMatrix()
 
 void Transform::SetLocalFromMatrix(const glm::mat4& m)
 {
-	// position
+	// Position
 	m_LocalPosition = glm::vec3(m[3]);
 
-	// rotation/scale ignored for now
+	// Rotation - not done yet (I don't think I need it for my game)
+
+	// Scale
+	glm::vec3 scale{};
+	scale.x = glm::length(glm::vec3(m_WorldMatrix[0]));
+	scale.y = glm::length(glm::vec3(m_WorldMatrix[1]));
+	scale.z = glm::length(glm::vec3(m_WorldMatrix[2]));
+	m_LocalScale = scale;
 
 	MarkDirty();
 }
