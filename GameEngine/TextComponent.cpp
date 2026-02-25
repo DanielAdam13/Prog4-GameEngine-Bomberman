@@ -7,6 +7,9 @@
 #include <SDL3/SDL_render.h>
 #include "Texture2D.h"
 
+#include "GameObject.h"
+#include "Transform.h"
+
 using namespace ge;
 
 TextComponent::TextComponent(GameObject* pOwnerPtr, const std::string& text, Font* font, const SDL_Color& color)
@@ -31,11 +34,15 @@ void TextComponent::UpdateComponent(float)
 	}
 }
 
-void TextComponent::RenderComponent(const glm::vec3& transformPos) const
+void TextComponent::RenderComponent() const
 {
 	if (m_TextTexture != nullptr)
 	{
-		Renderer::GetInstance().RenderTexture(*m_TextTexture.get(), transformPos.x, transformPos.y);
+		auto pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
+		const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldRotation().y };
+
+		// Has to use Renderer
+		Renderer::GetInstance().RenderTexture(*m_TextTexture.get(), worldTransPos.x, worldTransPos.y);
 	}
 }
 

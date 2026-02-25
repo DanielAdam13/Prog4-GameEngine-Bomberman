@@ -1,5 +1,7 @@
 #include "Image.h"
 #include "Renderer.h"
+#include "GameObject.h"
+#include "Transform.h"
 
 using namespace ge;
 
@@ -8,10 +10,13 @@ Image::Image(GameObject* pOwnerPtr)
 {
 }
 
-void Image::RenderComponent(const glm::vec3& transformPos) const
+void Image::RenderComponent() const
 {
-	// Has to use Renderer Singleton
-	Renderer::GetInstance().RenderTexture(*this->GetTexture(), transformPos.x, transformPos.y);
+	auto pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
+	const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldRotation().y };
+
+	// Has to use Renderer
+	Renderer::GetInstance().RenderTexture(*this->GetTexture(), worldTransPos.x, worldTransPos.y);
 }
 
 void Image::SetTexture(Texture2D* texture)

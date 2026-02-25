@@ -49,13 +49,11 @@ void GameObject::Update(float deltaTime)
 
 void GameObject::Render() const
 {
-	const auto& transformPos = m_pTransform->GetWorldPosition();
-
 	for (const auto& comp : m_Components)
 	{
 		if (comp && !comp->MarkedForDeletion())
 		{
-			comp->RenderComponent(transformPos);
+			comp->RenderComponent();
 		}
 	}
 }

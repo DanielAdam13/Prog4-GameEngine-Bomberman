@@ -22,7 +22,7 @@ namespace ge
 
 		virtual void FixedUpdateComponent(float) override {};
 		virtual void UpdateComponent(float) override;
-		virtual void RenderComponent(const glm::vec3&) const override {};
+		virtual void RenderComponent() const override {};
 
 	private:
 		TextComponent* m_pTextComponent{ nullptr };
