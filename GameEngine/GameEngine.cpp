@@ -145,11 +145,6 @@ void GameEngine::RunOneFrame()
 	}
 
 	SceneManager::GetInstance().Update(m_DeltaTime);
-
-	// wow!
-	/*SceneManager::GetInstance().GetCurrentScene()->FindObjectByName("GO_TextObject")->
-		GetComponent<TextComponent>()->SetText(std::to_string(m_CurrentFPS));*/
-
 	Renderer::GetInstance().Render();
 }
 

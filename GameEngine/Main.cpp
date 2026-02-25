@@ -63,14 +63,18 @@ static void LoadScenes()
 	textGO->AddComponent<TextComponent>(textGO.get(), "0.00 FPS", font, color);
 	textGO->AddComponent<FPSComponent>(textGO.get());
 
-	// TEST:
+	// TEST Reparenting:
 	/*textGO->SetParent(scene.FindObjectByID(1));
 
 	auto textTrans{ textGO->GetComponent<Transform>() };
 	textTrans->SetLocalPosition(textTrans->GetWorldPosition() + glm::vec3{100.f, 0.f, 0.f});
 
 	auto parentTrans{ scene.FindObjectByID(1)->GetComponent<Transform>() };
-	parentTrans->SetLocalPosition(parentTrans->GetLocalPosition() + glm::vec3{ 0.f, 150.f, 0.f });*/
+	parentTrans->SetLocalPosition(parentTrans->GetLocalPosition() + glm::vec3{ 0.f, 150.f, 0.f });
+	textGO->SetParent(nullptr);
+
+	parentTrans->SetLocalPosition(parentTrans->GetLocalPosition() + glm::vec3{ 0.f, -150.f, 0.f });
+	textTrans->SetLocalPosition(textTrans->GetWorldPosition() + glm::vec3{ 250.f, 0.f, 0.f });*/
 
 	const bool TEST{ textGO->HasComponent<TextComponent>() };
 
@@ -90,6 +94,15 @@ static void LoadScenes()
 
 	auto BalloonGO = std::make_unique<GameObject>("GO_Ballon_0");
 	BalloonGO->AddComponent<Image>(BalloonGO.get())->SetTexture(balloonTexture);
+
+	auto ballonTransform{ BalloonGO->GetComponent<Transform>() };
+	ballonTransform->SetLocalScale({ 1.f, 1.f, 1.f });
+	//ballonTransform->SetLocalPosition(ballonTransform->GetWorldPosition() + glm::vec3{ 100.f, 100.f, 0.f });
+
+	BalloonGO->SetParent(scene.FindObjectByID(1));
+	scene.FindObjectByID(1)->GetComponent<Transform>()->SetLocalScale({ 2.f, 2.f, 1.f });
+	scene.FindObjectByID(1)->GetComponent<Transform>()->SetLocalPosition({ 0.f, 0.f, 0.f });
+
 	scene.Add(std::move(BalloonGO));
 }
 

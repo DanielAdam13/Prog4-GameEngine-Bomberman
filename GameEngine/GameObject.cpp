@@ -89,31 +89,11 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 {
 	// 1. Is new parent valid?
 	if (newParent == this || m_Parent == newParent || 
-		newParent->MarkedForDeletion() ||
 		this->ContainsChild(newParent)) // new parent is not a child of the current m_Parent
 		return;
 
 	auto thisTransform{ this->GetComponent<Transform>() };
-
 	const glm::mat4 oldWorld{ thisTransform->GetWorldMatrix() };
-
-	// 2. Handle Local and World pos:
-	//if (newParent == nullptr)
-	//{
-	//	// Local = World
-	//	thisTransform->SetLocalPosition(thisTransform->GetWorldPosition());
-	//}
-	//else
-	//{
-	//	if (keepWorldPos)
-	//	{
-	//		// Update Local = World - parent.World
-	//		thisTransform->SetLocalPosition(thisTransform->GetWorldPosition() -
-	//			newParent->GetComponent<Transform>()->GetWorldPosition());
-	//	}
-	//		
-	//	thisTransform->MarkDirty();
-	//}
 
 	// 2. Remove itself as a child from the OLD parent
 	if (m_Parent)
@@ -134,7 +114,7 @@ void GameObject::SetParent(GameObject* newParent, bool keepWorldPos)
 		glm::mat4 parentWorld{ glm::mat4(1.f) };
 
 		// If parent is not nullptr -> take its existing world matrix
-		if (newParent)
+		if (newParent && !newParent->MarkedForDeletion())
 			parentWorld = newParent->GetComponent<Transform>()->GetWorldMatrix();
 
 		const glm::mat4 newLocal{ glm::inverse(parentWorld) * oldWorld };

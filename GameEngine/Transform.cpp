@@ -157,7 +157,7 @@ void Transform::SetLocalFromMatrix(const glm::mat4& m)
 	// position
 	m_LocalPosition = glm::vec3(m[3]);
 
-	// rotation/scale ignored for now (as requested)
+	// rotation/scale ignored for now
 
 	MarkDirty();
 }

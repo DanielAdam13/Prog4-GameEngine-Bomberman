@@ -13,10 +13,15 @@ Image::Image(GameObject* pOwnerPtr)
 void Image::RenderComponent() const
 {
 	auto pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
-	const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldPosition().y };
+	const glm::vec2 transformPosition{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldPosition().y };
+
+	const glm::vec2 texSize{ m_pTexture->GetSize() };
+	const glm::vec2 scaledSize{ texSize * glm::vec2{pOwnerTransform->GetLocalScale().x, pOwnerTransform->GetLocalScale().y} };
 
 	// Has to use Renderer
-	Renderer::GetInstance().RenderTexture(*this->GetTexture(), worldTransPos.x, worldTransPos.y);
+	Renderer::GetInstance().RenderTexture(*this->GetTexture(), 
+		transformPosition.x, transformPosition.y,
+		scaledSize.x, scaledSize.y);
 }
 
 void Image::SetTexture(Texture2D* texture)
