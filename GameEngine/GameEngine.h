@@ -33,5 +33,8 @@ namespace ge
 
 		float m_DeltaTime{ 0.f };
 		float m_FrameLag{ 0.f };
+
+		std::chrono::high_resolution_clock::time_point m_LastTime{};
+		bool m_FirstFrame{ true };
 	};
 }

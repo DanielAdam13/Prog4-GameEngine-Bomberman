@@ -110,18 +110,7 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 
 	while (!m_Quit)
 	{
-		const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
-
-		m_DeltaTime = std::chrono::duration<float>(frameStartTime - lastTime).count();
-		lastTime = frameStartTime;
-
 		RunOneFrame();
-
-		const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
-		const auto frameDuration{ frameEndTime - frameStartTime };
-
-		if (frameDuration < targetFrameRate)
-			std::this_thread::sleep_for(targetFrameRate - frameDuration);
 	}
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
@@ -130,6 +119,20 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 
 void GameEngine::RunOneFrame()
 {
+	const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
+
+	// ---- Delta Time calculation ----
+	if (m_FirstFrame)
+	{
+		m_LastTime = frameStartTime;
+		m_FirstFrame = false;
+	}
+
+	m_DeltaTime = std::chrono::duration<float>(frameStartTime - m_LastTime).count();
+	m_LastTime = frameStartTime;
+
+	// ---- MAIN FRAME LOGIC ----
+#pragma region MainFrame
 	m_Quit = !InputManager::GetInstance().ProcessInput();
 
 	m_FrameLag += m_DeltaTime;
@@ -141,4 +144,13 @@ void GameEngine::RunOneFrame()
 
 	SceneManager::GetInstance().Update(m_DeltaTime);
 	Renderer::GetInstance().Render();
+#pragma endregion
+
+	// ---- Frame end ----
+	const auto frameEndTime{ std::chrono::high_resolution_clock::now() };
+	const auto frameDuration{ frameEndTime - frameStartTime };
+
+	// Thread sleep so target frame rate is matched
+	if (frameDuration < targetFrameRate)
+		std::this_thread::sleep_for(targetFrameRate - frameDuration);
 }
