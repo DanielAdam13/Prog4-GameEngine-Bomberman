@@ -92,18 +92,17 @@ static void LoadScenes()
 	// WEEK 2 - Rotation
 	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
-	auto BalloonGO = std::make_unique<GameObject>("GO_Ballon_0");
-	BalloonGO->AddComponent<Image>(BalloonGO.get())->SetTexture(balloonTexture);
+	auto BalloonGO1 = std::make_unique<GameObject>("GO_Ballon_0");
+	BalloonGO1->AddComponent<Image>(BalloonGO1.get())->SetTexture(balloonTexture);
+	auto ballonTransform{ BalloonGO1->GetComponent<Transform>() };
+	ballonTransform->SetLocalScale({ 2.f, 2.f, 1.f });
+	ballonTransform->SetLocalPosition(ballonTransform->GetWorldPosition() + glm::vec3{ 100.f, 100.f, 0.f });
+	scene.Add(std::move(BalloonGO1));
 
-	auto ballonTransform{ BalloonGO->GetComponent<Transform>() };
-	ballonTransform->SetLocalScale({ 1.f, 1.f, 1.f });
-	//ballonTransform->SetLocalPosition(ballonTransform->GetWorldPosition() + glm::vec3{ 100.f, 100.f, 0.f });
-
-	BalloonGO->SetParent(scene.FindObjectByID(1));
-	scene.FindObjectByID(1)->GetComponent<Transform>()->SetLocalScale({ 2.f, 2.f, 1.f });
-	scene.FindObjectByID(1)->GetComponent<Transform>()->SetLocalPosition({ 0.f, 0.f, 0.f });
-
-	scene.Add(std::move(BalloonGO));
+	auto BalloonGO2 = std::make_unique<GameObject>("GO_Ballon_1");
+	BalloonGO2->AddComponent<Image>(BalloonGO2.get())->SetTexture(balloonTexture);
+	BalloonGO2->SetParent(scene.FindObjectByID(4), true);
+	scene.Add(std::move(BalloonGO2));
 }
 
 int main(int, char* [])

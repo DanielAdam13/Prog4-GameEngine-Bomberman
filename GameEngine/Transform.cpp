@@ -33,8 +33,11 @@ glm::vec3 Transform::GetWorldRotation()
 glm::vec3 Transform::GetWorldScale()
 {
 	RecomputeWorldMatrix();
-	// TODO: insert return statement here
-	return {};
+	glm::vec3 scale{};
+	scale.x = glm::length(glm::vec3(m_WorldMatrix[0]));
+	scale.y = glm::length(glm::vec3(m_WorldMatrix[1]));
+	scale.z = glm::length(glm::vec3(m_WorldMatrix[2]));
+	return scale;
 }
 
 const glm::mat4x4& Transform::GetWorldMatrix()
