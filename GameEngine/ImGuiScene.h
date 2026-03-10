@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <string>
 
 namespace ge
 {
@@ -7,7 +9,7 @@ namespace ge
 	public:		
 		explicit ImGuiInstance() = default;
 		virtual ~ImGuiInstance() = default;
-		virtual void RenderImGui() const = 0;
+		virtual void RenderImGui() = 0;
 		virtual void UpdateImGui(float) = 0;
 
 	private:
@@ -17,24 +19,34 @@ namespace ge
 	class Exercise1ImGui final : public ImGuiInstance
 	{
 	public:
-		explicit Exercise1ImGui() = default;
+		explicit Exercise1ImGui();
 		virtual ~Exercise1ImGui() override = default;
 
-		virtual void RenderImGui() const override;
-		virtual void UpdateImGui(float) override;
+		virtual void RenderImGui() override;
+		virtual void UpdateImGui(float) override {};
 
 	private:
+		std::vector<int> m_LargeBuffer;
 
+		std::vector<float> m_AveragedTimings;
+		std::vector<float> m_StepValues;
+		
+		int m_SamplesNr;
+		static constexpr int MinStep{ 2 };
+		static constexpr int MaxStep{ 1024 };
+		
+		void RunBenchmark();
+		
 	};
 
 	class Exercise2ImGui final : public ImGuiInstance
 	{
 	public:
-		explicit Exercise2ImGui() = default;
+		explicit Exercise2ImGui();
 		virtual ~Exercise2ImGui() override = default;
 
-		virtual void RenderImGui() const override;
-		virtual void UpdateImGui(float) override;
+		virtual void RenderImGui() override;
+		virtual void UpdateImGui(float) override {};
 
 	private:
 

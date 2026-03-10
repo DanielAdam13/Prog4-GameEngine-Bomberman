@@ -136,6 +136,5 @@ void InitializeImGuiExercisesScene()
 {
 	Scene& ImGuiExercisesScene{ SceneManager::GetInstance().CreateScene() };
 	ImGuiExercisesScene.AddImGuiScene(std::make_unique<Exercise1ImGui>());
-	ImGuiExercisesScene.AddImGuiScene(std::make_unique<Exercise2ImGui>());
 }
 
