@@ -31,7 +31,7 @@ namespace ge
 	private:
 		SDL_Renderer* m_Renderer{};
 		SDL_Window* m_Window{}; // Doesn't own
-		SDL_Color m_ClearColor{};	
+		SDL_Color m_ClearColor{};
 	
 	};
 }
