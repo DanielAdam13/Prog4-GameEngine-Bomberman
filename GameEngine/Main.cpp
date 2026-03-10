@@ -99,13 +99,13 @@ static void LoadScenes()
 
 	ballonTransform->SetLocalScale({ 2.f, 2.f, 1.f });
 	ballonTransform->SetLocalPosition(ballonTransform->GetWorldPosition() + glm::vec3{ 250.f, 350.f, 0.f });
-	BalloonGO1->AddComponent<Rotator>(BalloonGO1.get(), true, 30.f, 360.f);
+	BalloonGO1->AddComponent<Rotator>(BalloonGO1.get(), 360.f, 30.f);
 	scene.Add(std::move(BalloonGO1));
 
 	auto BalloonGO2 = std::make_unique<GameObject>("GO_Ballon_1");
 	BalloonGO2->AddComponent<Image>(BalloonGO2.get())->SetTexture(balloonTexture);
 	BalloonGO2->SetParent(scene.FindObjectByID(4), false);
-	BalloonGO2->AddComponent<Rotator>(BalloonGO2.get(), false, 100.f, 360.f);
+	BalloonGO2->AddComponent<Rotator>(BalloonGO2.get(), -360.f, 100.f);
 	scene.Add(std::move(BalloonGO2));
 }
 

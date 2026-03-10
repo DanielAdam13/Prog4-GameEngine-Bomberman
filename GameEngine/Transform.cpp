@@ -100,8 +100,8 @@ Transform* Transform::GetParentTransform() const
 
 void Transform::MarkDirty()
 {
-	if (m_DirtyFlag)
-		return;
+	/*if (m_DirtyFlag)
+		return;*/ // Incorrect because if a child changes the flag is true for parent -> incorrect
 
 	m_DirtyFlag = true;
 

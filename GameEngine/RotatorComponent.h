@@ -13,7 +13,7 @@ namespace ge
 		// Every Rotator Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 4 };
 
-		Rotator(GameObject* pOwnerPtr, bool isClockwise = true, float radius = 50.f, float angularSpeedDegrees = 180.f);
+		Rotator(GameObject* pOwnerPtr, float angularSpeedDegrees = 180.f, float radius = 50.f);
 		~Rotator() override = default;
 
 		Rotator(const Rotator& other) = delete;
@@ -27,7 +27,6 @@ namespace ge
 
 	private:
 		Transform* pOwnerTransform; // Doesn't own
-		bool m_ClockwiseRotation;
 
 		const glm::vec3 m_CircleCenter;
 		const float m_Radius;
