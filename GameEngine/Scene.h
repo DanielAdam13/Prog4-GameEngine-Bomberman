@@ -3,9 +3,11 @@
 #include <string>
 #include <vector>
 #include "GameObject.h"
+#include "ImGuiScene.h"
 
 namespace ge
 {
+
 	class Scene final
 	{
 	public:
@@ -29,6 +31,9 @@ namespace ge
 		void RemoveObjectByName(const std::string& goName);
 		void RemoveObjectByID(const unsigned int index);
 
+		// ---- ImGui ----
+		void AddImGuiScene(std::unique_ptr<ImGuiInstance> imguiScene);
+
 	private:
 		friend class SceneManager;
 		explicit Scene() = default;
@@ -36,6 +41,8 @@ namespace ge
 		std::vector <std::unique_ptr<GameObject>> m_Objects{};
 
 		void CleanupDestroyedGameObjects();
+
+		std::vector<std::unique_ptr<ImGuiInstance>> m_ImGuiInstances{};
 	};
 
 }

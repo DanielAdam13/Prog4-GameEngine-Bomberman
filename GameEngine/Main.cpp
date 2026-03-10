@@ -26,7 +26,30 @@ namespace fs = std::filesystem;
 
 using namespace ge;
 
+void InitializeFirstScene();
+void InitializeImGuiExercisesScene();
+
 static void LoadScenes()
+{
+	InitializeFirstScene();
+	InitializeImGuiExercisesScene();
+}
+
+int main(int, char* [])
+{
+#if __EMSCRIPTEN__
+	fs::path data_location = "";
+#else
+	fs::path data_location = "./resources/";
+	if (!fs::exists(data_location))
+		data_location = "../resources/";
+#endif
+	GameEngine::GetInstance().InitializeEngine(data_location);
+	GameEngine::GetInstance().Run(LoadScenes);
+	return 0;
+}
+
+void InitializeFirstScene()
 {
 	Scene& scene{ SceneManager::GetInstance().CreateScene() };
 
@@ -46,20 +69,20 @@ static void LoadScenes()
 	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
 
 	// For test purposes
-	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") }; 
+	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") };
 	if (daeLogo)
 	{
 		auto daeImageComponent{ daeLogo->GetComponent<Image>() };
 		glm::vec2 imageSize{ daeImageComponent->GetTexture()->GetSize() };
 		daeLogo->GetComponent<Transform>()->SetLocalPosition(
-			{ windowSize.first / 2 - imageSize.x / 2, 
-			windowSize.second / 2 - imageSize.y / 2, 
+			{ windowSize.first / 2 - imageSize.x / 2,
+			windowSize.second / 2 - imageSize.y / 2,
 			0.f });
 	}
 
 	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 36) };
 	constexpr SDL_Color color{ SDL_Color{128, 128, 128, 255} };
-	
+
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
 	textGO->AddComponent<TextComponent>(textGO.get(), "0.00 FPS", font, color);
 	textGO->AddComponent<FPSComponent>(textGO.get());
@@ -84,14 +107,14 @@ static void LoadScenes()
 	auto prog4AssingGO = std::make_unique<GameObject>("GO_P4AssignmentText");
 	prog4AssingGO->AddComponent<TextComponent>(prog4AssingGO.get(), (TEST) ? "Programming 4 Assignment" : "false", font, color);
 
-	prog4AssingGO->GetComponent<Transform>()->SetLocalPosition({ 
+	prog4AssingGO->GetComponent<Transform>()->SetLocalPosition({
 		windowSize.first / 2 - prog4AssingGO->GetComponent<TextComponent>()->GetTextureSize().x / 2,
 		0.f, 0.f });
 	scene.Add(std::move(prog4AssingGO));
 
 
 	// WEEK 2 - Rotation
-	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
+	/*const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
 	auto BalloonGO1 = std::make_unique<GameObject>("GO_Ballon_0");
 	BalloonGO1->AddComponent<Image>(BalloonGO1.get())->SetTexture(balloonTexture);
@@ -106,20 +129,13 @@ static void LoadScenes()
 	BalloonGO2->AddComponent<Image>(BalloonGO2.get())->SetTexture(balloonTexture);
 	BalloonGO2->SetParent(scene.FindObjectByID(4), false);
 	BalloonGO2->AddComponent<Rotator>(BalloonGO2.get(), -360.f, 100.f);
-	scene.Add(std::move(BalloonGO2));
+	scene.Add(std::move(BalloonGO2));*/
 }
 
-int main(int, char* [])
+void InitializeImGuiExercisesScene()
 {
-#if __EMSCRIPTEN__
-	fs::path data_location = "";
-#else
-	fs::path data_location = "./resources/";
-	if (!fs::exists(data_location))
-		data_location = "../resources/";
-#endif
-	GameEngine::GetInstance().InitializeEngine(data_location);
-	GameEngine::GetInstance().Run(LoadScenes);
-	return 0;
+	Scene& ImGuiExercisesScene{ SceneManager::GetInstance().CreateScene() };
+	ImGuiExercisesScene.AddImGuiScene(std::make_unique<Exercise1ImGui>());
+	ImGuiExercisesScene.AddImGuiScene(std::make_unique<Exercise2ImGui>());
 }
 

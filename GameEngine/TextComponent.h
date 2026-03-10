@@ -25,7 +25,7 @@ namespace ge
 		TextComponent& operator=(const TextComponent& other) = delete;
 		TextComponent& operator=(TextComponent&& other) = delete;
 
-		// Needs to override Update and Renderer
+		// Needs to override UpdateImGui and Renderer
 		virtual void FixedUpdateComponent(float) override {};
 		virtual void UpdateComponent(float) override;
 		virtual void RenderComponent() const override;

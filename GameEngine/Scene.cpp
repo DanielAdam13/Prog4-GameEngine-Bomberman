@@ -45,6 +45,12 @@ void Scene::Update(float deltaTime)
 			object->Update(deltaTime);
 	}
 
+	for (auto& imgui : m_ImGuiInstances)
+	{
+		if(imgui)
+			imgui->UpdateImGui(deltaTime);
+	}
+
 	CleanupDestroyedGameObjects();
 }
 
@@ -54,6 +60,12 @@ void Scene::Render() const
 	{
 		if (object && !object->MarkedForDeletion())
 			object->Render();
+	}
+
+	for (const auto& imgui : m_ImGuiInstances)
+	{
+		if(imgui)
+			imgui->RenderImGui();
 	}
 }
 
@@ -112,6 +124,12 @@ void Scene::RemoveObjectByID(const unsigned int index)
 
 	if (obj && !obj->MarkedForDeletion())
 		obj->MarkForDeletion(); // MARK
+}
+
+void Scene::AddImGuiScene(std::unique_ptr<ImGuiInstance> imguiScene)
+{
+	if (imguiScene)
+		m_ImGuiInstances.emplace_back(std::move(imguiScene));
 }
 
 void Scene::CleanupDestroyedGameObjects()

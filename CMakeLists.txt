@@ -19,7 +19,7 @@ endif()
 # list source files here
 add_executable(${TARGET_NAME} ${TARGET_PARAM}
   GameEngine/Main.cpp
- "GameEngine/GameEngine.h" "GameEngine/GameEngine.cpp" "GameEngine/Singleton.h" "GameEngine/Renderer.cpp" "GameEngine/Renderer.h" "GameEngine/Texture2D.cpp" "GameEngine/Texture2D.h" "GameEngine/ResourceManager.cpp" "GameEngine/ResourceManager.h" "GameEngine/Font.cpp" "GameEngine/Font.h" "GameEngine/InputManager.cpp" "GameEngine/InputManager.h" "GameEngine/Scene.cpp" "GameEngine/Scene.h" "GameEngine/SceneManager.cpp" "GameEngine/SceneManager.h" "GameEngine/GameObject.h" "GameEngine/GameObject.cpp" "GameEngine/Transform.h" "GameEngine/Transform.cpp" "GameEngine/Component.h"   "GameEngine/Image.h" "GameEngine/Image.cpp" "GameEngine/TextComponent.h" "GameEngine/TextComponent.cpp" "GameEngine/FPSComponent.h" "GameEngine/FPSComponent.cpp" "GameEngine/RotatorComponent.h" "GameEngine/RotatorComponent.cpp")
+ "GameEngine/GameEngine.h" "GameEngine/GameEngine.cpp" "GameEngine/Singleton.h" "GameEngine/Renderer.cpp" "GameEngine/Renderer.h" "GameEngine/Texture2D.cpp" "GameEngine/Texture2D.h" "GameEngine/ResourceManager.cpp" "GameEngine/ResourceManager.h" "GameEngine/Font.cpp" "GameEngine/Font.h" "GameEngine/InputManager.cpp" "GameEngine/InputManager.h" "GameEngine/Scene.cpp" "GameEngine/Scene.h" "GameEngine/SceneManager.cpp" "GameEngine/SceneManager.h" "GameEngine/GameObject.h" "GameEngine/GameObject.cpp" "GameEngine/Transform.h" "GameEngine/Transform.cpp" "GameEngine/Component.h"   "GameEngine/Image.h" "GameEngine/Image.cpp" "GameEngine/TextComponent.h" "GameEngine/TextComponent.cpp" "GameEngine/FPSComponent.h" "GameEngine/FPSComponent.cpp" "GameEngine/RotatorComponent.h" "GameEngine/RotatorComponent.cpp" "GameEngine/ImGuiScene.h" "GameEngine/ImGuiScene.cpp")
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
@@ -43,7 +43,7 @@ add_library(imgui STATIC
   ${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp
-)
+ "GameEngine/ImGuiScene.h" "GameEngine/ImGuiScene.cpp")
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${sdl3_SOURCE_DIR}/include)
 target_link_libraries(imgui PUBLIC SDL3::SDL3)
