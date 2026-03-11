@@ -9,13 +9,17 @@
 
 #include "Singleton.h"
 #include <glm/glm.hpp>
+#include <memory>
+
+#include "Commands/GameObjectCommand.h"
 
 namespace ge
 {
+
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
-		bool ProcessInput();
+		bool ProcessInput(float deltaTime);
 		void UpdateController(unsigned int controllerIndex = 0);
 
 		// Keyboard
@@ -31,6 +35,17 @@ namespace ge
 
 		bool IsControllerConnected() const noexcept { return m_ControllerConnected; }
 
+		enum class InputTrigger
+		{
+			Down,
+			Up,
+			Pressed
+		};
+
+		void BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
+		void BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
+
+
 	private:
 #ifdef _WIN32
 		XINPUT_STATE m_PreviousState{};
@@ -45,6 +60,23 @@ namespace ge
 		static constexpr float STICK_DEADZONE{ 0.1f }; // 10%
 		void ApplyRadialDeadzone(float& x, float& y, float deadzone);
 		static constexpr float STICK_MAX_VALUE{ 32767.f };
+
+		struct KeyBoardBinding
+		{
+			SDL_Scancode key;
+			InputTrigger triggerType;
+			std::unique_ptr<GameObjectCommand> command;
+		};
+
+		struct ControllerBinding
+		{
+			unsigned int button;
+			InputTrigger triggerType;
+			std::unique_ptr<GameObjectCommand> command;
+		};
+
+		std::vector<KeyBoardBinding> m_KeyboardBindings{};
+		std::vector<ControllerBinding> m_ControllerBindings{};
 	};
 
 }

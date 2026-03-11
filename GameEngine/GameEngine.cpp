@@ -133,7 +133,7 @@ void GameEngine::RunOneFrame()
 
 	// ---- MAIN FRAME LOGIC ----
 #pragma region MainFrame
-	m_Quit = !InputManager::GetInstance().ProcessInput();
+	m_Quit = !InputManager::GetInstance().ProcessInput(m_DeltaTime);
 
 	m_FrameLag += m_DeltaTime;
 	while (m_FrameLag >= m_FixedTimeStep)

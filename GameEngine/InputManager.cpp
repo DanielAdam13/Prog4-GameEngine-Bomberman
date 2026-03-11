@@ -5,9 +5,58 @@
 
 using namespace ge;
 
-bool InputManager::ProcessInput()
+bool InputManager::ProcessInput(float deltaTime)
 {
 	UpdateController(m_ControllerIndex);
+
+	const bool* keyState{ SDL_GetKeyboardState(nullptr) };
+
+	// --- Pressed Keyboard Bindings ---
+#pragma region PressedKeyBindingCommands
+	for (auto& keyBinding : m_KeyboardBindings)
+	{
+		bool shouldExecute{ false };
+
+		switch (keyBinding.triggerType)
+		{
+		case InputTrigger::Pressed:
+			shouldExecute = keyState[keyBinding.key];
+			break;
+		case InputTrigger::Down:
+			// Down in event loop
+			break;
+		case InputTrigger::Up:
+			// Down in Event Loop
+			break;
+		}
+		if (shouldExecute)
+			keyBinding.command->Execute(deltaTime);
+	}
+#pragma endregion
+
+	// --- Controller bindings ---
+#pragma region ControllerCommands
+	for (auto& controllerBinding : m_ControllerBindings)
+	{
+		bool shouldExecute{ false };
+
+		switch (controllerBinding.triggerType)
+		{
+		case InputTrigger::Down:    
+			shouldExecute = IsButtonDownThisFrame(controllerBinding.button); 
+			break;
+		case InputTrigger::Up:     
+			shouldExecute = IsButtonUpThisFrame(controllerBinding.button);  
+			break;
+		case InputTrigger::Pressed: 
+			shouldExecute = IsButtonPressed(controllerBinding.button);    
+			break;
+		}
+
+		if (shouldExecute)
+			controllerBinding.command->Execute(deltaTime);
+	}
+#pragma endregion
 
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) 
@@ -15,15 +64,44 @@ bool InputManager::ProcessInput()
 		if (e.type == SDL_EVENT_QUIT)
 			return false;
 
+		// --- Up and Down Keyboard Bindings ---
+#pragma region DownUpKeyBindingCommands
 		if (e.type == SDL_EVENT_KEY_DOWN) 
 		{
-			
+			// 1. If triggerType type matches
+			// and
+			// 2. If SDL key matches the keybinding's key
+			for (auto& keyBinding : m_KeyboardBindings)
+			{
+				if (keyBinding.triggerType == InputTrigger::Down &&
+					e.key.scancode == keyBinding.key)
+				{
+					keyBinding.command->Execute(deltaTime);
+				}
+			}
 		}
+
+		if (e.type == SDL_EVENT_KEY_UP)
+		{
+			for (auto& keyBinding : m_KeyboardBindings)
+			{
+				// 1. If triggerType type matches
+				// and
+				// 2. If SDL key matches the keybinding's key
+				if (keyBinding.triggerType == InputTrigger::Up &&
+					e.key.scancode == keyBinding.key)
+				{
+					keyBinding.command->Execute(deltaTime);
+				}
+			}
+		}
+
 		if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) 
 		{
 			
 		}
 		// etc...
+#pragma endregion
 
 		ImGui_ImplSDL3_ProcessEvent(&e);
 	}
@@ -93,6 +171,16 @@ glm::vec2 InputManager::GetRightStick()
 	float y{ m_CurrentState.Gamepad.sThumbRY / STICK_MAX_VALUE };
 	ApplyRadialDeadzone(x, y, STICK_DEADZONE);
 	return { x, y };
+}
+
+void InputManager::BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
+{
+	m_KeyboardBindings.push_back(KeyBoardBinding{ key, trigger, std::move(command) });
+}
+
+void InputManager::BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
+{
+	m_ControllerBindings.push_back(ControllerBinding{ button, trigger, std::move(command) });
 }
 
 void InputManager::ApplyRadialDeadzone(float& x, float& y, float deadzone)
