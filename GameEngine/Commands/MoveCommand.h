@@ -9,7 +9,7 @@ namespace ge
 	class MoveCommand final : public GameObjectCommand
 	{
 	public:
-		MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed = 10.f);
+		MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed = 80.f);
 		~MoveCommand() override = default;
 
 		virtual void Execute(float deltaTime) override;

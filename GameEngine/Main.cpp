@@ -24,15 +24,20 @@ namespace fs = std::filesystem;
 #include "Components/FPSComponent.h"
 #include "Components/RotatorComponent.h"
 
+#include "InputManager.h"
+#include "Commands/MoveCommand.h"
+
 using namespace ge;
 
 void InitializeFirstScene();
 void InitializeImGuiExercisesScene();
+void InitializePlayerInputTestScene();
 
 static void LoadScenes()
 {
 	InitializeFirstScene();
-	InitializeImGuiExercisesScene();
+	//InitializeImGuiExercisesScene();
+	InitializePlayerInputTestScene();
 }
 
 int main(int, char* [])
@@ -136,5 +141,33 @@ void InitializeImGuiExercisesScene()
 {
 	Scene& ImGuiExercisesScene{ SceneManager::GetInstance().CreateScene() };
 	ImGuiExercisesScene.AddImGuiScene(std::make_unique<Exercise1ImGui>());
+}
+
+void InitializePlayerInputTestScene()
+{
+	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
+
+	const auto playerTexture{ ResourceManager::GetInstance().LoadTexture("I_Player_Bomberman.png") };
+
+	auto player1GO = std::make_unique<GameObject>("GO_Player1");
+	player1GO->AddComponent<Image>(player1GO.get())->SetTexture(playerTexture);
+
+	auto playerTransform{ player1GO->GetComponent<Transform>() };
+	playerTransform->SetLocalPosition(playerTransform->GetWorldPosition() + glm::vec3{ 250.f, 350.f, 0.f });
+	playerTransform->SetLocalScale(glm::vec3{ 2.5f, 2.5f, 2.5f });
+
+	auto& input{ InputManager::GetInstance() };
+
+	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{0.f, -1.f, 0.f}));
+	input.BindKeyboardCommand(SDL_SCANCODE_A, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }));
+	input.BindKeyboardCommand(SDL_SCANCODE_S, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
+	input.BindKeyboardCommand(SDL_SCANCODE_D, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
+
+	InputTestScene.Add(std::move(player1GO));
+
 }
 
