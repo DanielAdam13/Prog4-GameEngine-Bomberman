@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObjectCommand.h"
+#include <glm/glm.hpp>
 
 namespace ge
 {
@@ -8,14 +9,20 @@ namespace ge
 	class MoveCommand final : public GameObjectCommand
 	{
 	public:
-		MoveCommand(GameObject* target);
+		MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed = 10.f);
 		~MoveCommand() override = default;
 
 		virtual void Execute(float deltaTime) override;
 
+		void SetSpeed(float newSpeed);
+		float GetSpeed() const noexcept;
+
 	private:
 		void Move(float deltaTime);
 		Transform* m_pTargetTransform;
+
+		glm::vec3 m_Direction;
+		float m_MoveSpeed;
 
 	};
 }
