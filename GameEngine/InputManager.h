@@ -7,6 +7,8 @@
 	#include <Xinput.h>
 #endif
 
+#include <SDL3/SDL.h>
+
 #include "Singleton.h"
 #include <glm/glm.hpp>
 #include <memory>
@@ -44,7 +46,7 @@ namespace ge
 
 		void BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
 		void BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
-
+		void BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command);
 
 	private:
 #ifdef _WIN32
@@ -77,6 +79,8 @@ namespace ge
 
 		std::vector<KeyBoardBinding> m_KeyboardBindings{};
 		std::vector<ControllerBinding> m_ControllerBindings{};
+
+		std::unique_ptr<GameObjectCommand> m_LeftStickCommand{};
 	};
 
 }

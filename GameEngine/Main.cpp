@@ -26,6 +26,7 @@ namespace fs = std::filesystem;
 
 #include "InputManager.h"
 #include "Commands/MoveCommand.h"
+#include "Commands/MoveStickCommand.h"
 
 using namespace ge;
 
@@ -148,26 +149,34 @@ void InitializePlayerInputTestScene()
 	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
 
 	const auto playerTexture{ ResourceManager::GetInstance().LoadTexture("I_Player_Bomberman.png") };
+	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
 	auto player1GO = std::make_unique<GameObject>("GO_Player1");
 	player1GO->AddComponent<Image>(player1GO.get())->SetTexture(playerTexture);
+	auto player1Transform{ player1GO->GetComponent<Transform>() };
+	player1Transform->SetLocalPosition(player1Transform->GetWorldPosition() + glm::vec3{ 250.f, 350.f, 0.f });
+	player1Transform->SetLocalScale(glm::vec3{ 2.5f, 2.5f, 2.5f });
 
-	auto playerTransform{ player1GO->GetComponent<Transform>() };
-	playerTransform->SetLocalPosition(playerTransform->GetWorldPosition() + glm::vec3{ 250.f, 350.f, 0.f });
-	playerTransform->SetLocalScale(glm::vec3{ 2.5f, 2.5f, 2.5f });
+	auto player2GO = std::make_unique<GameObject>("GO_Player2");
+	player2GO->AddComponent<Image>(player2GO.get())->SetTexture(balloonTexture);
+	auto player2Transform{ player2GO->GetComponent<Transform>() };
+	player2Transform->SetLocalPosition(player2Transform->GetWorldPosition() + glm::vec3{ 200.f, 150.f, 0.f });
+	player2Transform->SetLocalScale(glm::vec3{ 2.f, 2.f, 2.f });
 
 	auto& input{ InputManager::GetInstance() };
 
 	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{0.f, -1.f, 0.f}));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, 120.f));
 	input.BindKeyboardCommand(SDL_SCANCODE_A, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, 120.f));
 	input.BindKeyboardCommand(SDL_SCANCODE_S, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, 120.f));
 	input.BindKeyboardCommand(SDL_SCANCODE_D, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, 120.f));
+
+	input.BindControllerStickCommand(std::make_unique<MoveStickCommand>(player2GO.get(), 240.f));
 
 	InputTestScene.Add(std::move(player1GO));
+	InputTestScene.Add(std::move(player2GO));
 
 }
-

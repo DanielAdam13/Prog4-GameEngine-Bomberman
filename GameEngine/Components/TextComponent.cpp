@@ -84,6 +84,6 @@ void TextComponent::UpdateTextureForText()
 	}
 	else
 	{
-		*m_TextTexture = Texture2D(texture); // Move assingment
+		*m_TextTexture = Texture2D(texture); // MoveController assingment
 	}
 }

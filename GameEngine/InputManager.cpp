@@ -56,6 +56,9 @@ bool InputManager::ProcessInput(float deltaTime)
 		if (shouldExecute)
 			controllerBinding.command->Execute(deltaTime);
 	}
+
+	if (m_ControllerConnected && m_LeftStickCommand)
+		m_LeftStickCommand->Execute(deltaTime);
 #pragma endregion
 
 	SDL_Event e;
@@ -181,6 +184,11 @@ void InputManager::BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, s
 void InputManager::BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
 {
 	m_ControllerBindings.push_back(ControllerBinding{ button, trigger, std::move(command) });
+}
+
+void InputManager::BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command)
+{
+	m_LeftStickCommand = std::move(command);
 }
 
 void InputManager::ApplyRadialDeadzone(float& x, float& y, float deadzone)
