@@ -1,5 +1,5 @@
 #include "GameObject.h"
-#include "Transform.h"
+#include "Components/Transform.h"
 
 using namespace ge;
 

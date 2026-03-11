@@ -18,11 +18,11 @@ namespace fs = std::filesystem;
 #include "ResourceManager.h"
 #include "Renderer.h"
 
-#include "Image.h"
-#include "Transform.h"
-#include "TextComponent.h"
-#include "FPSComponent.h"
-#include "RotatorComponent.h"
+#include "Components/Image.h"
+#include "Components/Transform.h"
+#include "Components/TextComponent.h"
+#include "Components/FPSComponent.h"
+#include "Components/RotatorComponent.h"
 
 using namespace ge;
 

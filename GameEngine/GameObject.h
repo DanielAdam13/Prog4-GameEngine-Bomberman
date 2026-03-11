@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 #include <memory>
-#include "Transform.h"
+#include "Components/Transform.h"
 #include <array>
-#include "Component.h"
+#include "Components/Component.h"
 
 #include <concepts>
 #include <stdexcept>
