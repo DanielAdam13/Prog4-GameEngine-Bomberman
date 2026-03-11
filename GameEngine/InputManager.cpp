@@ -1,7 +1,7 @@
-#include <Windows.h>
 #include <SDL3/SDL.h>
 #include "InputManager.h"
 #include <backends/imgui_impl_sdl3.h>
+#include <cmath>
 
 using namespace ge;
 
@@ -75,4 +75,38 @@ bool InputManager::IsButtonUpThisFrame(unsigned int button) const noexcept
 bool InputManager::IsButtonPressed(unsigned int button) const noexcept
 {
 	return m_CurrentState.Gamepad.wButtons & button;
+}
+
+glm::vec2 InputManager::GetLeftStick()
+{
+	// should clamp between -1.f : 1.f for safety is using in animation or physics
+	float x{ m_CurrentState.Gamepad.sThumbLX / STICK_MAX_VALUE };
+	float y{ m_CurrentState.Gamepad.sThumbLY / STICK_MAX_VALUE };
+	ApplyRadialDeadzone(x, y, STICK_DEADZONE);
+	return { x, y };
+}
+
+glm::vec2 InputManager::GetRightStick()
+{
+	// should clamp between -1.f : 1.f for safety is using in animation or physics
+	float x{ m_CurrentState.Gamepad.sThumbRX / STICK_MAX_VALUE };
+	float y{ m_CurrentState.Gamepad.sThumbRY / STICK_MAX_VALUE };
+	ApplyRadialDeadzone(x, y, STICK_DEADZONE);
+	return { x, y };
+}
+
+void InputManager::ApplyRadialDeadzone(float& x, float& y, float deadzone)
+{
+	const float magnitude{ std::sqrt(x * x + y * y) };
+	if (magnitude < deadzone)
+	{
+		x = 0.f;
+		y = 0.f;
+		return;
+	}
+
+	// Apply deadzone
+	const float scale{ (magnitude - deadzone) / (1.f - deadzone) / magnitude };
+	x *= scale;
+	y *= scale;
 }

@@ -8,6 +8,7 @@
 #endif
 
 #include "Singleton.h"
+#include <glm/glm.hpp>
 
 namespace ge
 {
@@ -25,6 +26,9 @@ namespace ge
 		bool IsButtonUpThisFrame(unsigned int button) const noexcept;
 		bool IsButtonPressed(unsigned int button) const noexcept;
 
+		glm::vec2 GetLeftStick();
+		glm::vec2 GetRightStick();
+
 		bool IsControllerConnected() const noexcept { return m_ControllerConnected; }
 
 	private:
@@ -33,10 +37,14 @@ namespace ge
 		XINPUT_STATE m_CurrentState{};
 		WORD m_ButtonsPressedThisFrame{ 0 };
 		WORD m_ButtonsReleasedThisFrame{ 0 };
-		bool m_ControllerConnected{ false };
 #endif
 
+		bool m_ControllerConnected{ false };
 		unsigned int m_ControllerIndex{ 0 };
+
+		static constexpr float STICK_DEADZONE{ 0.1f }; // 10%
+		void ApplyRadialDeadzone(float& x, float& y, float deadzone);
+		static constexpr float STICK_MAX_VALUE{ 32767.f };
 	};
 
 }
