@@ -8,8 +8,8 @@ Rotator::Rotator(GameObject* pOwnerPtr, float angularSpeedDegrees, float radius 
 	:Component::Component(pOwnerPtr),
 	pOwnerTransform{ GetOwner()->GetComponent<Transform>() },
 	m_CircleCenter{ pOwnerTransform->GetWorldPosition() },
-	m_AngularSpeed{ glm::radians(angularSpeedDegrees) },
 	m_Radius{ radius },
+	m_AngularSpeed{ glm::radians(angularSpeedDegrees) },
 	m_Angle{ 0.f }
 {
 }

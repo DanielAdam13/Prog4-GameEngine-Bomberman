@@ -149,6 +149,7 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
   glm::glm
   imgui
   ${VLD_LIBRARIES}
+  $<$<PLATFORM_ID:Windows>:xinput.lib>
 )
 
 #----------------------------
