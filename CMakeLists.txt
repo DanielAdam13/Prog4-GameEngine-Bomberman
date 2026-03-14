@@ -30,7 +30,7 @@ target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui
-  GIT_TAG v1.92.5-docking
+  GIT_TAG docking
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(imgui)

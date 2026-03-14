@@ -54,7 +54,7 @@ namespace ge
 		void UnbindAllCommandsOfTarget(GameObject* target);
 
 	private:
-		// Acutal implementation in .cpp
+		// Acutal PIMPL implementation in .cpp
 		std::unique_ptr<InputManagerImpl> m_Impl;
 
 	};
