@@ -1,17 +1,16 @@
 #include "InputManager.h"
 
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
-#include <Xinput.h>
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
+	#include <Windows.h>
+	#include <Xinput.h>
 #endif
-
-#include "Commands/GameObjectCommand.h"
-
 
 #include <backends/imgui_impl_sdl3.h>
 #include <cmath>
+
+#include "Commands/GameObjectCommand.h"
 
 namespace ge
 {
@@ -19,6 +18,10 @@ namespace ge
 	class InputManagerImpl
 	{
 	public:
+		InputManagerImpl() = default;
+		// Emscripten build needs SDL gamepad cleanup
+		~InputManagerImpl();
+
 		bool ProcessInput(float deltaTime);
 		void UpdateController(unsigned int controllerIndex = 0);
 
@@ -81,6 +84,10 @@ namespace ge
 		std::vector<ControllerBinding> m_ControllerBindings{};
 
 		std::unique_ptr<GameObjectCommand> m_LeftStickCommand{};
+
+#ifndef WIN32
+		void MapButton(SDL_GamepadButton sdlButton, unsigned int bit);
+#endif // !WIN32
 	};
 
 
@@ -162,6 +169,18 @@ namespace ge
 // --------------------------------
 namespace ge
 {
+	InputManagerImpl::~InputManagerImpl()
+	{
+#ifndef WIN32
+		if (m_pGamepad)
+		{
+			SDL_CloseGamepad(m_pGamepad);
+			m_pGamepad = nullptr;
+		}
+#endif // !WIN32
+
+	}
+
 	bool InputManagerImpl::ProcessInput(float deltaTime)
 	{
 		UpdateController(m_ControllerIndex);
@@ -273,6 +292,7 @@ namespace ge
 	{
 		m_ControllerIndex = controllerIndex;
 
+#ifdef WIN32
 		CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
 		ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
 
@@ -293,6 +313,52 @@ namespace ge
 		auto buttonChanges{ m_CurrentState.Gamepad.wButtons ^ m_PreviousState.Gamepad.wButtons };
 		m_ButtonsPressedThisFrame = buttonChanges & m_CurrentState.Gamepad.wButtons;
 		m_ButtonsReleasedThisFrame = buttonChanges & (~m_CurrentState.Gamepad.wButtons);
+#else
+		// Open Gamepad if not yet connected (for runtime)
+		if (!m_pGamepad)
+		{
+			int count{};
+			SDL_JoystickID* gamepads{ SDL_GetGamepads(&count) };
+
+			if (gamepads && count > static_cast<int>(controllerIndex))
+				m_pGamepad = SDL_OpenGamepad(gamepads[controllerIndex]);
+
+			SDL_free(gamepads);
+		}
+
+		m_ControllerConnected = (m_pGamepad != nullptr);
+		if (!m_ControllerConnected)
+		{
+			m_SDLButtonsCurrent = 0;
+			m_SDLButtonsPrevious = 0;
+			m_ButtonsPressedThisFrame = 0;
+			m_ButtonsReleasedThisFrame = 0;
+			return;
+		}
+
+		m_SDLButtonsPrevious = m_SDLButtonsCurrent;
+		m_SDLButtonsCurrent = 0;
+
+		// Map all buttons to the defined gamepad in InputManager bits
+		MapButton(SDL_GAMEPAD_BUTTON_DPAD_UP, ControllerButton::DpadUp);
+		MapButton(SDL_GAMEPAD_BUTTON_DPAD_DOWN, ControllerButton::DpadDown);
+		MapButton(SDL_GAMEPAD_BUTTON_DPAD_LEFT, ControllerButton::DpadLeft);
+		MapButton(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, ControllerButton::DpadRight);
+		MapButton(SDL_GAMEPAD_BUTTON_START, ControllerButton::Start);
+		MapButton(SDL_GAMEPAD_BUTTON_BACK, ControllerButton::Back);
+		MapButton(SDL_GAMEPAD_BUTTON_LEFT_STICK, ControllerButton::LeftThumb);
+		MapButton(SDL_GAMEPAD_BUTTON_RIGHT_STICK, ControllerButton::RightThumb);
+		MapButton(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, ControllerButton::LeftShoulder);
+		MapButton(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, ControllerButton::RightShoulder);
+		MapButton(SDL_GAMEPAD_BUTTON_SOUTH, ControllerButton::A);
+		MapButton(SDL_GAMEPAD_BUTTON_EAST, ControllerButton::B);
+		MapButton(SDL_GAMEPAD_BUTTON_WEST, ControllerButton::X);
+		MapButton(SDL_GAMEPAD_BUTTON_NORTH, ControllerButton::Y);
+
+		uint32_t buttonChanges{ m_SDLButtonsCurrent ^ m_SDLButtonsPrevious };
+		m_ButtonsPressedThisFrame = buttonChanges & m_SDLButtonsCurrent;
+		m_ButtonsReleasedThisFrame = buttonChanges & (~m_SDLButtonsCurrent);
+#endif
 	}
 
 	bool InputManagerImpl::IsKeyDown(SDL_Scancode) const
@@ -317,23 +383,43 @@ namespace ge
 
 	bool InputManagerImpl::IsButtonPressed(unsigned int button) const noexcept
 	{
+#ifdef WIN32
 		return m_CurrentState.Gamepad.wButtons & button;
+#else
+		return m_SDLButtonsCurrent & button;
+#endif
 	}
 
 	glm::vec2 InputManagerImpl::GetLeftStick()
 	{
+#ifdef WIN32
 		// should clamp between -1.f : 1.f for safety is using in animation or physics
 		float x{ m_CurrentState.Gamepad.sThumbLX / STICK_MAX_VALUE };
 		float y{ m_CurrentState.Gamepad.sThumbLY / STICK_MAX_VALUE };
+#else
+		if (!m_pGamepad) 
+			return { 0.f, 0.f };
+
+		float x{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_LEFTX) / STICK_MAX_VALUE };
+		float y{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_LEFTY) / STICK_MAX_VALUE };
+#endif // WIN32
+
 		ApplyRadialDeadzone(x, y, STICK_DEADZONE);
 		return { x, y };
 	}
 
 	glm::vec2 InputManagerImpl::GetRightStick()
 	{
+#ifdef WIN32
 		// should clamp between -1.f : 1.f for safety is using in animation or physics
 		float x{ m_CurrentState.Gamepad.sThumbRX / STICK_MAX_VALUE };
 		float y{ m_CurrentState.Gamepad.sThumbRY / STICK_MAX_VALUE };
+#else
+		if (!m_pGamepad) return { 0.f, 0.f };
+		float x{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_RIGHTX) / STICK_MAX_VALUE };
+		float y{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_RIGHTY) / STICK_MAX_VALUE };
+#endif // WIN32
+
 		ApplyRadialDeadzone(x, y, STICK_DEADZONE);
 		return { x, y };
 	}
@@ -412,4 +498,11 @@ namespace ge
 		y *= scale;
 	}
 
+#ifndef WIN32
+	void InputManagerImpl::MapButton(SDL_GamepadButton sdlButton, unsigned int bit)
+	{
+		if (SDL_GetGamepadButton(m_pGamepad, sdlButton))
+			m_SDLButtonsCurrent |= bit;
+	}
+#endif // !WIN32
 }
