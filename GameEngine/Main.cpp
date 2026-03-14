@@ -176,6 +176,15 @@ void InitializePlayerInputTestScene()
 
 	input.BindControllerStickCommand(std::make_unique<MoveStickCommand>(player2GO.get(), 240.f));
 
+	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_UP, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, 240.f));
+	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_LEFT, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, 240.f));
+	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_DOWN, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, 240.f));
+	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_RIGHT, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, 240.f));
+
 	InputTestScene.Add(std::move(player1GO));
 	InputTestScene.Add(std::move(player2GO));
 

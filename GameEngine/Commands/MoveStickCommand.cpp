@@ -20,6 +20,8 @@ void MoveStickCommand::Execute(float deltaTime)
 void MoveStickCommand::MoveController(float deltaTime)
 {
 	const glm::vec2 stick{ InputManager::GetInstance().GetLeftStick() };
+
+	// Guard against deadzone, even after it was done in GetLeftStick
 	if (glm::length(stick) < 0.01f) 
 		return;
 
