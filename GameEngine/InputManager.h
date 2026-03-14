@@ -48,6 +48,11 @@ namespace ge
 		void BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
 		void BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command);
 
+		void UnbindAll();
+		void UnbindAllKeyboard();
+		void UnbindAllController();
+		void UnbindAllCommandsOfTarget(GameObject* target);
+
 	private:
 #ifdef _WIN32
 		XINPUT_STATE m_PreviousState{};

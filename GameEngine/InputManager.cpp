@@ -191,6 +191,49 @@ void InputManager::BindControllerStickCommand(std::unique_ptr<GameObjectCommand>
 	m_LeftStickCommand = std::move(command);
 }
 
+void InputManager::UnbindAll()
+{
+	m_KeyboardBindings.clear();
+	m_ControllerBindings.clear();
+	m_LeftStickCommand.reset();
+}
+
+void InputManager::UnbindAllKeyboard()
+{
+	m_KeyboardBindings.clear();
+}
+
+void InputManager::UnbindAllController()
+{
+	m_ControllerBindings.clear();
+	m_LeftStickCommand.reset();
+}
+
+void InputManager::UnbindAllCommandsOfTarget(GameObject* target)
+{
+	// Unbind Keyboard
+	std::erase_if(m_KeyboardBindings, [target](const KeyBoardBinding& binding)
+		{
+			const auto* command{ binding.command.get() };
+			return command && command->GetCommandTarget() == target; // If matching target and not null
+		});
+
+	// Unbind Controller
+	std::erase_if(m_ControllerBindings, [target](const ControllerBinding& binding)
+		{
+			const auto* command{ binding.command.get() };
+			return command && command->GetCommandTarget() == target;
+		});
+
+	// Unbind Controller Stick
+	if (m_LeftStickCommand)
+	{
+		const auto* command{ m_LeftStickCommand.get() };
+		if (command && command->GetCommandTarget() == target)
+			m_LeftStickCommand.reset();
+	}
+}
+
 void InputManager::ApplyRadialDeadzone(float& x, float& y, float deadzone)
 {
 	const float magnitude{ std::sqrt(x * x + y * y) };

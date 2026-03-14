@@ -93,19 +93,6 @@ void InitializeFirstScene()
 	textGO->AddComponent<TextComponent>(textGO.get(), "0.00 FPS", font, color);
 	textGO->AddComponent<FPSComponent>(textGO.get());
 
-	// TEST Reparenting:
-	/*textGO->SetParent(scene.FindObjectByID(1));
-
-	auto textTrans{ textGO->GetComponent<Transform>() };
-	textTrans->SetLocalPosition(textTrans->GetWorldPosition() + glm::vec3{100.f, 0.f, 0.f});
-
-	auto parentTrans{ scene.FindObjectByID(1)->GetComponent<Transform>() };
-	parentTrans->SetLocalPosition(parentTrans->GetLocalPosition() + glm::vec3{ 0.f, 150.f, 0.f });
-	textGO->SetParent(nullptr);
-
-	parentTrans->SetLocalPosition(parentTrans->GetLocalPosition() + glm::vec3{ 0.f, -150.f, 0.f });
-	textTrans->SetLocalPosition(textTrans->GetWorldPosition() + glm::vec3{ 250.f, 0.f, 0.f });*/
-
 	const bool TEST{ textGO->HasComponent<TextComponent>() };
 
 	scene.Add(std::move(textGO));

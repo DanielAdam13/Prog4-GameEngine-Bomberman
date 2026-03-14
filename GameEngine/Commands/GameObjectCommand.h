@@ -18,8 +18,10 @@ namespace ge
 
 		virtual void Execute(float) override = 0;
 
+		// Public for unbinding per target
+		GameObject* GetCommandTarget() const noexcept { return m_Target; } 
+
 	protected:
-		GameObject* GetCommandTarget() const noexcept { return m_Target; }
 
 	private:
 		GameObject* m_Target;
