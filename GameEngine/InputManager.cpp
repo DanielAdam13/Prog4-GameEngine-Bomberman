@@ -51,13 +51,15 @@ namespace ge
 #ifdef _WIN32
 		XINPUT_STATE m_PreviousState{};
 		XINPUT_STATE m_CurrentState{};
-		WORD m_ButtonsPressedThisFrame{ 0 };
-		WORD m_ButtonsReleasedThisFrame{ 0 };
+		
 #else
 		SDL_Gamepad* m_pGamepad{ nullptr };
 		uint32_t m_SDLButtonsCurrent{ 0 };
 		uint32_t m_SDLButtonsPrevious{ 0 };
 #endif
+
+		uint32_t m_ButtonsPressedThisFrame{ 0 };
+		uint32_t m_ButtonsReleasedThisFrame{ 0 };
 
 		bool m_ControllerConnected{ false };
 		unsigned int m_ControllerIndex{ 0 };
@@ -85,7 +87,7 @@ namespace ge
 
 		std::unique_ptr<GameObjectCommand> m_LeftStickCommand{};
 
-#ifndef WIN32
+#ifndef _WIN32
 		void MapButton(SDL_GamepadButton sdlButton, unsigned int bit);
 #endif // !WIN32
 	};
@@ -171,7 +173,7 @@ namespace ge
 {
 	InputManagerImpl::~InputManagerImpl()
 	{
-#ifndef WIN32
+#ifndef _WIN32
 		if (m_pGamepad)
 		{
 			SDL_CloseGamepad(m_pGamepad);
@@ -292,7 +294,7 @@ namespace ge
 	{
 		m_ControllerIndex = controllerIndex;
 
-#ifdef WIN32
+#ifdef _WIN32
 		CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
 		ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
 
@@ -383,7 +385,7 @@ namespace ge
 
 	bool InputManagerImpl::IsButtonPressed(unsigned int button) const noexcept
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		return m_CurrentState.Gamepad.wButtons & button;
 #else
 		return m_SDLButtonsCurrent & button;
@@ -392,7 +394,7 @@ namespace ge
 
 	glm::vec2 InputManagerImpl::GetLeftStick()
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		// should clamp between -1.f : 1.f for safety is using in animation or physics
 		float x{ m_CurrentState.Gamepad.sThumbLX / STICK_MAX_VALUE };
 		float y{ m_CurrentState.Gamepad.sThumbLY / STICK_MAX_VALUE };
@@ -410,7 +412,7 @@ namespace ge
 
 	glm::vec2 InputManagerImpl::GetRightStick()
 	{
-#ifdef WIN32
+#ifdef _WIN32
 		// should clamp between -1.f : 1.f for safety is using in animation or physics
 		float x{ m_CurrentState.Gamepad.sThumbRX / STICK_MAX_VALUE };
 		float y{ m_CurrentState.Gamepad.sThumbRY / STICK_MAX_VALUE };
@@ -498,7 +500,7 @@ namespace ge
 		y *= scale;
 	}
 
-#ifndef WIN32
+#ifndef _WIN32
 	void InputManagerImpl::MapButton(SDL_GamepadButton sdlButton, unsigned int bit)
 	{
 		if (SDL_GetGamepadButton(m_pGamepad, sdlButton))
