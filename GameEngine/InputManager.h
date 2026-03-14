@@ -1,26 +1,25 @@
 #pragma once
-
-#ifdef _WIN32
-	#define WIN32_LEAN_AND_MEAN
-	#define NOMINMAX
-	#include <Windows.h>
-	#include <Xinput.h>
-#endif
-
-#include <SDL3/SDL.h>
-
 #include "Singleton.h"
-#include <glm/glm.hpp>
-#include <memory>
 
-#include "Commands/GameObjectCommand.h"
+// SDL is multiplatform
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+#include <memory>
 
 namespace ge
 {
+	class InputManagerImpl;
+	class GameObjectCommand;
+	class GameObject;
 
+	// PIMPL CLASS
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
+		InputManager();
+		~InputManager();
+
 		bool ProcessInput(float deltaTime);
 		void UpdateController(unsigned int controllerIndex = 0);
 
@@ -35,8 +34,9 @@ namespace ge
 		glm::vec2 GetLeftStick();
 		glm::vec2 GetRightStick();
 
-		bool IsControllerConnected() const noexcept { return m_ControllerConnected; }
+		bool IsControllerConnected() const noexcept;
 
+		// Input Trigger should live here
 		enum class InputTrigger
 		{
 			Down,
@@ -54,42 +54,27 @@ namespace ge
 		void UnbindAllCommandsOfTarget(GameObject* target);
 
 	private:
-#ifdef _WIN32
-		XINPUT_STATE m_PreviousState{};
-		XINPUT_STATE m_CurrentState{};
-		WORD m_ButtonsPressedThisFrame{ 0 };
-		WORD m_ButtonsReleasedThisFrame{ 0 };
-#else
-		SDL_Gamepad* m_pGamepad{ nullptr };
-		uint32_t m_SDLButtonsCurrent{ 0 };
-		uint32_t m_SDLButtonsPrevious{ 0 };
-#endif
+		// Acutal implementation in .cpp
+		std::unique_ptr<InputManagerImpl> m_Impl;
 
-		bool m_ControllerConnected{ false };
-		unsigned int m_ControllerIndex{ 0 };
-
-		static constexpr float STICK_DEADZONE{ 0.1f }; // 10%
-		void ApplyRadialDeadzone(float& x, float& y, float deadzone);
-		static constexpr float STICK_MAX_VALUE{ 32767.f };
-
-		struct KeyBoardBinding
-		{
-			SDL_Scancode key;
-			InputTrigger triggerType;
-			std::unique_ptr<GameObjectCommand> command;
-		};
-
-		struct ControllerBinding
-		{
-			unsigned int button;
-			InputTrigger triggerType;
-			std::unique_ptr<GameObjectCommand> command;
-		};
-
-		std::vector<KeyBoardBinding> m_KeyboardBindings{};
-		std::vector<ControllerBinding> m_ControllerBindings{};
-
-		std::unique_ptr<GameObjectCommand> m_LeftStickCommand{};
 	};
 
+	// Controller bit masks with custom Button names
+	namespace ControllerButton
+	{
+		constexpr unsigned int DpadUp = 0x0001;
+		constexpr unsigned int DpadDown = 0x0002;
+		constexpr unsigned int DpadLeft = 0x0004;
+		constexpr unsigned int DpadRight = 0x0008;
+		constexpr unsigned int Start = 0x0010;
+		constexpr unsigned int Back = 0x0020;
+		constexpr unsigned int LeftThumb = 0x0040;
+		constexpr unsigned int RightThumb = 0x0080;
+		constexpr unsigned int LeftShoulder = 0x0100;
+		constexpr unsigned int RightShoulder = 0x0200;
+		constexpr unsigned int A = 0x1000;
+		constexpr unsigned int B = 0x2000;
+		constexpr unsigned int X = 0x4000;
+		constexpr unsigned int Y = 0x8000;
+	}
 }

@@ -160,6 +160,7 @@ void InitializePlayerInputTestScene()
 	const float firstPlayerSpeed{ moveUpRefPtr->GetSpeed() };
 	const float secondPlayerSpeed{ firstPlayerSpeed * 2 };
 
+
 	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
 		std::move(moveUp));
 	input.BindKeyboardCommand(SDL_SCANCODE_A, InputManager::InputTrigger::Pressed,
@@ -172,13 +173,13 @@ void InitializePlayerInputTestScene()
 	
 	input.BindControllerStickCommand(std::make_unique<MoveStickCommand>(player2GO.get(), secondPlayerSpeed));
 
-	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_UP, InputManager::InputTrigger::Pressed,
+	input.BindControllerCommand(ControllerButton::DpadUp, InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, secondPlayerSpeed));
-	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_LEFT, InputManager::InputTrigger::Pressed,
+	input.BindControllerCommand(ControllerButton::DpadLeft, InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, secondPlayerSpeed));
-	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_DOWN, InputManager::InputTrigger::Pressed,
+	input.BindControllerCommand(ControllerButton::DpadDown, InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, secondPlayerSpeed));
-	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_RIGHT, InputManager::InputTrigger::Pressed,
+	input.BindControllerCommand(ControllerButton::DpadRight, InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, secondPlayerSpeed));
 #pragma endregion
 
