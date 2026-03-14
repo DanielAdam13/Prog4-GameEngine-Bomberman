@@ -7,7 +7,7 @@ using namespace ge;
 MoveCommand::MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed)
 	:GameObjectCommand::GameObjectCommand(target),
 	m_pTargetTransform{ GetCommandTarget()->GetComponent<Transform>() },
-	m_Direction{ startingDirection },
+	m_ConstantMoveDirection{ startingDirection },
 	m_MoveSpeed{ moveSpeed }
 {
 }
@@ -30,5 +30,5 @@ float MoveCommand::GetSpeed() const noexcept
 void MoveCommand::Move(float deltaTime)
 {
 	m_pTargetTransform->SetLocalPosition(m_pTargetTransform->GetLocalPosition() + 
-		m_Direction * m_MoveSpeed * deltaTime);
+		m_ConstantMoveDirection * m_MoveSpeed * deltaTime);
 }

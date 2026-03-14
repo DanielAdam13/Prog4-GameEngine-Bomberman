@@ -21,7 +21,7 @@ namespace ge
 		void Move(float deltaTime);
 		Transform* m_pTargetTransform;
 
-		glm::vec3 m_Direction;
+		const glm::vec3 m_ConstantMoveDirection;
 		float m_MoveSpeed;
 
 	};

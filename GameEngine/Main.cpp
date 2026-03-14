@@ -150,27 +150,37 @@ void InitializePlayerInputTestScene()
 	player2Transform->SetLocalPosition(player2Transform->GetWorldPosition() + glm::vec3{ 200.f, 150.f, 0.f });
 	player2Transform->SetLocalScale(glm::vec3{ 2.f, 2.f, 2.f });
 
+	// Command Binding to two players
+#pragma region CommandBinding
 	auto& input{ InputManager::GetInstance() };
 
-	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, 120.f));
-	input.BindKeyboardCommand(SDL_SCANCODE_A, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, 120.f));
-	input.BindKeyboardCommand(SDL_SCANCODE_S, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, 120.f));
-	input.BindKeyboardCommand(SDL_SCANCODE_D, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, 120.f));
+	// Experimenting for player speed
+	auto moveUp{ std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, 120.f) };
+	MoveCommand* moveUpRefPtr{ moveUp.get() };
+	const float firstPlayerSpeed{ moveUpRefPtr->GetSpeed() };
+	const float secondPlayerSpeed{ firstPlayerSpeed * 2 };
 
-	input.BindControllerStickCommand(std::make_unique<MoveStickCommand>(player2GO.get(), 240.f));
+	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
+		std::move(moveUp));
+	input.BindKeyboardCommand(SDL_SCANCODE_A, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, firstPlayerSpeed));
+	input.BindKeyboardCommand(SDL_SCANCODE_S, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, firstPlayerSpeed));
+	input.BindKeyboardCommand(SDL_SCANCODE_D, InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, firstPlayerSpeed));
+
+	
+	input.BindControllerStickCommand(std::make_unique<MoveStickCommand>(player2GO.get(), secondPlayerSpeed));
 
 	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_UP, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, 240.f));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, secondPlayerSpeed));
 	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_LEFT, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, 240.f));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, secondPlayerSpeed));
 	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_DOWN, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, 240.f));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, secondPlayerSpeed));
 	input.BindControllerCommand(XINPUT_GAMEPAD_DPAD_RIGHT, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, 240.f));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, secondPlayerSpeed));
+#pragma endregion
 
 	InputTestScene.Add(std::move(player1GO));
 	InputTestScene.Add(std::move(player2GO));

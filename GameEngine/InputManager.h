@@ -59,6 +59,10 @@ namespace ge
 		XINPUT_STATE m_CurrentState{};
 		WORD m_ButtonsPressedThisFrame{ 0 };
 		WORD m_ButtonsReleasedThisFrame{ 0 };
+#else
+		SDL_Gamepad* m_pGamepad{ nullptr };
+		uint32_t m_SDLButtonsCurrent{ 0 };
+		uint32_t m_SDLButtonsPrevious{ 0 };
 #endif
 
 		bool m_ControllerConnected{ false };
