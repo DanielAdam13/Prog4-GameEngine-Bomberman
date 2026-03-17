@@ -28,7 +28,10 @@ namespace fs = std::filesystem;
 #include "Commands/MoveCommand.h"
 #include "Commands/MoveStickCommand.h"
 
+#include "Player.h"
+
 using namespace ge;
+using namespace bombGame;
 
 void InitializeFirstScene();
 void InitializeImGuiExercisesScene();
@@ -139,16 +142,14 @@ void InitializePlayerInputTestScene()
 	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
 	auto player1GO = std::make_unique<GameObject>("GO_Player1");
-	player1GO->AddComponent<Image>(player1GO.get())->SetTexture(playerTexture);
-	auto player1Transform{ player1GO->GetComponent<Transform>() };
-	player1Transform->SetLocalPosition(player1Transform->GetWorldPosition() + glm::vec3{ 250.f, 350.f, 0.f });
-	player1Transform->SetLocalScale(glm::vec3{ 2.5f, 2.5f, 2.5f });
+	Player player1{ player1GO.get(), playerTexture };
+	player1.SetPlayerPosition(glm::vec3{ 250.f, 350.f, 0.f });
+	player1.SetPlayerScale(glm::vec3{ 2.5f, 2.5f, 2.5f });
 
 	auto player2GO = std::make_unique<GameObject>("GO_Player2");
-	player2GO->AddComponent<Image>(player2GO.get())->SetTexture(balloonTexture);
-	auto player2Transform{ player2GO->GetComponent<Transform>() };
-	player2Transform->SetLocalPosition(player2Transform->GetWorldPosition() + glm::vec3{ 200.f, 150.f, 0.f });
-	player2Transform->SetLocalScale(glm::vec3{ 2.f, 2.f, 2.f });
+	Player player2{ player2GO.get(), balloonTexture };
+	player2.SetPlayerPosition(glm::vec3{ 200.f, 150.f, 0.f });
+	player2.SetPlayerScale(glm::vec3{ 2.f, 2.f, 2.f });
 
 	// Command Binding to two players
 #pragma region CommandBinding
