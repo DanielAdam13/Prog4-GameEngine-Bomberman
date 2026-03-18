@@ -14,7 +14,6 @@ using namespace bombGame;
 Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
 	float startSpeed, int playerHp, const glm::vec3& startPos, const glm::vec3& startScale)
 	:m_pPlayerObject{ playerObject },
-	m_pPlayerTexture{ playerTexture },
 	m_CachedPlayerTransform{ m_pPlayerObject->GetComponent<ge::Transform>() },
 	m_Speed{ startSpeed },
 	m_PlayerDeadEvent{ std::make_unique<Subject>(EventId::PLAYER_DIED) }
@@ -38,6 +37,13 @@ Player::~Player()
 {
 }
 
+void Player::SetPlayerTexture(ge::Texture2D* newTexture)
+{
+	// Don't delete old texture since it could be reused, depends on the user in Main.cpp / Game
+	if (newTexture)
+		m_pPlayerObject->GetComponent<ge::Image>()->SetTexture(newTexture);
+}
+
 void Player::SetPlayerPosition(const glm::vec3& newPos)
 {
 	m_CachedPlayerTransform->SetLocalPosition(m_CachedPlayerTransform->GetWorldPosition() + newPos);
@@ -58,12 +64,12 @@ glm::vec3 Player::GetPlayerScale() const noexcept
 	return m_CachedPlayerTransform->GetWorldScale();
 }
 
-float Player::GetSpeed() const noexcept
+float Player::GetPlayerSpeed() const noexcept
 {
 	return m_Speed;
 }
 
-void Player::SetSpeed(float newSpeed) noexcept
+void Player::SetPlayerSpeed(float newSpeed) noexcept
 {
 	m_Speed = newSpeed;
 }

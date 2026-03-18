@@ -165,8 +165,8 @@ void InitializeMainPlayersScene()
 	auto& input{ InputManager::GetInstance() };
 
 	// Player speeds
-	const float firstPlayerSpeed{ g_Player1->GetSpeed()};
-	const float secondPlayerSpeed{ g_Player2->GetSpeed() };
+	const float firstPlayerSpeed{ g_Player1->GetPlayerSpeed()};
+	const float secondPlayerSpeed{ g_Player2->GetPlayerSpeed() };
 
 	// 1:
 	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
