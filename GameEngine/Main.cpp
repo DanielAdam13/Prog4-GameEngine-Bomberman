@@ -27,6 +27,7 @@ namespace fs = std::filesystem;
 #include "InputManager.h"
 #include "Commands/MoveCommand.h"
 #include "Commands/MoveStickCommand.h"
+#include "Commands/DamageCommand.h"
 
 #include "Player.h"
 #include "Achievements.h"
@@ -35,18 +36,20 @@ namespace fs = std::filesystem;
 using namespace ge;
 using namespace bombGame;
 
-// TEMPORARY since my intention is for it to live over scenes, on the Game level
+// TEMPORARY since my intention is for these to live over scenes, on the Game level
 std::unique_ptr<AchievementsObserver> g_AchievementsObserver{};
+std::unique_ptr<Player> g_Player1{};
+std::unique_ptr<Player> g_Player2{};
 
 void InitializeFirstScene();
 void InitializeImGuiExercisesScene();
-void InitializePlayerInputTestScene();
+void InitializeMainPlayersScene();
 
 static void LoadScenes()
 {
 	InitializeFirstScene();
 	//InitializeImGuiExercisesScene();
-	InitializePlayerInputTestScene();
+	InitializeMainPlayersScene();
 }
 
 int main(int, char* [])
@@ -139,7 +142,7 @@ void InitializeImGuiExercisesScene()
 	ImGuiExercisesScene.AddImGuiScene(std::make_unique<Exercise1ImGui>());
 }
 
-void InitializePlayerInputTestScene()
+void InitializeMainPlayersScene()
 {
 	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
 
@@ -147,23 +150,23 @@ void InitializePlayerInputTestScene()
 	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
 	auto player1GO = std::make_unique<GameObject>("GO_Player1");
-	Player player1{ player1GO.get(), playerTexture, 120.f, glm::vec3{ 250.f, 350.f, 0.f }, glm::vec3{ 2.5f, 2.5f, 2.5f } };
+	g_Player1 = std::make_unique<Player>( player1GO.get(), playerTexture, 120.f, 3, glm::vec3{ 250.f, 350.f, 0.f }, glm::vec3{ 2.5f, 2.5f, 2.5f } );
 
 	auto player2GO = std::make_unique<GameObject>("GO_Player2");
-	Player player2{ player2GO.get(), balloonTexture, 240.f, glm::vec3{ 200.f, 150.f, 0.f }, glm::vec3{ 2.f, 2.f, 2.f } };
+	g_Player2 = std::make_unique<Player>(player2GO.get(), balloonTexture, 240.f, 3, glm::vec3{ 200.f, 150.f, 0.f }, glm::vec3{ 2.f, 2.f, 2.f });
 
 	// Apply observer pattern:
 	g_AchievementsObserver = std::make_unique<AchievementsObserver>();
-	player1.GetDeadEvent().AddObserver(g_AchievementsObserver.get());
-	player2.GetDeadEvent().AddObserver(g_AchievementsObserver.get());
+	g_Player1->GetDeadEvent().AddObserver(g_AchievementsObserver.get());
+	g_Player2->GetDeadEvent().AddObserver(g_AchievementsObserver.get());
 
 	// Command Binding to two players
 #pragma region CommandBinding
 	auto& input{ InputManager::GetInstance() };
 
 	// Player speeds
-	const float firstPlayerSpeed{ player1.GetSpeed()};
-	const float secondPlayerSpeed{ player2.GetSpeed() };
+	const float firstPlayerSpeed{ g_Player1->GetSpeed()};
+	const float secondPlayerSpeed{ g_Player2->GetSpeed() };
 
 	// 1:
 	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
@@ -174,6 +177,9 @@ void InitializePlayerInputTestScene()
 		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, firstPlayerSpeed));
 	input.BindKeyboardCommand(SDL_SCANCODE_D, InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, firstPlayerSpeed));
+
+	input.BindKeyboardCommand(SDL_SCANCODE_X, InputManager::InputTrigger::Up,
+		std::make_unique<DamageCommand>(player1GO.get(), 1));
 
 	// 2:
 	input.BindControllerStickCommand(std::make_unique<MoveStickCommand>(player2GO.get(), secondPlayerSpeed));
@@ -186,6 +192,9 @@ void InitializePlayerInputTestScene()
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, secondPlayerSpeed));
 	input.BindControllerCommand(ControllerButton::DpadRight, InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, secondPlayerSpeed));
+
+	input.BindControllerCommand(ControllerButton::A, InputManager::InputTrigger::Up,
+		std::make_unique<DamageCommand>(player2GO.get(), 1));
 #pragma endregion
 
 	InputTestScene.Add(std::move(player1GO));

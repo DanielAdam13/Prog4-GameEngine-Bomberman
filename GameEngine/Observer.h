@@ -10,6 +10,7 @@ namespace bombGame
 	enum EventId
 	{
 		PLAYER_DIED,
+		PLAYER_LOST_HEALTH,
 		GAME_OVER
 	};
 

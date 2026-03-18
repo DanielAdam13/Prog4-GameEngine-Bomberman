@@ -4,6 +4,7 @@
 
 namespace ge
 {
+	class GameObject;
 	class Transform;
 
 	class MoveCommand final : public GameObjectCommand

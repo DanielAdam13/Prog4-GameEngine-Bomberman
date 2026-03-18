@@ -4,16 +4,18 @@
 #include "GameObject.h"
 #include "Components/Image.h"
 #include "Components/Transform.h"
+#include "Components/HealthComponent.h"
+
 #include "ObservableSubject.h"
 #include "Achievements.h"
 
 using namespace bombGame;
 
 Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
-	float startSpeed, const glm::vec3& startPos, const glm::vec3& startScale)
+	float startSpeed, int playerHp, const glm::vec3& startPos, const glm::vec3& startScale)
 	:m_pPlayerObject{ playerObject },
 	m_pPlayerTexture{ playerTexture },
-	m_pPlayerTransform{ m_pPlayerObject->GetComponent<ge::Transform>() },
+	m_CachedPlayerTransform{ m_pPlayerObject->GetComponent<ge::Transform>() },
 	m_Speed{ startSpeed },
 	m_PlayerDeadEvent{ std::make_unique<Subject>(EventId::PLAYER_DIED) }
 {
@@ -22,8 +24,14 @@ Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
 	else
 		assert("No player texture assigned");
 
-	m_pPlayerTransform->SetLocalPosition(m_pPlayerTransform->GetWorldPosition() + startPos);
-	m_pPlayerTransform->SetLocalScale(startScale);
+	m_CachedPlayerTransform->SetLocalPosition(m_CachedPlayerTransform->GetWorldPosition() + startPos);
+	m_CachedPlayerTransform->SetLocalScale(startScale);
+
+	m_CachedPlayerHealth = m_pPlayerObject->AddComponent<ge::HealthComponent>(m_pPlayerObject, playerHp);
+	m_CachedPlayerHealth->SetOnDeathCallback([this]()
+		{
+			m_PlayerDeadEvent->NotifyObservers(m_pPlayerObject);
+		});
 }
 
 Player::~Player()
@@ -32,22 +40,22 @@ Player::~Player()
 
 void Player::SetPlayerPosition(const glm::vec3& newPos)
 {
-	m_pPlayerTransform->SetLocalPosition(m_pPlayerTransform->GetWorldPosition() + newPos);
+	m_CachedPlayerTransform->SetLocalPosition(m_CachedPlayerTransform->GetWorldPosition() + newPos);
 }
 
 void Player::SetPlayerScale(const glm::vec3& newScale)
 {
-	m_pPlayerTransform->SetLocalScale(newScale);
+	m_CachedPlayerTransform->SetLocalScale(newScale);
 }
 
 glm::vec3 Player::GetPlayerPosition() const noexcept
 {
-	return m_pPlayerTransform->GetWorldPosition();
+	return m_CachedPlayerTransform->GetWorldPosition();
 }
 
 glm::vec3 Player::GetPlayerScale() const noexcept
 {
-	return m_pPlayerTransform->GetWorldScale();
+	return m_CachedPlayerTransform->GetWorldScale();
 }
 
 float Player::GetSpeed() const noexcept

@@ -6,7 +6,9 @@ namespace ge
 {
 	class GameObject;
 	class Texture2D;
+
 	class Transform;
+	class HealthComponent;
 }
 
 namespace bombGame
@@ -18,7 +20,7 @@ namespace bombGame
 	{
 	public:
 		Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture, 
-			float speed = 120.f, const glm::vec3& startPos = {}, const glm::vec3& startScale = {1.f, 1.f, 1.f});
+			float speed = 120.f, int playerHp = 3, const glm::vec3& startPos = {}, const glm::vec3& startScale = {1.f, 1.f, 1.f});
 		~Player();
 
 		void SetPlayerPosition(const glm::vec3& newPos);
@@ -36,7 +38,8 @@ namespace bombGame
 		// Just references, doesn't own:
 		ge::GameObject* m_pPlayerObject;
 		ge::Texture2D* m_pPlayerTexture;
-		ge::Transform* m_pPlayerTransform;
+		ge::Transform* m_CachedPlayerTransform;
+		ge::HealthComponent* m_CachedPlayerHealth;
 
 		float m_Speed;
 
