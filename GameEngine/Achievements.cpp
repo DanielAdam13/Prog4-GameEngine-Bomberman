@@ -14,8 +14,12 @@ void AchievementsObserver::Notify(EventId event, ge::GameObject*)
 			m_NobodyDiedYet = false;
 		}
 		break;
+	/*case bombGame::PLAYER_LOST_HEALTH:
+		break;*/
 	case bombGame::GAME_OVER:
 		Unlock(AchievementTypes::GameWon);
+		break;
+	default:
 		break;
 	}
 }

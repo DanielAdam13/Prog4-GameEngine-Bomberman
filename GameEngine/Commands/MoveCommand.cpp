@@ -4,8 +4,8 @@
 
 using namespace ge;
 
-MoveCommand::MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed)
-	:GameObjectCommand::GameObjectCommand(target),
+MoveCommand::MoveCommand(GameObject* commandTarget, const glm::vec3& startingDirection, float moveSpeed)
+	:GameObjectCommand::GameObjectCommand(commandTarget),
 	m_pTargetTransform{ GetCommandTarget()->GetComponent<Transform>() },
 	m_ConstantMoveDirection{ startingDirection },
 	m_MoveSpeed{ moveSpeed }

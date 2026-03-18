@@ -34,7 +34,13 @@ namespace bombGame
 		float GetPlayerSpeed() const noexcept;
 		void SetPlayerSpeed(float newSpeed) noexcept;
 
+		int GetPlayerHealth() const noexcept;
+		// No brute force health setting
+
+		bool IsPlayerDead() const noexcept;
+
 		Subject& GetDeadEvent() const;
+		Subject& GetDamageEvent() const;
 
 	private:
 		// Just references, doesn't own:
@@ -44,7 +50,8 @@ namespace bombGame
 
 		float m_Speed;
 
-		// Event lives on player, observer is higher (scene/game)
+		// Events live on player, observer is higher (scene/game)
 		std::unique_ptr<Subject> m_PlayerDeadEvent; 
+		std::unique_ptr<Subject> m_PlayerDamageEvent;
 	};
 }

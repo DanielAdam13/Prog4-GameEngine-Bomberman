@@ -5,8 +5,7 @@ using namespace ge;
 HealthComponent::HealthComponent(GameObject* pOwnerPtr, int maxHealth)
 	:Component::Component(pOwnerPtr),
 	m_MaxHealth{ maxHealth },
-	m_CurrentHealth{ m_MaxHealth },
-	m_IsDead{ false }
+	m_CurrentHealth{ m_MaxHealth }
 {
 }
 
@@ -24,6 +23,11 @@ void HealthComponent::TakeDamage(int damageAmount)
 int HealthComponent::GetCurrentHealth() const noexcept
 {
 	return m_CurrentHealth;
+}
+
+bool HealthComponent::IsDead() const noexcept
+{
+	return m_CurrentHealth <= 0;
 }
 
 void HealthComponent::Die()

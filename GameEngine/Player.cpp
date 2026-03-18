@@ -16,7 +16,8 @@ Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
 	:m_pPlayerObject{ playerObject },
 	m_CachedPlayerTransform{ m_pPlayerObject->GetComponent<ge::Transform>() },
 	m_Speed{ startSpeed },
-	m_PlayerDeadEvent{ std::make_unique<Subject>(EventId::PLAYER_DIED) }
+	m_PlayerDeadEvent{ std::make_unique<Subject>(EventId::PLAYER_DIED) },
+	m_PlayerDamageEvent{ std::make_unique<Subject>(EventId::PLAYER_LOST_HEALTH) }
 {
 	if(playerTexture)
 		m_pPlayerObject->AddComponent<ge::Image>(m_pPlayerObject)->SetTexture(playerTexture);
@@ -27,9 +28,15 @@ Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
 	m_CachedPlayerTransform->SetLocalScale(startScale);
 
 	m_CachedPlayerHealth = m_pPlayerObject->AddComponent<ge::HealthComponent>(m_pPlayerObject, playerHp);
-	m_CachedPlayerHealth->SetOnDeathCallback([this]()
+
+	// Bind event callback functions:
+	m_CachedPlayerHealth->SetOnDeathCallback([this]() -> void
 		{
 			m_PlayerDeadEvent->NotifyObservers(m_pPlayerObject);
+		});
+	m_CachedPlayerHealth->SetOnTakingDamage([this]() -> void
+		{
+			m_PlayerDamageEvent->NotifyObservers(m_pPlayerObject);
 		});
 }
 
@@ -74,7 +81,22 @@ void Player::SetPlayerSpeed(float newSpeed) noexcept
 	m_Speed = newSpeed;
 }
 
+int Player::GetPlayerHealth() const noexcept
+{
+	return m_CachedPlayerHealth->GetCurrentHealth();
+}
+
+bool Player::IsPlayerDead() const noexcept
+{
+	return m_CachedPlayerHealth && m_CachedPlayerHealth->IsDead();
+}
+
 Subject& bombGame::Player::GetDeadEvent() const
 {
 	return *m_PlayerDeadEvent;
+}
+
+Subject& bombGame::Player::GetDamageEvent() const
+{
+	return *m_PlayerDamageEvent;
 }

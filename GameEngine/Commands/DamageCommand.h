@@ -9,7 +9,7 @@ namespace ge
 	class DamageCommand final : public GameObjectCommand
 	{
 	public:
-		DamageCommand(GameObject* target, int damageAmount = 1);
+		DamageCommand(GameObject* commandTarget, int damageAmount = 1);
 
 		virtual void Execute(float) override;
 

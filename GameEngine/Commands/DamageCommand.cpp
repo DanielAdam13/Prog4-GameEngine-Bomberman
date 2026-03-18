@@ -4,8 +4,8 @@
 
 using namespace ge;
 
-DamageCommand::DamageCommand(GameObject* target, int damageAmount)
-	:GameObjectCommand(target),
+DamageCommand::DamageCommand(GameObject* commandTarget, int damageAmount)
+	:GameObjectCommand(commandTarget),
 	m_DamageAmount{ damageAmount }
 {
 }

@@ -19,6 +19,7 @@ namespace ge
 
 		void TakeDamage(int damageAmount);
 		int GetCurrentHealth() const noexcept;
+		bool IsDead() const noexcept;
 
 		// Could do nothing if m_OnDeath is not set
 		void Die();
@@ -29,7 +30,6 @@ namespace ge
 	private:
 		int m_MaxHealth{};
 		int m_CurrentHealth{};
-		bool m_IsDead{ false };
 
 		std::function<void()> m_OnTakingDamage{};
 		std::function<void()> m_OnDeath{};
