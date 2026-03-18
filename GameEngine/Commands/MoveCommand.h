@@ -7,6 +7,7 @@ namespace ge
 	class GameObject;
 	class Transform;
 
+	// Engine Command
 	class MoveCommand final : public GameObjectCommand
 	{
 	public:

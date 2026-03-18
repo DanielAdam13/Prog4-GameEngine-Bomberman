@@ -8,12 +8,13 @@ namespace ge
 	class Texture2D;
 
 	class Transform;
-	class HealthComponent;
 }
 
 namespace bombGame
 {
 	class Subject;
+	class HealthComponent;
+	class ScoreComponent;
 
 	// Temporary implemetation before splitting GameEngine into a library
 	class Player final
@@ -36,22 +37,28 @@ namespace bombGame
 
 		int GetPlayerHealth() const noexcept;
 		// No brute force health setting
-
 		bool IsPlayerDead() const noexcept;
+
+		int GetPlayerScore() const noexcept;
 
 		Subject& GetDeadEvent() const;
 		Subject& GetDamageEvent() const;
+
+		Subject& GetScoreEvent() const;
 
 	private:
 		// Just references, doesn't own:
 		ge::GameObject* m_pPlayerObject;
 		ge::Transform* m_CachedPlayerTransform;
-		ge::HealthComponent* m_CachedPlayerHealth;
+		HealthComponent* m_CachedPlayerHealth;
+		ScoreComponent* m_CachedPlayerScore;
 
 		float m_Speed;
 
 		// Events live on player, observer is higher (scene/game)
 		std::unique_ptr<Subject> m_PlayerDeadEvent; 
 		std::unique_ptr<Subject> m_PlayerDamageEvent;
+
+		std::unique_ptr<Subject> m_PlayerScoreEvent;
 	};
 }

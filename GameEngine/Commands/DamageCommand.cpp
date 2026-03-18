@@ -2,10 +2,10 @@
 #include "GameObject.h"
 #include "Components/HealthComponent.h"
 
-using namespace ge;
+using namespace bombGame;
 
-DamageCommand::DamageCommand(GameObject* commandTarget, int damageAmount)
-	:GameObjectCommand(commandTarget),
+DamageCommand::DamageCommand(ge::GameObject* commandTarget, int damageAmount)
+	:ge::GameObjectCommand::GameObjectCommand(commandTarget),
 	m_DamageAmount{ damageAmount }
 {
 }

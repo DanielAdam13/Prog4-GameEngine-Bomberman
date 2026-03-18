@@ -11,6 +11,7 @@ namespace bombGame
 	{
 		PLAYER_DIED,
 		PLAYER_LOST_HEALTH,
+		PLAYER_SCORE_CHANGED,
 		GAME_OVER
 	};
 

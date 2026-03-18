@@ -7,6 +7,7 @@ namespace ge
 {
 	class GameObject;
 
+	// Engine Command Wrapper executing command if condition is met
 	class ConditionalCommand final : public GameObjectCommand
 	{
 	public:

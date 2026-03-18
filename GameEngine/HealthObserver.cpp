@@ -7,15 +7,21 @@ using namespace bombGame;
 
 void HealthObserver::Notify(EventId event, ge::GameObject* sourceObject)
 {
+	auto it{ m_HealthDisplaysMap.find(sourceObject) };
+
 	if (event == EventId::PLAYER_LOST_HEALTH)
 	{
-		auto it{ m_HealthDisplaysMap.find(sourceObject) };
 		if (it != m_HealthDisplaysMap.end())
 		{
-			const int objectHp{ sourceObject->GetComponent<ge::HealthComponent>()->GetCurrentHealth() };
+			const int objectHp{ sourceObject->GetComponent<HealthComponent>()->GetCurrentHealth() };
 			it->second->SetText(sourceObject->GetName() + " HP: " + std::to_string(objectHp));
 		}
 	}
+	else if (event == EventId::PLAYER_DIED)
+	{
+		it->second->SetText(sourceObject->GetName() + " DEAD");
+	}
+	
 }
 
 void HealthObserver::RegisterPlayer(ge::GameObject* player, ge::TextComponent* connectedText)

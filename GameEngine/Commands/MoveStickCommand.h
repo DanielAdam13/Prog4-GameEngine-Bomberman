@@ -6,6 +6,7 @@ namespace ge
 {
 	class Transform;
 
+	// Engine Command
 	class MoveStickCommand final : public GameObjectCommand
 	{
 	public:

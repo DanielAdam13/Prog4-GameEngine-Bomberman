@@ -10,9 +10,10 @@ TTF_Font* Font::GetFont() const
 }
 
 Font::Font(const std::string& fullPath, float size) 
-	:m_Font{ nullptr }
+	:m_Font{ nullptr },
+	m_FontPath{ fullPath }
 {
-	m_Font = TTF_OpenFont(fullPath.c_str(), size);
+	m_Font = TTF_OpenFont(m_FontPath.c_str(), size);
 	if (m_Font == nullptr) 
 	{
 		throw std::runtime_error(std::string("Failed to load font: ") + SDL_GetError());
@@ -25,5 +26,19 @@ Font::~Font()
 	{
 		TTF_CloseFont(m_Font);
 		m_Font = nullptr;
+	}
+}
+
+void Font::SetFontSize(float newSize)
+{
+	if (m_Font)
+	{
+		TTF_CloseFont(m_Font);
+	}
+
+	m_Font = TTF_OpenFont(m_FontPath.c_str(), newSize);
+	if (m_Font == nullptr)
+	{
+		throw std::runtime_error(std::string("Failed to load font: ") + SDL_GetError());
 	}
 }

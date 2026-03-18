@@ -5,11 +5,15 @@ namespace ge
 {
 	class GameObject;
 	class HealthComponent;
+}
 
-	class DamageCommand final : public GameObjectCommand
+namespace bombGame
+{
+	// Game-specific Command
+	class DamageCommand final : public ge::GameObjectCommand
 	{
 	public:
-		DamageCommand(GameObject* commandTarget, int damageAmount = 1);
+		DamageCommand(ge::GameObject* commandTarget, int damageAmount = 1);
 
 		virtual void Execute(float) override;
 

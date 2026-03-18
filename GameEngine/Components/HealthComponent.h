@@ -2,15 +2,21 @@
 #include "Component.h"
 
 namespace ge
+{ 
+	class GameObject;
+}
+
+namespace bombGame
 {
-	class HealthComponent final : public Component
+	// Game-side Component
+	class HealthComponent final : public ge::Component
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
-		// Every Transform Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 5 };
+		// Every HealthComponent Instance shares the same component type ID
+		static constexpr ge::ComponentTypeID StaticTypeID{ 5 };
 
-		HealthComponent(GameObject* pOwnerPtr, int maxHealth);
+		HealthComponent(ge::GameObject* pOwnerPtr, int maxHealth);
 		virtual ~HealthComponent() override = default;
 
 		virtual void RenderComponent() const override {};
@@ -25,7 +31,7 @@ namespace ge
 		void Die();
 
 		void SetOnTakingDamage(std::function<void()> callback);
-		void SetOnDeathCallback(std::function<void()> callback);
+		void SetOnDeath(std::function<void()> callback);
 
 	private:
 		int m_MaxHealth{};

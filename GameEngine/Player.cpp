@@ -5,6 +5,7 @@
 #include "Components/Image.h"
 #include "Components/Transform.h"
 #include "Components/HealthComponent.h"
+#include "Components/ScoreComponent.h"
 
 #include "ObservableSubject.h"
 #include "Achievements.h"
@@ -17,7 +18,8 @@ Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
 	m_CachedPlayerTransform{ m_pPlayerObject->GetComponent<ge::Transform>() },
 	m_Speed{ startSpeed },
 	m_PlayerDeadEvent{ std::make_unique<Subject>(EventId::PLAYER_DIED) },
-	m_PlayerDamageEvent{ std::make_unique<Subject>(EventId::PLAYER_LOST_HEALTH) }
+	m_PlayerDamageEvent{ std::make_unique<Subject>(EventId::PLAYER_LOST_HEALTH) },
+	m_PlayerScoreEvent{ std::make_unique<Subject>(EventId::PLAYER_SCORE_CHANGED) }
 {
 	if(playerTexture)
 		m_pPlayerObject->AddComponent<ge::Image>(m_pPlayerObject)->SetTexture(playerTexture);
@@ -27,16 +29,22 @@ Player::Player(ge::GameObject* playerObject, ge::Texture2D* playerTexture,
 	m_CachedPlayerTransform->SetLocalPosition(m_CachedPlayerTransform->GetWorldPosition() + startPos);
 	m_CachedPlayerTransform->SetLocalScale(startScale);
 
-	m_CachedPlayerHealth = m_pPlayerObject->AddComponent<ge::HealthComponent>(m_pPlayerObject, playerHp);
-
-	// Bind event callback functions:
-	m_CachedPlayerHealth->SetOnDeathCallback([this]() -> void
+	m_CachedPlayerHealth = m_pPlayerObject->AddComponent<HealthComponent>(m_pPlayerObject, playerHp);
+	// Bind event callback functions for health:
+	m_CachedPlayerHealth->SetOnDeath([this]() -> void
 		{
 			m_PlayerDeadEvent->NotifyObservers(m_pPlayerObject);
 		});
 	m_CachedPlayerHealth->SetOnTakingDamage([this]() -> void
 		{
 			m_PlayerDamageEvent->NotifyObservers(m_pPlayerObject);
+		});
+
+	m_CachedPlayerScore = m_pPlayerObject->AddComponent<ScoreComponent>(m_pPlayerObject, 0);
+	// Bind event callback function for score:
+	m_CachedPlayerScore->SetOnScoreChange([this]()->void
+		{
+			m_PlayerScoreEvent->NotifyObservers(m_pPlayerObject);
 		});
 }
 
@@ -91,6 +99,11 @@ bool Player::IsPlayerDead() const noexcept
 	return m_CachedPlayerHealth && m_CachedPlayerHealth->IsDead();
 }
 
+int bombGame::Player::GetPlayerScore() const noexcept
+{
+	return 0;
+}
+
 Subject& bombGame::Player::GetDeadEvent() const
 {
 	return *m_PlayerDeadEvent;
@@ -99,4 +112,9 @@ Subject& bombGame::Player::GetDeadEvent() const
 Subject& bombGame::Player::GetDamageEvent() const
 {
 	return *m_PlayerDamageEvent;
+}
+
+Subject& bombGame::Player::GetScoreEvent() const
+{
+	return *m_PlayerScoreEvent;
 }

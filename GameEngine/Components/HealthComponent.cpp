@@ -1,9 +1,9 @@
 #include "HealthComponent.h"
 
-using namespace ge;
+using namespace bombGame;
 
-HealthComponent::HealthComponent(GameObject* pOwnerPtr, int maxHealth)
-	:Component::Component(pOwnerPtr),
+HealthComponent::HealthComponent(ge::GameObject* pOwnerPtr, int maxHealth)
+	:ge::Component::Component(pOwnerPtr),
 	m_MaxHealth{ maxHealth },
 	m_CurrentHealth{ m_MaxHealth }
 {
@@ -41,7 +41,7 @@ void HealthComponent::SetOnTakingDamage(std::function<void()> callback)
 	m_OnTakingDamage = callback;
 }
 
-void HealthComponent::SetOnDeathCallback(std::function<void()> callback)
+void HealthComponent::SetOnDeath(std::function<void()> callback)
 {
 	m_OnDeath = callback;
 }

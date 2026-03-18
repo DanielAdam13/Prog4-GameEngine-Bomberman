@@ -24,16 +24,19 @@ namespace fs = std::filesystem;
 #include "Components/FPSComponent.h"
 #include "Components/RotatorComponent.h"
 #include "Components/HealthComponent.h"
+#include "Components/ScoreComponent.h"
 
 #include "InputManager.h"
 #include "Commands/MoveCommand.h"
 //#include "Commands/MoveStickCommand.h"
 #include "Commands/DamageCommand.h"
+#include "Commands/ScoreCommand.h"
 #include "Commands/ConditionalCommand.h"
 
 #include "Player.h"
 #include "Achievements.h"
 #include "HealthObserver.h"
+#include "ScoreObserver.h"
 #include "ObservableSubject.h"
 #include <string>
 
@@ -45,6 +48,7 @@ std::unique_ptr<AchievementsObserver> g_AchievementsObserver{};
 std::unique_ptr<HealthObserver> g_HealthObserver{};
 std::unique_ptr<Player> g_Player1{};
 std::unique_ptr<Player> g_Player2{};
+std::unique_ptr<ScoreObserver> g_ScoreObserver{};
 
 void InitializeFirstScene();
 void InitializeImGuiExercisesScene();
@@ -122,6 +126,22 @@ void InitializeFirstScene()
 		0.f, 0.f });
 	scene.Add(std::move(prog4AssingGO));
 
+	const auto tutFont{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 20) };
+
+	auto tutorial1GO = std::make_unique<GameObject>("GO_TutorialText1");
+	tutorial1GO->AddComponent<TextComponent>(tutorial1GO.get(),
+		"Use the D-Pad to move the Balloon, X to inflict damage, A to collect", tutFont, color);
+	auto tutorial2GO = std::make_unique<GameObject>("GO_TutorialText1");
+	tutorial2GO->AddComponent<TextComponent>(tutorial2GO.get(),
+		"Use WASD to move the BomberMan, X to inflict damage, E to collect", tutFont, color);
+
+	tutorial1GO->GetComponent<Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
+	tutorial2GO->GetComponent<Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
+
+
+	scene.Add(std::move(tutorial1GO));
+	scene.Add(std::move(tutorial2GO));
+
 
 	// WEEK 2 - Rotation
 	/*const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
@@ -152,6 +172,11 @@ void InitializeMainPlayersScene()
 {
 	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
 
+	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 28) };
+	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
+	constexpr SDL_Color color1{ SDL_Color{20, 100, 200, 255} };
+	constexpr SDL_Color color2{ SDL_Color{220, 100, 50, 255} };
+
 	// 1. Player Initialization
 	const auto playerTexture{ ResourceManager::GetInstance().LoadTexture("I_Player_Bomberman.png") };
 	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
@@ -171,32 +196,49 @@ void InitializeMainPlayersScene()
 
 	g_HealthObserver = std::make_unique<HealthObserver>();
 	g_Player1->GetDamageEvent().AddObserver(g_HealthObserver.get());
+	g_Player1->GetDeadEvent().AddObserver(g_HealthObserver.get());
 	g_Player2->GetDamageEvent().AddObserver(g_HealthObserver.get());
+	g_Player2->GetDeadEvent().AddObserver(g_HealthObserver.get());
+
+	g_ScoreObserver = std::make_unique<ScoreObserver>();
+	g_Player1->GetScoreEvent().AddObserver(g_ScoreObserver.get());
+	g_Player2->GetScoreEvent().AddObserver(g_ScoreObserver.get());
 
 	// 2. Health Displays:
-	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 36) };
-
-	constexpr SDL_Color color1{ SDL_Color{20, 100, 200, 255} };
-	constexpr SDL_Color color2{ SDL_Color{220, 100, 50, 255} };
-
-	auto firstPlayerHealthDisplay = std::make_unique<GameObject>("GO_FirstPlayerDisplay");
-	firstPlayerHealthDisplay->AddComponent<TextComponent>(firstPlayerHealthDisplay.get(),
+	auto p1HealthDisplay = std::make_unique<GameObject>("GO_FirstPlayerDisplay");
+	p1HealthDisplay->AddComponent<TextComponent>(p1HealthDisplay.get(),
 		std::string(player1GO->GetName() + " HP: " + std::to_string(g_Player1->GetPlayerHealth())), font, color1);
+	p1HealthDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
+		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
 
-	auto secondPlayerHealthDisplay = std::make_unique<GameObject>("GO_SecondPlayerDisplay");
-	secondPlayerHealthDisplay->AddComponent<TextComponent>(secondPlayerHealthDisplay.get(),
+	auto p2HealthDisplay = std::make_unique<GameObject>("GO_SecondPlayerDisplay");
+	p2HealthDisplay->AddComponent<TextComponent>(p2HealthDisplay.get(),
 		std::string(player2GO->GetName() + " HP: " + std::to_string(g_Player2->GetPlayerHealth())), font, color2);
+	p2HealthDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{ 
+		windowSize.first * 0.75f, windowSize.second * 0.9f, 0.f });
 
-	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
-	firstPlayerHealthDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
-	secondPlayerHealthDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 4, 0.f });
+	// 3. Score Displays:
+	auto p1ScoreDisplay = std::make_unique<GameObject>("GO_FirstPlayerScore");
+	p1ScoreDisplay->AddComponent<TextComponent>(p1ScoreDisplay.get(),
+		"Score: 0", font, color1);
+	p1ScoreDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
+		windowSize.first * 0.05f, windowSize.second * 0.8f, 0.f });
 
-	// 3. Register player health displays to HEALTH OBSERVER
-	g_HealthObserver->RegisterPlayer(player1GO.get(), firstPlayerHealthDisplay->GetComponent<TextComponent>());
-	g_HealthObserver->RegisterPlayer(player2GO.get(), secondPlayerHealthDisplay->GetComponent<TextComponent>());
+	auto p2ScoreDisplay = std::make_unique<GameObject>("GO_SecondPlayerScore");
+	p2ScoreDisplay->AddComponent<TextComponent>(p2ScoreDisplay.get(),
+		"Score: 0", font, color2);
+	p2ScoreDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
+		windowSize.first * 0.75f, windowSize.second * 0.8f, 0.f });
+
+	// 4. Register player health and score displays to HEALTH and SCORE observers
+	g_HealthObserver->RegisterPlayer(player1GO.get(), p1HealthDisplay->GetComponent<TextComponent>());
+	g_HealthObserver->RegisterPlayer(player2GO.get(), p2HealthDisplay->GetComponent<TextComponent>());
+
+	g_ScoreObserver->RegisterPlayer(player1GO.get(), p1ScoreDisplay->GetComponent<TextComponent>());
+	g_ScoreObserver->RegisterPlayer(player2GO.get(), p2ScoreDisplay->GetComponent<TextComponent>());
 
 
-	// 4. Command Binding to two players
+	// 5. Command Binding to two players
 #pragma region CommandBinding
 	auto& input{ InputManager::GetInstance() };
 
@@ -204,41 +246,68 @@ void InitializeMainPlayersScene()
 	const float firstPlayerSpeed{ g_Player1->GetPlayerSpeed()};
 	const float secondPlayerSpeed{ g_Player2->GetPlayerSpeed() };
 
+	auto deathConditionLambda1{ [&]() -> bool { return !g_Player1->IsPlayerDead(); } };
+	auto deathConditionLambda2{ [&]() -> bool { return !g_Player2->IsPlayerDead(); } };
 	// First player:
 	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, firstPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player1GO.get(), 
+			glm::vec3{ 0.f, -1.f, 0.f }, firstPlayerSpeed),
+			deathConditionLambda1));
 	input.BindKeyboardCommand(SDL_SCANCODE_A, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, firstPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player1GO.get(), 
+			glm::vec3{ -1.f, 0.f, 0.f }, firstPlayerSpeed),
+			deathConditionLambda1));
 	input.BindKeyboardCommand(SDL_SCANCODE_S, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, firstPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player1GO.get(), 
+			glm::vec3{ 0.f, 1.f, 0.f }, firstPlayerSpeed),
+			deathConditionLambda1));
 	input.BindKeyboardCommand(SDL_SCANCODE_D, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, firstPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player1GO.get(), 
+			glm::vec3{ 1.f, 0.f, 0.f }, firstPlayerSpeed),
+			deathConditionLambda1));
 
 	// Player 1 command but target is Player 2 and uses a condition checking if player 1 is dead
 	input.BindKeyboardCommand(SDL_SCANCODE_X, InputManager::InputTrigger::Up,
 		std::make_unique<ConditionalCommand>(std::make_unique<DamageCommand>(player2GO.get(), 1), 
-			[&]() { return !g_Player1->IsPlayerDead(); }));
+			deathConditionLambda1));
+	input.BindKeyboardCommand(SDL_SCANCODE_E, InputManager::InputTrigger::Up,
+		std::make_unique<ConditionalCommand>(std::make_unique<ScoreCommand>(player1GO.get(), 10),
+			deathConditionLambda1));
 
 	// Second player:
 	input.BindControllerCommand(ControllerButton::DpadUp, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }, secondPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player2GO.get(), 
+			glm::vec3{ 0.f, -1.f, 0.f }, secondPlayerSpeed),
+			deathConditionLambda2));
 	input.BindControllerCommand(ControllerButton::DpadLeft, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }, secondPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player2GO.get(),
+			glm::vec3{ -1.f, 0.f, 0.f }, secondPlayerSpeed),
+			deathConditionLambda2));
 	input.BindControllerCommand(ControllerButton::DpadDown, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }, secondPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player2GO.get(),
+			glm::vec3{ 0.f, 1.f, 0.f }, secondPlayerSpeed),
+			deathConditionLambda2));
 	input.BindControllerCommand(ControllerButton::DpadRight, InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }, secondPlayerSpeed));
+		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player2GO.get(),
+			glm::vec3{ 1.f, 0.f, 0.f }, secondPlayerSpeed),
+			deathConditionLambda2));
 
 	// Player 2 command but target is Player 1 and uses a condition checking if player 2 is dead
-	input.BindControllerCommand(ControllerButton::A, InputManager::InputTrigger::Up,
+	input.BindControllerCommand(ControllerButton::X, InputManager::InputTrigger::Up,
 		std::make_unique<ConditionalCommand>(std::make_unique<DamageCommand>(player1GO.get(), 1),
-			[&]() { return !g_Player2->IsPlayerDead(); }));;
+			deathConditionLambda2));
+	input.BindControllerCommand(ControllerButton::A, InputManager::InputTrigger::Up,
+		std::make_unique<ConditionalCommand>(std::make_unique<ScoreCommand>(player2GO.get(), 10),
+			deathConditionLambda2));
 #pragma endregion
 
 	InputTestScene.Add(std::move(player1GO));
 	InputTestScene.Add(std::move(player2GO));
 
-	InputTestScene.Add(std::move(firstPlayerHealthDisplay));
-	InputTestScene.Add(std::move(secondPlayerHealthDisplay));
+	InputTestScene.Add(std::move(p1HealthDisplay));
+	InputTestScene.Add(std::move(p2HealthDisplay));
+
+	InputTestScene.Add(std::move(p1ScoreDisplay));
+	InputTestScene.Add(std::move(p2ScoreDisplay));
 
 }
