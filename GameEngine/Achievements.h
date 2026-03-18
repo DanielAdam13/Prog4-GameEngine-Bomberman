@@ -1,17 +1,33 @@
 #pragma once
 #include "Observer.h"
+#include <vector>
+
+namespace ge
+{
+	class GameObject;
+}
 
 namespace bombGame
 {
-	class Achievements final : public Observer
+	class AchievementsObserver final : public Observer
 	{
 	public:
-		Achievements() = default;
-		virtual ~Achievements() override = default;
+		AchievementsObserver() = default;
+		virtual ~AchievementsObserver() override = default;
 
-		//virtual void Notify(Event event, GameActor*) override;
+		virtual void Notify(EventId event, ge::GameObject* sourceObject) override;
+
+		enum class AchievementTypes
+		{
+			FirstBlood,
+			GameWon
+		};
 
 	private:
+		void Unlock(AchievementTypes achievement);
 
+		std::vector<AchievementTypes> m_UnlockedAchievements{};
+
+		bool m_NobodyDiedYet{ true };
 	};
 }
