@@ -10,7 +10,7 @@ namespace ge
 	{
 	public:
 		explicit Subject();
-		~Subject() = default;
+		~Subject();
 
 		void AddObserver(IObserver* observer);
 		void RemoveObserver(IObserver* observer);

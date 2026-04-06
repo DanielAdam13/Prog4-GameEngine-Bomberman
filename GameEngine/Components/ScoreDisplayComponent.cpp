@@ -31,10 +31,10 @@ ScoreDisplayComponent::ScoreDisplayComponent(ge::GameObject* owner, ge::GameObje
 ScoreDisplayComponent::~ScoreDisplayComponent()
 {
 	// Unregistering observers - Subject holds raw pointers
-	if (auto* playerComp{ m_pTrackedPlayer->GetComponent<bombGame::PlayerComponent>() })
+	/*if (auto* playerComp{ m_pTrackedPlayer->GetComponent<bombGame::PlayerComponent>() })
 	{
 		playerComp->GetScoreChangeEvent().RemoveObserver(this);
-	}
+	}*/
 }
 
 void ScoreDisplayComponent::Notify(int eventId, ge::GameObject*)

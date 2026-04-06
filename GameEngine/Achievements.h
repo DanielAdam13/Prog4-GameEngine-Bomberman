@@ -10,13 +10,13 @@ namespace ge
 
 namespace bombGame
 {
-	class AchievementsObserver final : public ge::IObserver
+	class AchievementsManager final : public ge::IObserver
 	{
 	public:
-		AchievementsObserver() = default;
-		virtual ~AchievementsObserver() override = default;
+		AchievementsManager() = default;
+		virtual ~AchievementsManager() override = default;
 
-		//virtual void Notify(EventId event, ge::GameObject* sourceObject) override;
+		virtual void Notify(int eventId, ge::GameObject* sourceObject) override;
 
 		enum class AchievementTypes
 		{

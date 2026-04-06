@@ -7,6 +7,11 @@ Subject::Subject()
 {
 }
 
+Subject::~Subject()
+{
+	m_SubjectObservers.clear();
+}
+
 void Subject::AddObserver(IObserver* observer)
 {
 	m_SubjectObservers.push_back(observer);

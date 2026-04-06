@@ -25,7 +25,10 @@ namespace fs = std::filesystem;
 #include "Components/RotatorComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/ScoreComponent.h"
+
 #include "Components/PlayerComponent.h"
+#include "Components/HealthDisplayComponent.h"
+#include "Components/ScoreDisplayComponent.h"
 
 #include "InputManager.h"
 #include "Commands/MoveCommand.h"
@@ -43,10 +46,7 @@ using namespace ge;
 using namespace bombGame;
 
 // TEMPORARY since my intention is for these to live over scenes, on the Game level
-std::unique_ptr<AchievementsObserver> g_AchievementsObserver{};
-std::unique_ptr<GameObject> player1GO{ nullptr };
-std::unique_ptr<GameObject> player2GO{ nullptr };
-
+std::unique_ptr<AchievementsManager> g_AchievementsObserver{};
 
 void InitializeFirstScene();
 void InitializeImGuiExercisesScene();
@@ -171,7 +171,7 @@ void InitializeMainPlayersScene()
 	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
 
 	// Resources:
-	//const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 28) };
+	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 28) };
 	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
 	constexpr SDL_Color color1{ SDL_Color{20, 100, 200, 255} };
 	constexpr SDL_Color color2{ SDL_Color{220, 100, 50, 255} };
@@ -180,7 +180,7 @@ void InitializeMainPlayersScene()
 	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
 	// 1. Player Initialization
-	player1GO = std::make_unique<GameObject>("GO_Player1");
+	auto player1GO = std::make_unique<GameObject>("GO_Player1");
 	player1GO->AddComponent<ge::Image>(player1GO.get())->SetTexture(playerTexture);
 	player1GO->GetComponent<ge::Transform>()->SetLocalPosition({ 250.f, 350.f, 0.f });
 	player1GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.5f, 2.5f, 2.5f });
@@ -188,7 +188,7 @@ void InitializeMainPlayersScene()
 	player1GO->AddComponent<ScoreComponent>(player1GO.get(), 0);
 	player1GO->AddComponent<PlayerComponent>(player1GO.get(), 120.f);
 
-	player2GO = std::make_unique<GameObject>("GO_Player2");
+	auto player2GO = std::make_unique<GameObject>("GO_Player2");
 	player2GO->AddComponent<ge::Image>(player2GO.get())->SetTexture(balloonTexture);
 	player2GO->GetComponent<ge::Transform>()->SetLocalPosition({ 200.f, 150.f, 0.f });
 	player2GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.f, 2.f, 2.f });
@@ -198,22 +198,30 @@ void InitializeMainPlayersScene()
 
 
 	// 2. Health Displays:
-	/*auto p1HealthDisplayGO = std::make_unique<GameObject>("GO_FirstPlayerDisplay");
+	auto p1HealthDisplayGO = std::make_unique<GameObject>("GO_P1HealthDisplay");
+	p1HealthDisplayGO->AddComponent<ge::TextComponent>(p1HealthDisplayGO.get(), "", font, color1);
+	p1HealthDisplayGO->AddComponent<HealthDisplayComponent>(p1HealthDisplayGO.get(), player1GO.get());
+	p1HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
+		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
 
-	auto p2HealthDisplayGO = std::make_unique<GameObject>("GO_SecondPlayerDisplay");*/
+	auto p2HealthDisplayGO = std::make_unique<GameObject>("GO_P2HealthDisplay");
+	p2HealthDisplayGO->AddComponent<ge::TextComponent>(p2HealthDisplayGO.get(), "", font, color2);
+	p2HealthDisplayGO->AddComponent<HealthDisplayComponent>(p2HealthDisplayGO.get(), player2GO.get());
+	p2HealthDisplayGO->GetComponent<Transform>()->SetLocalPosition({
+		windowSize.first * 0.75f, windowSize.second * 0.9f, 0.f });
 
 	// 3. Score Displays:
-	/*auto p1ScoreDisplay = std::make_unique<GameObject>("GO_FirstPlayerScore");
-	p1ScoreDisplay->AddComponent<TextComponent>(p1ScoreDisplay.get(),
-		"Score: 0", font, color1);
-	p1ScoreDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
+	auto p1ScoreDisplayGO = std::make_unique<GameObject>("GO_FirstPlayerScore");
+	p1ScoreDisplayGO->AddComponent<TextComponent>(p1ScoreDisplayGO.get(), "Score: 0", font, color1);
+	p1ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p1ScoreDisplayGO.get(), player1GO.get());
+	p1ScoreDisplayGO->GetComponent<Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.8f, 0.f });
 
-	auto p2ScoreDisplay = std::make_unique<GameObject>("GO_SecondPlayerScore");
-	p2ScoreDisplay->AddComponent<TextComponent>(p2ScoreDisplay.get(),
-		"Score: 0", font, color2);
-	p2ScoreDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
-		windowSize.first * 0.75f, windowSize.second * 0.8f, 0.f });*/
+	auto p2ScoreDisplayGO = std::make_unique<GameObject>("GO_SecondPlayerScore");
+	p2ScoreDisplayGO->AddComponent<TextComponent>(p2ScoreDisplayGO.get(), "Score: 0", font, color2);
+	p2ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p2ScoreDisplayGO.get(), player2GO.get());
+	p2ScoreDisplayGO->GetComponent<Transform>()->SetLocalPosition({
+		windowSize.first * 0.75f, windowSize.second * 0.8f, 0.f });
 
 	// 4. Command Binding to two players
 #pragma region CommandBinding
@@ -285,10 +293,10 @@ void InitializeMainPlayersScene()
 	InputTestScene.Add(std::move(player1GO));
 	InputTestScene.Add(std::move(player2GO));
 
-	/*InputTestScene.Add(std::move(p1HealthDisplayGO));
+	InputTestScene.Add(std::move(p1HealthDisplayGO));
 	InputTestScene.Add(std::move(p2HealthDisplayGO));
 
-	InputTestScene.Add(std::move(p1ScoreDisplay));
-	InputTestScene.Add(std::move(p2ScoreDisplay));*/
+	InputTestScene.Add(std::move(p1ScoreDisplayGO));
+	InputTestScene.Add(std::move(p2ScoreDisplayGO));
 
 }

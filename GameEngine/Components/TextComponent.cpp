@@ -36,14 +36,13 @@ void TextComponent::UpdateComponent(float)
 
 void TextComponent::RenderComponent() const
 {
-	if (m_TextTexture != nullptr)
-	{
-		auto* pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
-		const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldPosition().y };
+	if (!m_TextTexture) return;
 
-		// Has to use Renderer
-		Renderer::GetInstance().RenderTexture(*m_TextTexture.get(), worldTransPos.x, worldTransPos.y);
-	}
+	auto* pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
+	const glm::vec2 worldTransPos{ pOwnerTransform->GetWorldPosition().x, pOwnerTransform->GetWorldPosition().y };
+
+	// Has to use Renderer
+	Renderer::GetInstance().RenderTexture(*m_TextTexture.get(), worldTransPos.x, worldTransPos.y);
 }
 
 void TextComponent::SetText(const std::string& text)
@@ -65,6 +64,12 @@ glm::vec2 TextComponent::GetTextureSize() const noexcept
 
 void TextComponent::UpdateTextureForText()
 {
+	if (m_Text.empty())
+	{
+		m_TextTexture.reset();
+		return;
+	}
+
 	const auto textSurface = TTF_RenderText_Blended(m_pTextFont->GetFont(), m_Text.c_str(), m_Text.length(), m_TextColor);
 	if (textSurface == nullptr)
 		throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
