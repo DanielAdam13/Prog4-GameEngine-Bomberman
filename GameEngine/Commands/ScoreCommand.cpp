@@ -12,7 +12,7 @@ ScoreCommand::ScoreCommand(ge::GameObject* commandTarget, int scoreDiff)
 
 void ScoreCommand::Execute(float)
 {
-	auto* scoreComp{ GetCommandTarget()->GetComponent<ScoreComponent>() };
+	auto* scoreComp{ GetCommandTarget()->GetComponent<ge::ScoreComponent>() };
 
 	if (scoreComp)
 		scoreComp->ChangeScore(m_ScoreDiff);

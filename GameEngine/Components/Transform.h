@@ -5,6 +5,7 @@ namespace ge
 {
 	class GameObject;
 
+	// Engine Component
 	class Transform final : public Component
 	{
 	public:

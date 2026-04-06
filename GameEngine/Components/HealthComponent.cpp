@@ -1,6 +1,6 @@
 #include "HealthComponent.h"
 
-using namespace bombGame;
+using namespace ge;
 
 HealthComponent::HealthComponent(ge::GameObject* pOwnerPtr, int maxHealth)
 	:ge::Component::Component(pOwnerPtr),

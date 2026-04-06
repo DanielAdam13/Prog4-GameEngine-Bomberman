@@ -1,6 +1,7 @@
 #pragma once
 #include "Observer.h"
 #include <vector>
+#include "GameEvents.h"
 
 namespace ge
 {
@@ -9,13 +10,13 @@ namespace ge
 
 namespace bombGame
 {
-	class AchievementsObserver final : public Observer
+	class AchievementsObserver final : public ge::IObserver
 	{
 	public:
 		AchievementsObserver() = default;
 		virtual ~AchievementsObserver() override = default;
 
-		virtual void Notify(EventId event, ge::GameObject* sourceObject) override;
+		//virtual void Notify(EventId event, ge::GameObject* sourceObject) override;
 
 		enum class AchievementTypes
 		{

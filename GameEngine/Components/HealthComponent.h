@@ -2,13 +2,10 @@
 #include "Component.h"
 
 namespace ge
-{ 
-	class GameObject;
-}
-
-namespace bombGame
 {
-	// Game-side Component
+	class GameObject;
+
+	// Engine Component
 	class HealthComponent final : public ge::Component
 	{
 	public:

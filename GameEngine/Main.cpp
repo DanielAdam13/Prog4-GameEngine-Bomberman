@@ -25,6 +25,7 @@ namespace fs = std::filesystem;
 #include "Components/RotatorComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/ScoreComponent.h"
+#include "Components/PlayerComponent.h"
 
 #include "InputManager.h"
 #include "Commands/MoveCommand.h"
@@ -33,10 +34,8 @@ namespace fs = std::filesystem;
 #include "Commands/ScoreCommand.h"
 #include "Commands/ConditionalCommand.h"
 
-#include "Player.h"
 #include "Achievements.h"
-#include "HealthObserver.h"
-#include "ScoreObserver.h"
+
 #include "ObservableSubject.h"
 #include <string>
 
@@ -45,10 +44,9 @@ using namespace bombGame;
 
 // TEMPORARY since my intention is for these to live over scenes, on the Game level
 std::unique_ptr<AchievementsObserver> g_AchievementsObserver{};
-std::unique_ptr<HealthObserver> g_HealthObserver{};
-std::unique_ptr<Player> g_Player1{};
-std::unique_ptr<Player> g_Player2{};
-std::unique_ptr<ScoreObserver> g_ScoreObserver{};
+std::unique_ptr<GameObject> player1GO{ nullptr };
+std::unique_ptr<GameObject> player2GO{ nullptr };
+
 
 void InitializeFirstScene();
 void InitializeImGuiExercisesScene();
@@ -172,53 +170,40 @@ void InitializeMainPlayersScene()
 {
 	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
 
-	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 28) };
+	// Resources:
+	//const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 28) };
 	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
 	constexpr SDL_Color color1{ SDL_Color{20, 100, 200, 255} };
 	constexpr SDL_Color color2{ SDL_Color{220, 100, 50, 255} };
 
-	// 1. Player Initialization
 	const auto playerTexture{ ResourceManager::GetInstance().LoadTexture("I_Player_Bomberman.png") };
 	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
 
-	auto player1GO = std::make_unique<GameObject>("GO_Player1");
-	g_Player1 = std::make_unique<Player>( player1GO.get(), playerTexture, 
-		120.f, 3, glm::vec3{ 250.f, 350.f, 0.f }, glm::vec3{ 2.5f, 2.5f, 2.5f } );
+	// 1. Player Initialization
+	player1GO = std::make_unique<GameObject>("GO_Player1");
+	player1GO->AddComponent<ge::Image>(player1GO.get())->SetTexture(playerTexture);
+	player1GO->GetComponent<ge::Transform>()->SetLocalPosition({ 250.f, 350.f, 0.f });
+	player1GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+	player1GO->AddComponent<HealthComponent>(player1GO.get(), 3);
+	player1GO->AddComponent<ScoreComponent>(player1GO.get(), 0);
+	player1GO->AddComponent<PlayerComponent>(player1GO.get(), 120.f);
 
-	auto player2GO = std::make_unique<GameObject>("GO_Player2");
-	g_Player2 = std::make_unique<Player>(player2GO.get(), balloonTexture, 
-		240.f, 3, glm::vec3{ 200.f, 150.f, 0.f }, glm::vec3{ 2.f, 2.f, 2.f });
+	player2GO = std::make_unique<GameObject>("GO_Player2");
+	player2GO->AddComponent<ge::Image>(player2GO.get())->SetTexture(balloonTexture);
+	player2GO->GetComponent<ge::Transform>()->SetLocalPosition({ 200.f, 150.f, 0.f });
+	player2GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.f, 2.f, 2.f });
+	player2GO->AddComponent<HealthComponent>(player2GO.get(), 3);
+	player2GO->AddComponent<ScoreComponent>(player2GO.get(), 0);
+	player2GO->AddComponent<PlayerComponent>(player2GO.get(), 240.f);
 
-	// Apply observer pattern:
-	g_AchievementsObserver = std::make_unique<AchievementsObserver>();
-	g_Player1->GetDeadEvent().AddObserver(g_AchievementsObserver.get());
-	g_Player2->GetDeadEvent().AddObserver(g_AchievementsObserver.get());
-
-	g_HealthObserver = std::make_unique<HealthObserver>();
-	g_Player1->GetDamageEvent().AddObserver(g_HealthObserver.get());
-	g_Player1->GetDeadEvent().AddObserver(g_HealthObserver.get());
-	g_Player2->GetDamageEvent().AddObserver(g_HealthObserver.get());
-	g_Player2->GetDeadEvent().AddObserver(g_HealthObserver.get());
-
-	g_ScoreObserver = std::make_unique<ScoreObserver>();
-	g_Player1->GetScoreEvent().AddObserver(g_ScoreObserver.get());
-	g_Player2->GetScoreEvent().AddObserver(g_ScoreObserver.get());
 
 	// 2. Health Displays:
-	auto p1HealthDisplay = std::make_unique<GameObject>("GO_FirstPlayerDisplay");
-	p1HealthDisplay->AddComponent<TextComponent>(p1HealthDisplay.get(),
-		std::string(player1GO->GetName() + " HP: " + std::to_string(g_Player1->GetPlayerHealth())), font, color1);
-	p1HealthDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
-		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
+	/*auto p1HealthDisplayGO = std::make_unique<GameObject>("GO_FirstPlayerDisplay");
 
-	auto p2HealthDisplay = std::make_unique<GameObject>("GO_SecondPlayerDisplay");
-	p2HealthDisplay->AddComponent<TextComponent>(p2HealthDisplay.get(),
-		std::string(player2GO->GetName() + " HP: " + std::to_string(g_Player2->GetPlayerHealth())), font, color2);
-	p2HealthDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{ 
-		windowSize.first * 0.75f, windowSize.second * 0.9f, 0.f });
+	auto p2HealthDisplayGO = std::make_unique<GameObject>("GO_SecondPlayerDisplay");*/
 
 	// 3. Score Displays:
-	auto p1ScoreDisplay = std::make_unique<GameObject>("GO_FirstPlayerScore");
+	/*auto p1ScoreDisplay = std::make_unique<GameObject>("GO_FirstPlayerScore");
 	p1ScoreDisplay->AddComponent<TextComponent>(p1ScoreDisplay.get(),
 		"Score: 0", font, color1);
 	p1ScoreDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
@@ -228,26 +213,22 @@ void InitializeMainPlayersScene()
 	p2ScoreDisplay->AddComponent<TextComponent>(p2ScoreDisplay.get(),
 		"Score: 0", font, color2);
 	p2ScoreDisplay->GetComponent<Transform>()->SetLocalPosition(glm::vec3{
-		windowSize.first * 0.75f, windowSize.second * 0.8f, 0.f });
+		windowSize.first * 0.75f, windowSize.second * 0.8f, 0.f });*/
 
-	// 4. Register player health and score displays to HEALTH and SCORE observers
-	g_HealthObserver->RegisterPlayer(player1GO.get(), p1HealthDisplay->GetComponent<TextComponent>());
-	g_HealthObserver->RegisterPlayer(player2GO.get(), p2HealthDisplay->GetComponent<TextComponent>());
-
-	g_ScoreObserver->RegisterPlayer(player1GO.get(), p1ScoreDisplay->GetComponent<TextComponent>());
-	g_ScoreObserver->RegisterPlayer(player2GO.get(), p2ScoreDisplay->GetComponent<TextComponent>());
-
-
-	// 5. Command Binding to two players
+	// 4. Command Binding to two players
 #pragma region CommandBinding
 	auto& input{ InputManager::GetInstance() };
 
-	// Player speeds
-	const float firstPlayerSpeed{ g_Player1->GetPlayerSpeed()};
-	const float secondPlayerSpeed{ g_Player2->GetPlayerSpeed() };
+	auto* p1PlayerCompRaw{ player1GO.get()->GetComponent<PlayerComponent>() };
+	auto* p2PlayerCompRaw{ player2GO.get()->GetComponent<PlayerComponent>() };
 
-	auto deathConditionLambda1{ [&]() -> bool { return !g_Player1->IsPlayerDead(); } };
-	auto deathConditionLambda2{ [&]() -> bool { return !g_Player2->IsPlayerDead(); } };
+	// Player speeds
+	auto deathConditionLambda1{ [p1PlayerCompRaw]() -> bool { return p1PlayerCompRaw && p1PlayerCompRaw->IsAlive(); } };
+	auto deathConditionLambda2{ [p2PlayerCompRaw]() -> bool { return p2PlayerCompRaw && p2PlayerCompRaw->IsAlive(); } };
+
+	const float firstPlayerSpeed{ p1PlayerCompRaw->GetSpeed() };
+	const float secondPlayerSpeed{ p2PlayerCompRaw->GetSpeed() };
+
 	// First player:
 	input.BindKeyboardCommand(SDL_SCANCODE_W, InputManager::InputTrigger::Pressed,
 		std::make_unique<ConditionalCommand>(std::make_unique<MoveCommand>(player1GO.get(), 
@@ -304,10 +285,10 @@ void InitializeMainPlayersScene()
 	InputTestScene.Add(std::move(player1GO));
 	InputTestScene.Add(std::move(player2GO));
 
-	InputTestScene.Add(std::move(p1HealthDisplay));
-	InputTestScene.Add(std::move(p2HealthDisplay));
+	/*InputTestScene.Add(std::move(p1HealthDisplayGO));
+	InputTestScene.Add(std::move(p2HealthDisplayGO));
 
 	InputTestScene.Add(std::move(p1ScoreDisplay));
-	InputTestScene.Add(std::move(p2ScoreDisplay));
+	InputTestScene.Add(std::move(p2ScoreDisplay));*/
 
 }

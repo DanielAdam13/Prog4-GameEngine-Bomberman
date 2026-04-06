@@ -1,9 +1,9 @@
 #pragma once
 #include "Component.h"
 
-namespace bombGame
+namespace ge
 {
-	// Game-side Component
+	// Engine Component
 	class ScoreComponent final : public ge::Component
 	{
 	public:

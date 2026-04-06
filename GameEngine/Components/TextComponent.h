@@ -10,6 +10,7 @@ namespace ge
 	class Texture2D;
 	class GameObject;
 
+	// Engine Component
 	class TextComponent final : public Component
 	{
 	public:

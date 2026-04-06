@@ -3,25 +3,14 @@
 namespace ge
 {
 	class GameObject;
-}
 
-namespace bombGame
-{
-	enum EventId
-	{
-		PLAYER_DIED,
-		PLAYER_LOST_HEALTH,
-		PLAYER_SCORE_CHANGED,
-		GAME_OVER
-	};
-
-	class Observer
+	class IObserver
 	{
 	public:
-		Observer() = default;
-		virtual ~Observer() = default;
+		IObserver() = default;
+		virtual ~IObserver() = default;
 
-		virtual void Notify(EventId event, ge::GameObject* sourceObject) = 0;
+		virtual void Notify(int eventId, ge::GameObject* sourceObject) = 0;
 
 	protected:
 

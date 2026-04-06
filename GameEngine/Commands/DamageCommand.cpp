@@ -12,7 +12,7 @@ DamageCommand::DamageCommand(ge::GameObject* commandTarget, int damageAmount)
 
 void DamageCommand::Execute(float)
 {
-	auto* targetHealthComponent{ GetCommandTarget()->GetComponent<HealthComponent>() };
+	auto* targetHealthComponent{ GetCommandTarget()->GetComponent<ge::HealthComponent>() };
 
 	if (targetHealthComponent)
 		targetHealthComponent->TakeDamage(m_DamageAmount);

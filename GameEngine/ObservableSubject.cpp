@@ -1,19 +1,18 @@
 #include "ObservableSubject.h"
 #include "GameObject.h"
 
-using namespace bombGame;
+using namespace ge;
 
-Subject::Subject(EventId id)
-	:m_EventId{ id }
+Subject::Subject()
 {
 }
 
-void Subject::AddObserver(Observer* observer)
+void Subject::AddObserver(IObserver* observer)
 {
 	m_SubjectObservers.push_back(observer);
 }
 
-void Subject::RemoveObserver(Observer* observer)
+void Subject::RemoveObserver(IObserver* observer)
 {
 	m_SubjectObservers.erase(
 		std::remove(m_SubjectObservers.begin(), m_SubjectObservers.end(), observer),
@@ -21,10 +20,10 @@ void Subject::RemoveObserver(Observer* observer)
 	);
 }
 
-void Subject::NotifyObservers(ge::GameObject* sourceObject)
+void Subject::NotifyObservers(int eventId, ge::GameObject* sourceObject)
 {
 	for (auto* observer : m_SubjectObservers)
 	{
-		observer->Notify(m_EventId, sourceObject);
+		observer->Notify(eventId, sourceObject);
 	}
 }

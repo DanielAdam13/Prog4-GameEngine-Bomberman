@@ -5,6 +5,7 @@
 
 namespace ge
 {
+	// Engine Component
 	class Image final : public Component
 	{
 	public:

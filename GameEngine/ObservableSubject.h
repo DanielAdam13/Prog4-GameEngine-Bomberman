@@ -5,24 +5,20 @@
 namespace ge
 {
 	class GameObject;
-}
 
-namespace bombGame
-{
 	class Subject final
 	{
 	public:
-		explicit Subject(const EventId id);
+		explicit Subject();
 		~Subject() = default;
 
-		void AddObserver(Observer* observer);
-		void RemoveObserver(Observer* observer);
+		void AddObserver(IObserver* observer);
+		void RemoveObserver(IObserver* observer);
 
-		void NotifyObservers(ge::GameObject* sourceObject);
+		void NotifyObservers(int eventId, ge::GameObject* sourceObject);
 
 	private:
-		std::vector<Observer*> m_SubjectObservers{};
+		std::vector<IObserver*> m_SubjectObservers{};
 
-		const EventId m_EventId{};
 	};
 }

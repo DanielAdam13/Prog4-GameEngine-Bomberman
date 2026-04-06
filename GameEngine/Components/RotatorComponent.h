@@ -6,6 +6,7 @@ namespace ge
 	class GameObject;
 	class Transform;
 
+	// Engine Component
 	class Rotator final : public Component
 	{
 	public:

@@ -1,6 +1,6 @@
 #include "ScoreComponent.h"
 
-using namespace bombGame;
+using namespace ge;
 
 ScoreComponent::ScoreComponent(ge::GameObject* pOwnerPtr, int startingScore)
 	:ge::Component::Component(pOwnerPtr),

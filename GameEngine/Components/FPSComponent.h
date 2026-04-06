@@ -6,6 +6,7 @@ namespace ge
 {
 	class TextComponent;
 
+	// Engine Component
 	class FPSComponent final : public Component
 	{
 	public:
