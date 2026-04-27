@@ -1,7 +1,8 @@
 #include "MoveStickCommand.h"
-#include "InputManager.h"
 #include "GameObject.h"
 #include "Components/Transform.h"
+#include "Services/ServiceLocator.h"
+#include "Services/InputManager.h"
 
 using namespace ge;
 
@@ -19,7 +20,7 @@ void MoveStickCommand::Execute(float deltaTime)
 
 void MoveStickCommand::MoveController(float deltaTime)
 {
-	const glm::vec2 stick{ InputManager::GetInstance().GetLeftStick() };
+	const glm::vec2 stick{ ge::ServiceLocator::GetInputManager().GetLeftStick() };
 
 	// Guard against deadzone, even after it was done in GetLeftStick
 	if (glm::length(stick) < 0.01f) 

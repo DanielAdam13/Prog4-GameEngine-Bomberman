@@ -30,9 +30,8 @@ namespace fs = std::filesystem;
 #include "Components/HealthDisplayComponent.h"
 #include "Components/ScoreDisplayComponent.h"
 
-#include "InputManager.h"
+//#include "InputManager.h"
 #include "Commands/MoveCommand.h"
-//#include "Commands/MoveStickCommand.h"
 #include "Commands/DamageCommand.h"
 #include "Commands/ScoreCommand.h"
 #include "Commands/ConditionalCommand.h"
@@ -41,6 +40,11 @@ namespace fs = std::filesystem;
 
 #include "ObservableSubject.h"
 #include <string>
+
+#include "Services/ServiceLocator.h"
+#include "Services/SDLSoundSystem.h"
+#include "Services/LoggingSoundService.h"
+#include "Services/InputManager.h"
 
 using namespace ge;
 using namespace bombGame;
@@ -69,6 +73,14 @@ int main(int, char* [])
 		data_location = "../resources/";
 #endif
 	GameEngine::GetInstance().InitializeEngine(data_location);
+
+	// Initialize Services:
+#if _DEBUG
+	ge::ServiceLocator::RegisterSoundSystem(std::make_unique<LoggingSoundSystem>(std::make_unique<SDLSoundSystem>()));
+#else 
+	ge::ServiceLocator::RegisterSoundSystem(std::make_unique<SDLSoundSystem>());
+#endif
+
 	GameEngine::GetInstance().Run(LoadScenes);
 	return 0;
 }
@@ -225,7 +237,7 @@ void InitializeMainPlayersScene()
 
 	// 4. Command Binding to two players
 #pragma region CommandBinding
-	auto& input{ InputManager::GetInstance() };
+	auto& input{ ge::ServiceLocator::GetInputManager() };
 
 	auto* p1PlayerCompRaw{ player1GO.get()->GetComponent<PlayerComponent>() };
 	auto* p2PlayerCompRaw{ player2GO.get()->GetComponent<PlayerComponent>() };

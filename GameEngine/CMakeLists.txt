@@ -8,13 +8,18 @@ add_library(gameEngine_lib STATIC
   "Texture2D.h" "Texture2D.cpp"
   "ResourceManager.h" "ResourceManager.cpp"
   "Font.h" "Font.cpp"
-  "InputManager.h" "InputManager.cpp"
+  "Services/InputManager.h" "Services/InputManager.cpp"
   "Scene.h" "Scene.cpp"
   "SceneManager.h" "SceneManager.cpp"
   "GameObject.h" "GameObject.cpp"
   "ImGuiScene.h" "ImGuiScene.cpp"
   "Observer.h"
   "ObservableSubject.h" "ObservableSubject.cpp"
+  "Services/ServiceLocator.h" "Services/ServiceLocator.cpp"
+  "Services/SoundSystem.h" "Services/SoundSystem.cpp"
+  "Services/NullSoundSystem.h"
+  "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp"
+  "Services/LoggingSoundService.h" "Services/LoggingSoundService.cpp"
  
   "Components/Component.h"
   "Components/Transform.h" "Components/Transform.cpp"
@@ -29,7 +34,8 @@ add_library(gameEngine_lib STATIC
   "Commands/GameObjectCommand.h"
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
   "Commands/MoveStickCommand.h" "Commands/MoveStickCommand.cpp"
-  "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp")
+  "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp" 
+)
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 

@@ -14,7 +14,7 @@ namespace ge
 	class GameObject;
 
 	// PIMPL CLASS
-	class InputManager final : public Singleton<InputManager>
+	class InputManager final
 	{
 	public:
 		InputManager();
@@ -31,8 +31,8 @@ namespace ge
 		bool IsButtonUpThisFrame(unsigned int button) const noexcept;
 		bool IsButtonPressed(unsigned int button) const noexcept;
 
-		glm::vec2 GetLeftStick();
-		glm::vec2 GetRightStick();
+		glm::vec2 GetLeftStick() const;
+		glm::vec2 GetRightStick() const;
 
 		bool IsControllerConnected() const noexcept;
 

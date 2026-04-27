@@ -18,8 +18,13 @@ using namespace ge;
 
 #include "Renderer.h"
 #include "ResourceManager.h"
-#include "InputManager.h"
 #include "SceneManager.h"
+
+// Services:
+#include "Services/ServiceLocator.h"
+#include "Services/InputManager.h"
+#include "Services/SoundSystem.h"
+#include "Services/NullSoundSystem.h"
 
 SDL_Window* g_Window{};
 
@@ -89,6 +94,9 @@ void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 	// ----------------------------
 	Renderer::GetInstance().Init(g_Window);
 	ResourceManager::GetInstance().Init(dataPath);
+
+	ServiceLocator::RegisterInputManager(std::make_unique<ge::InputManager>());
+	ServiceLocator::RegisterSoundSystem(std::make_unique<ge::NullSoundSystem>());
 }
 
 GameEngine::~GameEngine()
@@ -133,7 +141,7 @@ void GameEngine::RunOneFrame()
 
 	// ---- MAIN FRAME LOGIC ----
 #pragma region MainFrame
-	m_Quit = !InputManager::GetInstance().ProcessInput(m_DeltaTime);
+	m_Quit = !ge::ServiceLocator::GetInputManager().ProcessInput(m_DeltaTime);
 
 	m_FrameLag += m_DeltaTime;
 	while (m_FrameLag >= m_FixedTimeStep)
