@@ -1,0 +1,22 @@
+#pragma once
+#include "Services/SoundSystem.h"
+
+#include <memory>
+
+namespace bombGame
+{
+	class SDLSoundSysImpl;
+
+	class SDLSoundSystem : public ge::SoundSystem
+	{
+	public:
+		SDLSoundSystem();
+		virtual ~SDLSoundSystem() override = default;
+
+		virtual void Play(const ge::Sound_Id soundId, const float volume) override;
+		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;
+
+	private:
+		std::unique_ptr<SDLSoundSysImpl> m_Impl{};
+	};
+}

@@ -45,6 +45,9 @@ namespace fs = std::filesystem;
 #include "Services/SDLSoundSystem.h"
 #include "Services/LoggingSoundService.h"
 #include "Services/InputManager.h"
+#include "Services/SoundIds.h"
+
+#include <memory>
 
 using namespace ge;
 using namespace bombGame;
@@ -76,10 +79,16 @@ int main(int, char* [])
 
 	// Initialize Services:
 #if _DEBUG
-	ge::ServiceLocator::RegisterSoundSystem(std::make_unique<LoggingSoundSystem>(std::make_unique<SDLSoundSystem>()));
+	auto sdlSound{ std::make_unique<LoggingSoundSystem>(std::make_unique<SDLSoundSystem>()) };
+	LoggingSoundSystem* sdlRaw{ sdlSound.get() };
+
+	ge::ServiceLocator::RegisterSoundSystem(std::move(sdlSound));
 #else 
 	ge::ServiceLocator::RegisterSoundSystem(std::make_unique<SDLSoundSystem>());
 #endif
+
+	// Pre-load sound files:
+	sdlRaw->RegisterSound(bombGame::SoundIds::ExplosionBomb, "sounds/bomb_explosion.wav");
 
 	GameEngine::GetInstance().Run(LoadScenes);
 	return 0;
@@ -116,7 +125,7 @@ void InitializeFirstScene()
 			0.f });
 	}
 
-	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 36) };
+	const auto font{ ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 36) };
 	constexpr SDL_Color color{ SDL_Color{128, 128, 128, 255} };
 
 	auto textGO = std::make_unique<GameObject>("GO_TextObject");
@@ -136,7 +145,7 @@ void InitializeFirstScene()
 		0.f, 0.f });
 	scene.Add(std::move(prog4AssingGO));
 
-	const auto tutFont{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 20) };
+	const auto tutFont{ ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };
 
 	auto tutorial1GO = std::make_unique<GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<TextComponent>(tutorial1GO.get(),
@@ -183,13 +192,13 @@ void InitializeMainPlayersScene()
 	Scene& InputTestScene{ SceneManager::GetInstance().CreateScene() };
 
 	// Resources:
-	const auto font{ ResourceManager::GetInstance().LoadFont("Lingua.otf", 28) };
+	const auto font{ ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 28) };
 	const auto windowSize{ Renderer::GetInstance().GetWindowSize() };
 	constexpr SDL_Color color1{ SDL_Color{20, 100, 200, 255} };
 	constexpr SDL_Color color2{ SDL_Color{220, 100, 50, 255} };
 
-	const auto playerTexture{ ResourceManager::GetInstance().LoadTexture("I_Player_Bomberman.png") };
-	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("I_Balloon_Bomberman.png") };
+	const auto playerTexture{ ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
+	const auto balloonTexture{ ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
 
 	// 1. Player Initialization
 	auto player1GO = std::make_unique<GameObject>("GO_Player1");

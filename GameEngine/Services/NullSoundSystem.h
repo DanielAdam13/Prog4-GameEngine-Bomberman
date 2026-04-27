@@ -11,6 +11,8 @@ namespace ge
 
 		// Empty/Null Play implementation
 		virtual void Play(const Sound_Id, const float) override {};
+
+		virtual void RegisterSound(ge::Sound_Id, const std::string&) override {};
 	private:
 
 	};

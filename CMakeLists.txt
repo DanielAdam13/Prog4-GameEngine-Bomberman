@@ -116,6 +116,35 @@ if(NOT SDL3_ttf_FOUND)
 endif()
 
 #----------------------------
+# SDL3_mixer
+#----------------------------
+find_package(SDL3_mixer 3.2 CONFIG QUIET)
+if(NOT SDL3_mixer_FOUND)
+  if (WIN32)
+    FetchContent_Declare(
+      SDL3_mixer
+      URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-3.2.0/SDL3_mixer-devel-3.2.0-VC.zip
+      DOWNLOAD_NO_PROGRESS ON
+      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+    )
+    FetchContent_MakeAvailable(SDL3_mixer)
+    list(PREPEND CMAKE_PREFIX_PATH "${sdl3_mixer_SOURCE_DIR}")
+    find_package(SDL3_mixer CONFIG REQUIRED)
+  else()
+    FetchContent_Declare(
+      SDL3_mixer
+      GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+      GIT_TAG release-3.2.0
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+    )
+    set(SDL3MIXER_INSTALL OFF)
+    set(SDL3MIXER_VENDORED ON)
+    FetchContent_MakeAvailable(SDL3_mixer)
+  endif()
+endif()
+
+#----------------------------
 # Dear Imgui built here
 #----------------------------
 add_library(imgui STATIC

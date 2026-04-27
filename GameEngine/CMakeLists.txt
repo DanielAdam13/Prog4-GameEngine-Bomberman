@@ -18,7 +18,6 @@ add_library(gameEngine_lib STATIC
   "Services/ServiceLocator.h" "Services/ServiceLocator.cpp"
   "Services/SoundSystem.h" "Services/SoundSystem.cpp"
   "Services/NullSoundSystem.h"
-  "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp"
   "Services/LoggingSoundService.h" "Services/LoggingSoundService.cpp"
  
   "Components/Component.h"

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <string>
 
 namespace ge
 {
@@ -13,6 +14,7 @@ namespace ge
 		virtual ~SoundSystem() = default;
 
 		virtual void Play(const Sound_Id id, const float volume) = 0;
+		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) = 0;
 
 	private:
 	};

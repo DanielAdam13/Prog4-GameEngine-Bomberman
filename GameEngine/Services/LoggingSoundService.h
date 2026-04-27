@@ -1,5 +1,4 @@
 #pragma once
-#include "Services/SDLSoundSystem.h"
 #include "Services/SoundSystem.h"
 
 #include <memory>
@@ -14,6 +13,8 @@ namespace ge
 		virtual ~LoggingSoundSystem() override = default;
 
 		virtual void Play(const Sound_Id soundId, const float volume) override;
+		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;
+
 	private:
 		std::unique_ptr<SoundSystem> m_RealSoundSystem{};
 	};
