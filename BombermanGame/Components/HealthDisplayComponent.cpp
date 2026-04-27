@@ -1,12 +1,12 @@
 #include "HealthDisplayComponent.h"
 
 #include "GameObject.h"
-#include "TextComponent.h"
+#include "Components/TextComponent.h"
 #include "PlayerComponent.h"
 
 #include "GameEvents.h"
 
-#include "HealthComponent.h"
+#include "Components/HealthComponent.h"
 #include <string>
 
 #include <cassert>

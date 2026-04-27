@@ -16,13 +16,16 @@ else()
   set(TARGET_PARAM WIN32)
 endif()
 
-# list source files here
-add_executable(${TARGET_NAME} ${TARGET_PARAM}
-  GameEngine/Main.cpp
- "GameEngine/GameEngine.h" "GameEngine/GameEngine.cpp" "GameEngine/Singleton.h" "GameEngine/Renderer.cpp" "GameEngine/Renderer.h" "GameEngine/Texture2D.cpp" "GameEngine/Texture2D.h" "GameEngine/ResourceManager.cpp" "GameEngine/ResourceManager.h" "GameEngine/Font.cpp" "GameEngine/Font.h" "GameEngine/InputManager.cpp" "GameEngine/InputManager.h" "GameEngine/Scene.cpp" "GameEngine/Scene.h" "GameEngine/SceneManager.cpp" "GameEngine/SceneManager.h" "GameEngine/GameObject.h" "GameEngine/GameObject.cpp" "GameEngine/Components/Transform.h" "GameEngine/Components/Transform.cpp" "GameEngine/Components/Component.h"   "GameEngine/Components/Image.h" "GameEngine/Components/Image.cpp" "GameEngine/Components/TextComponent.h" "GameEngine/Components/TextComponent.cpp" "GameEngine/Components/FPSComponent.h" "GameEngine/Components/FPSComponent.cpp" "GameEngine/Components/RotatorComponent.h" "GameEngine/Components/RotatorComponent.cpp" "GameEngine/ImGuiScene.h" "GameEngine/ImGuiScene.cpp" "GameEngine/Commands/Command.h"  "GameEngine/Commands/GameObjectCommand.h" "GameEngine/Commands/MoveCommand.h" "GameEngine/Commands/MoveCommand.cpp" "GameEngine/Commands/MoveStickCommand.h" "GameEngine/Commands/MoveStickCommand.cpp" "GameEngine/Observer.h"  "GameEngine/Achievements.h" "GameEngine/Achievements.cpp" "GameEngine/ObservableSubject.h" "GameEngine/ObservableSubject.cpp"   "GameEngine/Commands/DamageCommand.h" "GameEngine/Commands/DamageCommand.cpp" "GameEngine/Components/HealthComponent.h" "GameEngine/Components/HealthComponent.cpp"   "GameEngine/Commands/ConditionalCommand.h" "GameEngine/Commands/ConditionalCommand.cpp" "GameEngine/Components/ScoreComponent.h" "GameEngine/Components/ScoreComponent.cpp" "GameEngine/Commands/ScoreCommand.h" "GameEngine/Commands/ScoreCommand.cpp"   "GameEngine/Components/PlayerComponent.h" "GameEngine/Components/PlayerComponent.cpp" "GameEngine/GameEvents.h" "GameEngine/Components/HealthDisplayComponent.h" "GameEngine/Components/HealthDisplayComponent.cpp" "GameEngine/Components/ScoreDisplayComponent.h" "GameEngine/Components/ScoreDisplayComponent.cpp")
-
-# enable c++20 features
-target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
+#----------------------------
+# Helper: apply project-wide warning flags to a target.
+#----------------------------
+function(ge_apply_warnings target)
+  if(MSVC)
+    target_compile_options(${target} PRIVATE /W4 /WX)
+  else()
+    target_compile_options(${target} PRIVATE -Wall -Wextra -Werror)
+  endif()
+endfunction()
 
 #----------------------------
 # Dear ImGui
@@ -34,19 +37,6 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(imgui)
-
-add_library(imgui STATIC
-  ${imgui_SOURCE_DIR}/imgui.cpp
-  ${imgui_SOURCE_DIR}/imgui_draw.cpp
-  ${imgui_SOURCE_DIR}/imgui_tables.cpp
-  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-  ${imgui_SOURCE_DIR}/imgui_demo.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp
- "GameEngine/ImGuiScene.h" "GameEngine/ImGuiScene.cpp")
-
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${sdl3_SOURCE_DIR}/include)
-target_link_libraries(imgui PUBLIC SDL3::SDL3)
 
 #----------------------------
 # GLM
@@ -126,142 +116,38 @@ if(NOT SDL3_ttf_FOUND)
 endif()
 
 #----------------------------
+# Dear Imgui built here
+#----------------------------
+add_library(imgui STATIC
+  ${imgui_SOURCE_DIR}/imgui.cpp
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp
+  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+  ${imgui_SOURCE_DIR}/imgui_demo.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp)
+
+target_include_directories(imgui PUBLIC 
+    ${imgui_SOURCE_DIR} 
+    ${sdl3_SOURCE_DIR}/backends)
+
+target_link_libraries(imgui PUBLIC SDL3::SDL3)
+
+#----------------------------
 # VLD (Visual Leak Detector) for memory leak detection on Windows
 #----------------------------
 if (WIN32)
   find_package(VLD CONFIG)
 endif()
 
-# Add steam if available
+#----------------------------
+# Steamworks (optional). Detected here so Game/CMakeLists.txt sees
+#----------------------------
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/steam")
 find_package(Steamworks QUIET)
 
-target_include_directories("${TARGET_NAME}" PUBLIC
-  ${CMAKE_SOURCE_DIR}/GameEngine/
-  ${imgui_SOURCE_DIR}
-  ${imgui_SOURCE_DIR}/backends 
-  ${VLD_INCLUDE_DIR}
-)
-
-target_link_libraries("${TARGET_NAME}" PUBLIC
-  SDL3::SDL3
-  SDL3_ttf::SDL3_ttf
-  glm::glm
-  imgui
-  ${VLD_LIBRARIES}
-  $<$<PLATFORM_ID:Windows>:xinput.lib>
-)
-
 #----------------------------
-# Compile at warning level 4 + treat warnings as errors
+# Subprojects
 #----------------------------
-if(MSVC)
-  target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
-else()
-  target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -Werror)
-endif()
-
-if(EMSCRIPTEN)
-  set(EMSCRIPTEN_COMPILE_FLAGS "${EMSCRIPTEN_LINK_FLAGS} -g")
-  set(EMSCRIPTEN_LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS} -sUSE_FREETYPE=1 -sUSE_HARFBUZZ=1 -g -sALLOW_MEMORY_GROWTH --preload-file \"${CMAKE_SOURCE_DIR}/resources@/\"")
-
-  # Use the Emscripten toolchain
-  set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/EmscriptenToolchain.cmake)
-
-  # Additional settings for Emscripten build
-  set_target_properties(${TARGET_NAME} PROPERTIES
-      COMPILE_FLAGS "${EMSCRIPTEN_COMPILE_FLAGS}"
-      LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
-  )
-
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:${TARGET_NAME}>/"
-  )
-
-  # Have emscripten generate a html page too.
-  set(CMAKE_EXECUTABLE_SUFFIX ".html")
-
-elseif(WIN32)
-  # Set Game Engine as the default startup project
-  set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${TARGET_NAME})
-  # Set working directory to output folder
-  set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET_NAME}>")
-
-  # Copy SDL dlls to output folder
-  set(SDL_RUNTIME_DLLS
-    SDL3::SDL3
-    SDL3_ttf::SDL3_ttf
-  )
-
-  foreach(dllTarget IN LISTS SDL_RUNTIME_DLLS)
-    add_custom_command(
-      TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-          "$<TARGET_FILE:${dllTarget}>"
-          "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-      VERBATIM
-    )
-  endforeach()
-
-  if(Steamworks_FOUND)
-    target_link_libraries("${TARGET_NAME}" PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(${TARGET_NAME} PRIVATE USE_STEAMWORKS)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E copy "${Steamworks_RUNTIME_DLL}" "$<TARGET_FILE_DIR:${TARGET_NAME}>")
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
-      COMMENT "Generating steam_appid.txt"
-    )
-  endif()
-
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${TARGET_NAME}>/resources"
-  )
-elseif(APPLE)
-  set_target_properties(${TARGET_NAME} PROPERTIES
-    MACOSX_BUNDLE TRUE
-    INSTALL_RPATH "@executable_path/../Frameworks"
-    BUILD_WITH_INSTALL_RPATH TRUE
-  )
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL3::SDL3-shared>" "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/"
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL3_ttf::SDL3_ttf-shared>" "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/"
-    COMMAND install_name_tool -change "@rpath/libSDL3_ttf.0.dylib" "@executable_path/../Frameworks/libSDL3_ttf.0.2.2.dylib" "$<TARGET_FILE:${TARGET_NAME}>"
-    COMMAND install_name_tool -change "@rpath/libSDL3.0.dylib" "@executable_path/../Frameworks/libSDL3.0.dylib" "$<TARGET_FILE:${TARGET_NAME}>"
-  )
-
-  if(Steamworks_FOUND)
-    target_link_libraries("${TARGET_NAME}" PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(${TARGET_NAME} PRIVATE USE_STEAMWORKS)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${Steamworks_LIBRARIES}" "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/"
-    )
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
-      COMMENT "Generating steam_appid.txt"
-    )
-  endif()
-
-  # Copy Resources folder to output directory after build
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${TARGET_NAME}>/resources"
-  )
-else()
- if(Steamworks_FOUND)
-    target_link_libraries("${TARGET_NAME}" PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(${TARGET_NAME} PRIVATE USE_STEAMWORKS)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${Steamworks_LIBRARIES}" "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-    )
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-      COMMAND "${CMAKE_COMMAND}" -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
-      COMMENT "Generating steam_appid.txt"
-    )
-  endif()
-
-  # Copy Resources folder to output directory after build
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${TARGET_NAME}>/resources"
-  )
-endif()
+add_subdirectory(GameEngine)
+add_subdirectory(BombermanGame)

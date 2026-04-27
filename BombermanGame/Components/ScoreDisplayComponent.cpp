@@ -1,12 +1,12 @@
 #include "ScoreDisplayComponent.h"
 
 #include "GameObject.h"
-#include "TextComponent.h"
+#include "Components/TextComponent.h"
 #include "PlayerComponent.h"
 
 #include "GameEvents.h"
 
-#include "ScoreComponent.h"
+#include "Components/ScoreComponent.h"
 #include <string>
 
 #include <cassert>

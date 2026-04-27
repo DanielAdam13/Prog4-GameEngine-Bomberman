@@ -4,6 +4,7 @@ namespace ge
 {
 	class GameObject;
 
+	// Interface that allows any user to override the Notify method (for custom event outcomes)
 	class IObserver
 	{
 	public:

@@ -1,7 +1,7 @@
 #include "PlayerComponent.h"
 #include "GameObject.h"
-#include "HealthComponent.h"
-#include "ScoreComponent.h"
+#include "Components/HealthComponent.h"
+#include "Components/ScoreComponent.h"
 #include "GameEvents.h"
 #include <cassert>
 
