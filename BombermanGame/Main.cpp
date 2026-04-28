@@ -78,17 +78,28 @@ int main(int, char* [])
 	GameEngine::GetInstance().InitializeEngine(data_location);
 
 	// Initialize Services:
+	ge::SoundSystem* soundSysRaw{ nullptr };
 #if _DEBUG
 	auto sdlSound{ std::make_unique<LoggingSoundSystem>(std::make_unique<SDLSoundSystem>()) };
-	LoggingSoundSystem* sdlRaw{ sdlSound.get() };
+	soundSysRaw = sdlSound.get();
 
 	ge::ServiceLocator::RegisterSoundSystem(std::move(sdlSound));
 #else 
-	ge::ServiceLocator::RegisterSoundSystem(std::make_unique<SDLSoundSystem>());
+	auto sdlSound{ std::make_unique<SDLSoundSystem>() };
+	soundSysRaw = sdlSound.get();
+
+	ge::ServiceLocator::RegisterSoundSystem(std::move(sdlSound));
 #endif
 
 	// Pre-load sound files:
-	sdlRaw->RegisterSound(bombGame::SoundIds::ExplosionBomb, "sounds/bomb_explosion.wav");
+	soundSysRaw->RegisterSound(bombGame::SoundIds::ExplosionBomb, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomb_explosion.wav"));
+	soundSysRaw->RegisterSound(bombGame::SoundIds::BombermanDied, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomberman_killed.wav"));
+	soundSysRaw->RegisterSound(bombGame::SoundIds::LayBomb, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomb_lay.wav"));
+	soundSysRaw->RegisterSound(bombGame::SoundIds::Pause, ge::ResourceManager::GetInstance().GetFullPath("sounds/pause.wav"));
+	soundSysRaw->RegisterSound(bombGame::SoundIds::Powerup, ge::ResourceManager::GetInstance().GetFullPath("sounds/powerup.wav"));
+	soundSysRaw->RegisterSound(bombGame::SoundIds::Step_Horizontal, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_horizontal.wav"));
+	soundSysRaw->RegisterSound(bombGame::SoundIds::Step_Vertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
+	
 
 	GameEngine::GetInstance().Run(LoadScenes);
 	return 0;
@@ -320,4 +331,5 @@ void InitializeMainPlayersScene()
 	InputTestScene.Add(std::move(p1ScoreDisplayGO));
 	InputTestScene.Add(std::move(p2ScoreDisplayGO));
 
+	ge::ServiceLocator::GetSoundSystem().Play(bombGame::SoundIds::ExplosionBomb, 75.f);
 }

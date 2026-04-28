@@ -38,6 +38,11 @@ Font* ResourceManager::LoadFont(const std::string& file, uint8_t size)
 	return m_LoadedFonts.at(key).get();
 }
 
+std::string ge::ResourceManager::GetFullPath(std::string&& relativePath) const noexcept
+{
+	return std::string(m_DataPath.string() + relativePath);
+}
+
 void ResourceManager::UnloadUnusedResources()
 {
 	/*for (auto it = m_LoadedTextures.begin(); it != m_LoadedTextures.end();)

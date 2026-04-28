@@ -12,6 +12,10 @@ namespace bombGame
 	public:
 		SDLSoundSystem();
 		virtual ~SDLSoundSystem() override = default;
+		SDLSoundSystem(const SDLSoundSystem& other) = delete;
+		SDLSoundSystem(SDLSoundSystem&& other) = delete;
+		SDLSoundSystem& operator=(const SDLSoundSystem& other) = delete;
+		SDLSoundSystem& operator=(SDLSoundSystem&& other) = delete;
 
 		virtual void Play(const ge::Sound_Id soundId, const float volume) override;
 		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;

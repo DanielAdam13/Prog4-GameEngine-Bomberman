@@ -101,6 +101,7 @@ void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 
 GameEngine::~GameEngine()
 {
+	ServiceLocator::Shutdown();
 	Renderer::GetInstance().Destroy();
 	SDL_DestroyWindow(g_Window);
 	g_Window = nullptr;

@@ -8,6 +8,8 @@
 #include "Texture2D.h"
 #include "Font.h"
 
+#include <string>
+
 namespace ge
 {
 	class Texture2D;
@@ -19,6 +21,8 @@ namespace ge
 		void Init(const std::filesystem::path& data);
 		Texture2D* LoadTexture(const std::string& file);
 		Font* LoadFont(const std::string& file, uint8_t size);
+
+		std::string GetFullPath(std::string&& relativePath) const noexcept;
 
 	private:
 		friend class Singleton<ResourceManager>;

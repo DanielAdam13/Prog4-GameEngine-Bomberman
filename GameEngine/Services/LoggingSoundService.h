@@ -10,7 +10,11 @@ namespace ge
 	{
 	public:
 		LoggingSoundSystem(std::unique_ptr<SoundSystem>&& soundSys);
-		virtual ~LoggingSoundSystem() override = default;
+		virtual ~LoggingSoundSystem() override;
+		LoggingSoundSystem(const LoggingSoundSystem& other) = delete;
+		LoggingSoundSystem(LoggingSoundSystem&& other) = delete;
+		LoggingSoundSystem& operator=(const LoggingSoundSystem& other) = delete;
+		LoggingSoundSystem& operator=(LoggingSoundSystem&& other) = delete;
 
 		virtual void Play(const Sound_Id soundId, const float volume) override;
 		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;

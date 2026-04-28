@@ -10,6 +10,11 @@ ge::LoggingSoundSystem::LoggingSoundSystem(std::unique_ptr<SoundSystem>&& soundS
 		m_RealSoundSystem = std::move(soundSys);
 }
 
+ge::LoggingSoundSystem::~LoggingSoundSystem()
+{
+	m_RealSoundSystem.reset();
+}
+
 void ge::LoggingSoundSystem::Play(const Sound_Id soundId, const float volume)
 {
 	m_RealSoundSystem->Play(soundId, volume);
