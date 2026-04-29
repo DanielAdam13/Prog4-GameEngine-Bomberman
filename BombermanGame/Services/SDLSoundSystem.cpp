@@ -8,9 +8,12 @@
 #include <algorithm>
 #include <vector>
 
+#ifndef __EMSCRIPTEN__
 #include <condition_variable>
-#include <queue>
 #include <thread>
+#endif
+
+#include <queue>
 #include <atomic>
 #include <cassert>
 
@@ -50,12 +53,16 @@ namespace bombGame
 		std::vector<MIX_Track*> m_TrackPool{};
 		size_t m_NextTrack{ 0 };
 
+#ifndef __EMSCRIPTEN__
 		// Threading:
 		std::queue<PlayRequest> m_PlayQueue{};
 		std::mutex m_Mutex{}; // Mutex needed for locks
 		std::condition_variable m_Cv{}; // Condition variable to wait on for ExecutePlay()
 		std::atomic<bool> m_ShouldQuit{ false }; // for when window is closed
 		std::thread m_WorkerThread{}; // Thread for Load and Play()
+#endif // !__EMSCRIPTEN__
+
+		
 
 		// Processes Queue by the workrer thread
 		void WorkerLoop(); 
@@ -86,8 +93,10 @@ namespace bombGame
 			m_TrackPool.push_back(track);
 		}
 
+#ifndef __EMSCRIPTEN__
 		// Initialize worker thread with its dedicated method
 		m_WorkerThread = std::thread(&SDLSoundSysImpl::WorkerLoop, this);
+#endif
 	}
 
 	SDLSoundSysImpl::~SDLSoundSysImpl()
@@ -117,6 +126,9 @@ namespace bombGame
 
 	void SDLSoundSysImpl::Play(const ge::Sound_Id soundId, const float volume)
 	{
+#ifdef __EMSCRIPTEN__
+		ExecutePlay(soundId, std::clamp(volume, 0.f, 1.f));
+#else
 		{
 			std::lock_guard<std::mutex> lock(m_Mutex);
 			const float clampedVolume{ std::clamp(volume, 0.f, 1.f) };
@@ -125,6 +137,7 @@ namespace bombGame
 
 		// and the Worker/Sound thread is notified VIA the condition variable
 		m_Cv.notify_one();
+#endif
 	}
 
 	void SDLSoundSysImpl::RegisterSound(ge::Sound_Id id, const std::string& fileName)
