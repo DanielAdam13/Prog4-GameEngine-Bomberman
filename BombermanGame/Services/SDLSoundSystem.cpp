@@ -123,7 +123,7 @@ namespace bombGame
 			m_PlayQueue.push(PlayRequest{ soundId, clampedVolume });
 		} // lock goes out of scope
 
-		// and condition variable is notified
+		// and the Worker/Sound thread is notified VIA the condition variable
 		m_Cv.notify_one();
 	}
 
@@ -200,7 +200,7 @@ namespace bombGame
 	{
 		while (true)
 		{
-			PlayRequest request;
+			PlayRequest request; // don't intialize - this will happen each frame on the worker thread, also - no need
 			{
 				std::unique_lock<std::mutex> lock(m_Mutex);
 
@@ -226,6 +226,12 @@ bombGame::SDLSoundSystem::SDLSoundSystem()
 	:m_Impl{ std::make_unique<SDLSoundSysImpl>() }
 {
 }
+
+bombGame::SDLSoundSystem::~SDLSoundSystem()
+{
+	m_Impl.reset();
+}
+
 void bombGame::SDLSoundSystem::Play(const ge::Sound_Id soundId, const float volume)
 {
 	m_Impl->Play(soundId, volume);

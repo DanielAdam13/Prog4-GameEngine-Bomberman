@@ -11,7 +11,7 @@ namespace bombGame
 	{
 	public:
 		SDLSoundSystem();
-		virtual ~SDLSoundSystem() override = default;
+		virtual ~SDLSoundSystem() override;
 		SDLSoundSystem(const SDLSoundSystem& other) = delete;
 		SDLSoundSystem(SDLSoundSystem&& other) = delete;
 		SDLSoundSystem& operator=(const SDLSoundSystem& other) = delete;
