@@ -7,6 +7,8 @@ namespace ge
 
 namespace bombGame
 {
+	class SoundManager;
+
 	// Fully static singleton class containing logic of the Bomberman Game itself
 	class BombermanGame final
 	{
@@ -24,8 +26,11 @@ namespace bombGame
 
 	private:
 		static ge::SoundSystem* StoredSoundSystem;
+		static SoundManager BombermanSoundManager;
 
 		static void InitializeFirstScene();
 		static void InitializeMainPlayersScene();
+
+		
 	};
 }

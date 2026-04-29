@@ -27,9 +27,12 @@
 #include "Commands/DamageCommand.h"
 #include "Commands/ScoreCommand.h"
 
+#include "SoundManager.h"
+
 #include <memory>
 
 ge::SoundSystem* bombGame::BombermanGame::StoredSoundSystem{ nullptr };
+bombGame::SoundManager bombGame::BombermanGame::BombermanSoundManager{};
 
 bombGame::BombermanGame::BombermanGame()
 {
@@ -97,17 +100,17 @@ void bombGame::BombermanGame::InitializeFirstScene()
 	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 36) };
 	constexpr SDL_Color color{ SDL_Color{128, 128, 128, 255} };
 
+#if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
 	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", font, color);
 	textGO->AddComponent<ge::FPSComponent>(textGO.get());
 
-	const bool TEST{ textGO->HasComponent<ge::TextComponent>() };
-
 	scene.Add(std::move(textGO));
+#endif
 
 	auto prog4AssingGO = std::make_unique<ge::GameObject>("GO_P4AssignmentText");
 	prog4AssingGO->AddComponent<ge::TextComponent>(prog4AssingGO.get(),
-		(TEST) ? "Programming 4 Assignment" : "false", font, color);
+		"Programming 4 Assignment", font, color);
 
 	prog4AssingGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first / 2 - prog4AssingGO->GetComponent<ge::TextComponent>()->GetTextureSize().x / 2,
@@ -151,7 +154,11 @@ void bombGame::BombermanGame::InitializeMainPlayersScene()
 	player1GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 3);
 	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), 0);
-	player1GO->AddComponent<PlayerComponent>(player1GO.get(), 120.f);
+	auto player1PlayerComp{ player1GO->AddComponent<PlayerComponent>(player1GO.get(), 120.f) };
+	player1PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
+	player1PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
+	player1PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
+	
 
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
 	player2GO->AddComponent<ge::Image>(player2GO.get())->SetTexture(balloonTexture);
@@ -159,7 +166,10 @@ void bombGame::BombermanGame::InitializeMainPlayersScene()
 	player2GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.f, 2.f, 2.f });
 	player2GO->AddComponent<ge::HealthComponent>(player2GO.get(), 3);
 	player2GO->AddComponent<ge::ScoreComponent>(player2GO.get(), 0);
-	player2GO->AddComponent<PlayerComponent>(player2GO.get(), 240.f);
+	auto player2PlayerComp{ player2GO->AddComponent<PlayerComponent>(player2GO.get(), 240.f) };
+	player2PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
+	player2PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
+	player2PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
 
 
 	// 2. Health Displays:

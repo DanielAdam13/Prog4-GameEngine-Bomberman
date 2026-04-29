@@ -7,15 +7,11 @@
 #include "GameEngine.h"
 #include "BombermanGame.h"
 
-#include <ResourceManager.h>
 #include <Services/ServiceLocator.h>
 #include "Services/SDLSoundSystem.h"
 #include <Services/LoggingSoundService.h>
-#include <Services/SoundIds.h>
-#include <Services/SoundSystem.h>
 
 #include <memory>
-#include <utility>
 #include <filesystem>
 
 using namespace ge;
