@@ -13,7 +13,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
   "Services/SoundIds.h"
-  "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp")
+  "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
+  "BombermanGame.h" "BombermanGame.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
