@@ -60,12 +60,10 @@ namespace bombGame
 		std::condition_variable m_Cv{}; // Condition variable to wait on for ExecutePlay()
 		std::atomic<bool> m_ShouldQuit{ false }; // for when window is closed
 		std::thread m_WorkerThread{}; // Thread for Load and Play()
-#endif // !__EMSCRIPTEN__
-
-		
 
 		// Processes Queue by the workrer thread
-		void WorkerLoop(); 
+		void WorkerLoop();
+#endif // !__EMSCRIPTEN__
 
 		// Actual sequential PlayTrack logic
 		void ExecutePlay(const ge::Sound_Id soundId, const float volume);
@@ -209,6 +207,7 @@ namespace bombGame
 		MIX_PlayTrack(track, 0); // 0 - default: play once
 	}
 
+#ifndef __EMSCRIPTEN__
 	void SDLSoundSysImpl::WorkerLoop()
 	{
 		while (true)
@@ -234,6 +233,7 @@ namespace bombGame
 		}
 	}
 }
+#endif
 
 bombGame::SDLSoundSystem::SDLSoundSystem()
 	:m_Impl{ std::make_unique<SDLSoundSysImpl>() }
