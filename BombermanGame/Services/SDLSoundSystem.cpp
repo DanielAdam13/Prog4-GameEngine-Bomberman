@@ -99,6 +99,7 @@ namespace bombGame
 
 	SDLSoundSysImpl::~SDLSoundSysImpl()
 	{
+#ifndef __EMSCRIPTEN__
 		{
 			std::lock_guard<std::mutex> lock(m_Mutex);
 			m_ShouldQuit.store(true);
@@ -106,6 +107,7 @@ namespace bombGame
 		m_Cv.notify_one();
 		if (m_WorkerThread.joinable())
 			m_WorkerThread.join();
+#endif
 
 		// Destroy track pool:
 		for (auto* track : m_TrackPool)
