@@ -8,15 +8,33 @@
 #include <algorithm>
 #include <vector>
 
+#include <condition_variable>
+#include <queue>
+#include <thread>
+#include <atomic>
+#include <cassert>
+
 namespace bombGame
 {
+	// Type passed to the queue executed from the worker thread
+	struct PlayRequest
+	{
+		ge::Sound_Id soundId;
+		float volume;
+	};
+
+
 	class SDLSoundSysImpl final
 	{
 	public:
 		SDLSoundSysImpl();
 		~SDLSoundSysImpl();
 
+		// Push the PlayRequest to the play queue
 		void Play(const ge::Sound_Id soundId, const float volume);
+
+		// DANGER - Might cause a data race due to writing to m_FileNames while
+		// the worker thread might be processing it
 		void RegisterSound(ge::Sound_Id id, const std::string& fileName);
 
 	private:
@@ -26,11 +44,24 @@ namespace bombGame
 		MIX_Mixer* m_Mixer{ nullptr };
 
 		std::unordered_map<ge::Sound_Id, MIX_Audio*> m_LoadedAudios{};
-		std::unordered_map<ge::Sound_Id, std::string> m_Filenames{};
+		std::unordered_map<ge::Sound_Id, std::string> m_FileNames{};
 
 		static constexpr size_t TrackPoolSize{ 16 };
 		std::vector<MIX_Track*> m_TrackPool{};
 		size_t m_NextTrack{ 0 };
+
+		// Threading:
+		std::queue<PlayRequest> m_PlayQueue{};
+		std::mutex m_Mutex{}; // Mutex needed for locks
+		std::condition_variable m_Cv{}; // Condition variable to wait on for ExecutePlay()
+		std::atomic<bool> m_ShouldQuit{ false }; // for when window is closed
+		std::thread m_WorkerThread{}; // Thread for Load and Play()
+
+		// Processes Queue by the workrer thread
+		void WorkerLoop(); 
+
+		// Actual sequential PlayTrack logic
+		void ExecutePlay(const ge::Sound_Id soundId, const float volume);
 	};
 
 	SDLSoundSysImpl::SDLSoundSysImpl()
@@ -54,74 +85,62 @@ namespace bombGame
 
 			m_TrackPool.push_back(track);
 		}
+
+		// Initialize worker thread with its dedicated method
+		m_WorkerThread = std::thread(&SDLSoundSysImpl::WorkerLoop, this);
 	}
 
 	SDLSoundSysImpl::~SDLSoundSysImpl()
 	{
+		{
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			m_ShouldQuit.store(true);
+		} // lock goes out of scope
+		m_Cv.notify_one();
+		if (m_WorkerThread.joinable())
+			m_WorkerThread.join();
+
 		// Destroy track pool:
 		for (auto* track : m_TrackPool)
-		{
 			MIX_DestroyTrack(track);
-		}
-		m_TrackPool.clear();
 
 		// Destroy audio container:
 		for (auto& [id, audio] : m_LoadedAudios)
-		{
 			MIX_DestroyAudio(audio);
-		}
-		m_LoadedAudios.clear();
 
+		// Destroy Mixer:
 		if (m_Mixer)
 			MIX_DestroyMixer(m_Mixer);
 
 		MIX_Quit();
 	}
+
 	void SDLSoundSysImpl::Play(const ge::Sound_Id soundId, const float volume)
 	{
-		// Already loaded:
-		const auto it{ m_LoadedAudios.find(soundId) };
-		MIX_Audio* audio{ (it != m_LoadedAudios.end()) ? it->second : nullptr };
-
-		// If doesn't exist -> LOAD by cached filename
-		if(!audio)
 		{
-			const auto fileIt{ m_Filenames.find(soundId) };
+			std::lock_guard<std::mutex> lock(m_Mutex);
+			const float clampedVolume{ std::clamp(volume, 0.f, 1.f) };
+			m_PlayQueue.push(PlayRequest{ soundId, clampedVolume });
+		} // lock goes out of scope
 
-			if (fileIt == m_Filenames.end())
-			{
-				// Filename was never registered...
-				return;
-			}
-
-			// And load
-			audio = LoadAndCache(soundId, fileIt->second);
-			if (!audio)
-				return;
-		}
-
-		// Get track from track pool
-		MIX_Track* track{ m_TrackPool[m_NextTrack] };
-		// and update next track
-		m_NextTrack = (m_NextTrack + 1) % m_TrackPool.size();
-
-		const float clampedVolume{ std::clamp(volume, 0.f, 1.f) };
-		MIX_SetTrackAudio(track, audio);
-		MIX_SetTrackGain(track, clampedVolume);
-		MIX_PlayTrack(track, 0); // 0 - default: play once
-
+		// and condition variable is notified
+		m_Cv.notify_one();
 	}
 
 	void SDLSoundSysImpl::RegisterSound(ge::Sound_Id id, const std::string& fileName)
 	{
-		// If a sound was already registered under this id, destroy it
+		// "Guard" against data races happening due to m_FileNames
+		assert(m_PlayQueue.empty());
+
+		// If a sound was already registered under this id, destroy it FIRST
 		if (auto it{ m_LoadedAudios.find(id) }; it != m_LoadedAudios.end())
 		{
 			MIX_DestroyAudio(it->second);
 			m_LoadedAudios.erase(it);
 		}
 
-		m_Filenames[id] = fileName;
+		// Create/Replace
+		m_FileNames[id] = fileName;
 		LoadAndCache(id, fileName);
 	}
 
@@ -141,6 +160,65 @@ namespace bombGame
 		// And then cache it:
 		m_LoadedAudios.emplace(soundId, audio);
 		return audio;
+	}
+
+	void SDLSoundSysImpl::ExecutePlay(const ge::Sound_Id soundId, const float volume)
+	{
+		// Already loaded:
+		const auto it{ m_LoadedAudios.find(soundId) };
+		MIX_Audio* audio{ (it != m_LoadedAudios.end()) ? it->second : nullptr };
+
+		// If doesn't exist -> LOAD by cached filename
+		if (!audio)
+		{
+			const auto fileIt{ m_FileNames.find(soundId) };
+
+			// If filename has not been registered, early out...
+			if (fileIt == m_FileNames.end())
+			{
+				return;
+			}
+
+			// If filename exists, Load the sound for next time
+			audio = LoadAndCache(soundId, fileIt->second);
+			if (!audio)
+				return;
+		}
+
+		// Get track from track pool
+		MIX_Track* track{ m_TrackPool[m_NextTrack] };
+		// and update next track
+		m_NextTrack = (m_NextTrack + 1) % m_TrackPool.size();
+
+		// Play
+		MIX_SetTrackAudio(track, audio);
+		MIX_SetTrackGain(track, volume); // volume is already clamped from the queue.push() call in Play()
+		MIX_PlayTrack(track, 0); // 0 - default: play once
+	}
+
+	void SDLSoundSysImpl::WorkerLoop()
+	{
+		while (true)
+		{
+			PlayRequest request;
+			{
+				std::unique_lock<std::mutex> lock(m_Mutex);
+
+				// WAIT UNTIL WHOLE QUEUE IS PROCESSED (ExecutePlay() is called for EVERY PlayRequest)
+				m_Cv.wait(lock, [this]() 
+					{
+						return !m_PlayQueue.empty() || m_ShouldQuit.load(); 
+					});
+
+				if (m_ShouldQuit.load() && m_PlayQueue.empty())
+					return;
+
+				request = m_PlayQueue.front();
+				m_PlayQueue.pop();
+			} // lock/mutex goes out of scope
+
+			ExecutePlay(request.soundId, request.volume);
+		}
 	}
 }
 

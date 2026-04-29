@@ -16,7 +16,7 @@ add_library(gameEngine_lib STATIC
   "Observer.h"
   "ObservableSubject.h" "ObservableSubject.cpp"
   "Services/ServiceLocator.h" "Services/ServiceLocator.cpp"
-  "Services/SoundSystem.h" "Services/SoundSystem.cpp"
+  "Services/SoundSystem.h" 
   "Services/NullSoundSystem.h"
   "Services/LoggingSoundService.h" "Services/LoggingSoundService.cpp"
  

@@ -90,7 +90,6 @@ int main(int, char* [])
 
 	ge::ServiceLocator::RegisterSoundSystem(std::move(sdlSound));
 #endif
-
 	// Pre-load sound files:
 	soundSysRaw->RegisterSound(bombGame::SoundIds::ExplosionBomb, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomb_explosion.wav"));
 	soundSysRaw->RegisterSound(bombGame::SoundIds::BombermanDied, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomberman_killed.wav"));
@@ -99,7 +98,8 @@ int main(int, char* [])
 	soundSysRaw->RegisterSound(bombGame::SoundIds::Powerup, ge::ResourceManager::GetInstance().GetFullPath("sounds/powerup.wav"));
 	soundSysRaw->RegisterSound(bombGame::SoundIds::Step_Horizontal, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_horizontal.wav"));
 	soundSysRaw->RegisterSound(bombGame::SoundIds::Step_Vertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
-	
+
+	ge::ServiceLocator::GetSoundSystem().Play(bombGame::SoundIds::BombermanDied, 0.15f);
 
 	GameEngine::GetInstance().Run(LoadScenes);
 	return 0;
@@ -330,6 +330,4 @@ void InitializeMainPlayersScene()
 
 	InputTestScene.Add(std::move(p1ScoreDisplayGO));
 	InputTestScene.Add(std::move(p2ScoreDisplayGO));
-
-	ge::ServiceLocator::GetSoundSystem().Play(bombGame::SoundIds::ExplosionBomb, 75.f);
 }
