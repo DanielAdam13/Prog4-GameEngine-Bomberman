@@ -234,8 +234,9 @@ namespace bombGame
 			ExecutePlay(request.soundId, request.volume);
 		}
 	}
-}
 #endif
+}
+
 
 bombGame::SDLSoundSystem::SDLSoundSystem()
 	:m_Impl{ std::make_unique<SDLSoundSysImpl>() }
