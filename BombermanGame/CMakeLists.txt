@@ -14,7 +14,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
   "Services/SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
-  "BombermanGame.h" "BombermanGame.cpp" "SoundManager.h" "SoundManager.cpp")
+  "BombermanGame.h" "BombermanGame.cpp" "SoundManager.h" "SoundManager.cpp" "StateMachine/WanderState.h" "StateMachine/WanderState.cpp" "StateMachine/ChaseState.h" "StateMachine/ChaseState.cpp" "StateMachine/RunState.h" "StateMachine/RunState.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

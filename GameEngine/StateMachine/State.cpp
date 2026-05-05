@@ -7,5 +7,5 @@ ge::State::State(GameObject* pTargetPtr)
 
 ge::GameObject* ge::State::GetTarget() const noexcept
 {
-	return nullptr;
+	return m_TargetPtr;
 }
