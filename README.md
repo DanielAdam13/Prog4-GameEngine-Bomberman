@@ -10,13 +10,23 @@ Minigin is a very small project using [SDL3](https://www.libsdl.org/) and [glm](
 
 Minigin can/may be used as a start project for the exam assignment in the course [Programming 4](https://youtu.be/j96Oh6vzhmg) at DAE. In that assignment students need to recreate a popular 80's arcade game with a game engine they need to program themselves. During the course we discuss several game programming patterns, using the book '[Game Programming Patterns](https://gameprogrammingpatterns.com/)' by [Robert Nystrom](https://github.com/munificent) as reading material. 
 
-# Disclaimer
+# Architectural Choices
 
-Minigin is, despite perhaps the suggestion in its name, **not** a game engine. It is just a very simple SDL3 ready project with some of the scaffolding in place to get started. None of the patterns discussed in the course are used yet (except singleton which use we challenge during the course). It is up to the students to implement their own vision for their engine, apply patterns as they see fit, create their game as efficient as possible.
+Game Object <-> Component
+A Game Object OWNS a container of Components, not allowing any duplicates. The Game Object is the top-most level of abstraction in the game engine, it is the "main hub" for any methods/variables. Components, Commands, States all receive information via the Game Object target/owner. The feature of a Game Object not having any duplicate Components is very beneficial for a lot of reasons:
+- It makes cross-component lookup very CONVENIENT - you just call GetComponent<T> (where T is the component type) from anywhere and the user is sure that they are receiving only a singular instance, no overcomplication in the regard of wondering "which one".
+- Observers are all built on the assumption that only one Component of a type exists on a Game Object. If it didn't, the event logic would become entangled and complex.
+- State coherence - if a Game Object has multiple Health Components, what does that even mean? It makes no sense.
 
-# Use
+Component <-> Command
+The Component system is entirely separate from the Command System. A Command will receive input and may change values on the target Game Object but then a Component can do its own logic despite the command, making them, overall, a separate abstraction.
 
-Get the source from this project, or since students need to have their work on github too, they can use this repository as a template. Hit the "Use this template" button on the top right corner of the github page of this project.
+State <-> Component, Command
+In the same way, a State is a yet another level of abstraction, different from both a Component and Command. A State will receive a potentially already changed references to variables from the Game Object itself, which might already be updated by a Command or a Component.
+
+States, Transitions:
+States are a feature in the game engine that could be used via the FSM (Finite State Machine) Component. The FSMComponent OWNS all states and transitions. It does not care about any outside information, it only changes the current state by EVALUATING its transitions. As mentioned above, this component benefits greatly from the single instance feature for a Component on a Game Object - for a Game Object, it makes sense that it only has one State Machine.
+
 
 ## Windows version
 

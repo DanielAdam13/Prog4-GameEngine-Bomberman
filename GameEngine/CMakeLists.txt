@@ -34,9 +34,10 @@ add_library(gameEngine_lib STATIC
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
   "Commands/MoveStickCommand.h" "Commands/MoveStickCommand.cpp"
   "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp" 
+  "Components/FSMComponent.h" "Components/FSMComponent.cpp"
 
   "StateMachine/State.h" 
-  "StateMachine/Transition.h" "StateMachine/Transition.cpp")
+  "StateMachine/Transition.h" "StateMachine/Transition.cpp" )
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 
