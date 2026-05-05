@@ -5,6 +5,8 @@
 
 namespace bombGame
 {
+	class SDLSoundSysImpl;
+
 	class SDLSoundSystem final : public ge::SoundSystem
 	{
 	public:
@@ -19,7 +21,6 @@ namespace bombGame
 		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;
 
 	private:
-		friend class SDLSoundSysImpl;
 		std::unique_ptr<SDLSoundSysImpl> m_Impl{};
 	};
 }

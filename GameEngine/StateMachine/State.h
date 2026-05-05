@@ -2,10 +2,12 @@
 
 namespace ge
 {
+	class GameObject;
+
 	class State
 	{
 	public:
-		State() = default;
+		State(GameObject* pTargetPtr);
 		virtual ~State() = default;
 		State(const State&) = delete;
 		State& operator=(const State&) = delete;
@@ -17,8 +19,10 @@ namespace ge
 		virtual void OnExit() = 0;
 
 	protected:
+		GameObject* GetTarget() const noexcept;
 
 	private:
+		GameObject* m_TargetPtr{ nullptr };
 
 	};
 }

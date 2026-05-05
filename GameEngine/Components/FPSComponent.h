@@ -5,6 +5,7 @@
 namespace ge
 {
 	class TextComponent;
+	class GameObject;
 
 	// Engine Component
 	class FPSComponent final : public Component
