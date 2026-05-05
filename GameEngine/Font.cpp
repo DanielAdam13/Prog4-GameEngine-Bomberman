@@ -42,3 +42,18 @@ void Font::SetFontSize(float newSize)
 		throw std::runtime_error(std::string("Failed to load font: ") + SDL_GetError());
 	}
 }
+
+void ge::Font::SetBold(bool bold)
+{
+	if (!m_Font) 
+		return;
+
+	TTF_FontStyleFlags style{ TTF_GetFontStyle(m_Font) };
+
+	if (bold)
+		style |= TTF_STYLE_BOLD;
+	else
+		style &= ~TTF_STYLE_BOLD;
+
+	TTF_SetFontStyle(m_Font, style);
+}

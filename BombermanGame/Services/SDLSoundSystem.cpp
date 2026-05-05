@@ -237,7 +237,6 @@ namespace bombGame
 #endif
 }
 
-
 bombGame::SDLSoundSystem::SDLSoundSystem()
 	:m_Impl{ std::make_unique<SDLSoundSysImpl>() }
 {

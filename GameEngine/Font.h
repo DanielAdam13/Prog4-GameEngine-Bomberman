@@ -20,6 +20,7 @@ namespace ge
 		Font & operator= (const Font &&) = delete;
 
 		void SetFontSize(float newSize);
+		void SetBold(bool bold);
 
 	private:
 		TTF_Font* m_Font;

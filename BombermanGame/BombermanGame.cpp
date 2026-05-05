@@ -62,90 +62,55 @@ void bombGame::BombermanGame::LoadSound()
 
 void bombGame::BombermanGame::LoadScenes()
 {
-	InitializeFirstScene();
-	InitializeMainPlayersScene();
+	InitializeMainGameplayScene();
 }
 
-void bombGame::BombermanGame::InitializeFirstScene()
+void bombGame::BombermanGame::InitializeMainGameplayScene()
 {
-	ge::Scene& scene{ ge::SceneManager::GetInstance().CreateScene() };
+	ge::Scene& MainGameplayScene{ ge::SceneManager::GetInstance().CreateScene() };
 
-	// Texture Resources
-	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("background.png") };
-	const auto daeTexture{ ge::ResourceManager::GetInstance().LoadTexture("logo.png") };
+	// Resources:
+	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 28) };
+	font->SetBold(true);
+	ge::Renderer::GetInstance().SetWindowSize(800, 800);
+	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
+	constexpr SDL_Color colorRed{ SDL_Color{220, 120, 50, 255} };
+	const auto tutFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };
+	tutFont->SetBold(true);
 
+	const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
+	const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
+	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
+
+	// Static objects in scene initialization:
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
-	scene.Add(std::move(backgroundGO));
-
-
-	auto daeLogoGO = std::make_unique<ge::GameObject>("GO_DaeLogo");
-	daeLogoGO->AddComponent<ge::Image>(daeLogoGO.get())->SetTexture(daeTexture);
-	scene.Add(std::move(daeLogoGO));
-
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
-
-	// For test purposes
-	auto daeLogo{ scene.FindObjectByName("GO_DaeLogo") };
-	if (daeLogo)
-	{
-		auto daeImageComponent{ daeLogo->GetComponent<ge::Image>() };
-		glm::vec2 imageSize{ daeImageComponent->GetTexture()->GetSize() };
-		daeLogo->GetComponent<ge::Transform>()->SetLocalPosition(
-			{ windowSize.first / 2 - imageSize.x / 2,
-			windowSize.second / 2 - imageSize.y / 2,
-			0.f });
-	}
-
-	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 36) };
-	constexpr SDL_Color color{ SDL_Color{128, 128, 128, 255} };
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.f, 3.f, 1.f);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(0.f, 50.f, 0.f);
+	MainGameplayScene.Add(std::move(backgroundGO));
 
 #if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
-	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", font, color);
+	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", font, colorRed);
 	textGO->AddComponent<ge::FPSComponent>(textGO.get());
 
-	scene.Add(std::move(textGO));
+	MainGameplayScene.Add(std::move(textGO));
 #endif
-
-	auto prog4AssingGO = std::make_unique<ge::GameObject>("GO_P4AssignmentText");
-	prog4AssingGO->AddComponent<ge::TextComponent>(prog4AssingGO.get(),
-		"Programming 4 Assignment", font, color);
-
-	prog4AssingGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first / 2 - prog4AssingGO->GetComponent<ge::TextComponent>()->GetTextureSize().x / 2,
-		0.f, 0.f });
-	scene.Add(std::move(prog4AssingGO));
-
-	const auto tutFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
-		"Use the D-Pad to move the Balloon, X to inflict damage, A to collect", tutFont, color);
+		"Use the D-Pad to move the Balloon, X to inflict damage, A to collect", tutFont, colorRed);
 	auto tutorial2GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
-		"Use WASD to move the BomberMan, X to inflict damage, E to collect", tutFont, color);
+		"Use WASD to move the BomberMan, X to inflict damage, E to collect", tutFont, colorBlack);
 
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
 
 
-	scene.Add(std::move(tutorial1GO));
-	scene.Add(std::move(tutorial2GO));
-}
-
-void bombGame::BombermanGame::InitializeMainPlayersScene()
-{
-	ge::Scene& InputTestScene{ ge::SceneManager::GetInstance().CreateScene() };
-
-	// Resources:
-	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 28) };
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
-	constexpr SDL_Color color1{ SDL_Color{20, 100, 200, 255} };
-	constexpr SDL_Color color2{ SDL_Color{220, 100, 50, 255} };
-
-	const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
-	const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
+	MainGameplayScene.Add(std::move(tutorial1GO));
+	MainGameplayScene.Add(std::move(tutorial2GO));
 
 	// 1. Player Initialization
 	auto player1GO = std::make_unique<ge::GameObject>("GO_Player1");
@@ -174,29 +139,29 @@ void bombGame::BombermanGame::InitializeMainPlayersScene()
 
 	// 2. Health Displays:
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");
-	p1HealthDisplayGO->AddComponent<ge::TextComponent>(p1HealthDisplayGO.get(), "", font, color1);
+	p1HealthDisplayGO->AddComponent<ge::TextComponent>(p1HealthDisplayGO.get(), "", font, colorBlack);
 	p1HealthDisplayGO->AddComponent<HealthDisplayComponent>(p1HealthDisplayGO.get(), player1GO.get());
 	p1HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
 
 	auto p2HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P2HealthDisplay");
-	p2HealthDisplayGO->AddComponent<ge::TextComponent>(p2HealthDisplayGO.get(), "", font, color2);
+	p2HealthDisplayGO->AddComponent<ge::TextComponent>(p2HealthDisplayGO.get(), "", font, colorRed);
 	p2HealthDisplayGO->AddComponent<HealthDisplayComponent>(p2HealthDisplayGO.get(), player2GO.get());
 	p2HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.75f, windowSize.second * 0.9f, 0.f });
+		windowSize.first * 0.65f, windowSize.second * 0.9f, 0.f });
 
 	// 3. Score Displays:
 	auto p1ScoreDisplayGO = std::make_unique<ge::GameObject>("GO_FirstPlayerScore");
-	p1ScoreDisplayGO->AddComponent<ge::TextComponent>(p1ScoreDisplayGO.get(), "Score: 0", font, color1);
+	p1ScoreDisplayGO->AddComponent<ge::TextComponent>(p1ScoreDisplayGO.get(), "Score: 0", font, colorBlack);
 	p1ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p1ScoreDisplayGO.get(), player1GO.get());
 	p1ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.8f, 0.f });
 
 	auto p2ScoreDisplayGO = std::make_unique<ge::GameObject>("GO_SecondPlayerScore");
-	p2ScoreDisplayGO->AddComponent<ge::TextComponent>(p2ScoreDisplayGO.get(), "Score: 0", font, color2);
+	p2ScoreDisplayGO->AddComponent<ge::TextComponent>(p2ScoreDisplayGO.get(), "Score: 0", font, colorRed);
 	p2ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p2ScoreDisplayGO.get(), player2GO.get());
 	p2ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.75f, windowSize.second * 0.8f, 0.f });
+		windowSize.first * 0.65f, windowSize.second * 0.8f, 0.f });
 
 	// 4. Command Binding to two players
 #pragma region CommandBinding
@@ -265,12 +230,12 @@ void bombGame::BombermanGame::InitializeMainPlayersScene()
 			deathConditionLambda2));
 #pragma endregion
 
-	InputTestScene.Add(std::move(player1GO));
-	InputTestScene.Add(std::move(player2GO));
+	MainGameplayScene.Add(std::move(player1GO));
+	MainGameplayScene.Add(std::move(player2GO));
 
-	InputTestScene.Add(std::move(p1HealthDisplayGO));
-	InputTestScene.Add(std::move(p2HealthDisplayGO));
+	MainGameplayScene.Add(std::move(p1HealthDisplayGO));
+	MainGameplayScene.Add(std::move(p2HealthDisplayGO));
 
-	InputTestScene.Add(std::move(p1ScoreDisplayGO));
-	InputTestScene.Add(std::move(p2ScoreDisplayGO));
+	MainGameplayScene.Add(std::move(p1ScoreDisplayGO));
+	MainGameplayScene.Add(std::move(p2ScoreDisplayGO));
 }

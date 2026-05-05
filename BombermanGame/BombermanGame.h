@@ -28,9 +28,7 @@ namespace bombGame
 		static ge::SoundSystem* StoredSoundSystem;
 		static SoundManager BombermanSoundManager;
 
-		static void InitializeFirstScene();
-		static void InitializeMainPlayersScene();
-
-		
+		//static void InitializeFirstScene();
+		static void InitializeMainGameplayScene();
 	};
 }
