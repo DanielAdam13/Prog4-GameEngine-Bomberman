@@ -6,20 +6,20 @@
 
 #include <random>
 
-bombGame::WanderState::WanderState(ge::GameObject* pTargetPtr)
-	:ge::State::State(pTargetPtr),
+bombGame::WanderState::WanderState(ge::GameObject* pSourcePtr)
+	:ge::State::State(pSourcePtr),
 	m_CurrentWanderDirection{ m_PossibleDirections[0] },
-	m_WanderTimer{ 0.f }
+	m_WanderTimer{ 0.f },
+	m_pSourceTransform{ pSourcePtr->GetComponent<ge::Transform>() },
+	m_pEnemyController{ pSourcePtr->GetComponent<EnemyComponent>() }
 {
 	// Set at start
-	GetSource()->GetComponent<EnemyComponent>()->SetMoveDirection(m_CurrentWanderDirection);
+	m_pEnemyController->SetMoveDirection(m_CurrentWanderDirection);
 }
 
 void bombGame::WanderState::OnUpdate(float deltaTime)
 {
-	auto* enemyController{ GetSource()->GetComponent<EnemyComponent>() };
-
-	// Switch direction:
+	// Switch direction logic:
 	m_WanderTimer += deltaTime;
 
 	if (m_WanderTimer >= DirectionSwitchTimer)
@@ -28,18 +28,13 @@ void bombGame::WanderState::OnUpdate(float deltaTime)
 		static std::uniform_int_distribution<size_t> dist(0, m_PossibleDirections.size() - 1);
 
 		m_CurrentWanderDirection = m_PossibleDirections[dist(gen)];
-		enemyController->SetMoveDirection(m_CurrentWanderDirection);
+		m_pEnemyController->SetMoveDirection(m_CurrentWanderDirection);
 
 		m_WanderTimer -= DirectionSwitchTimer;
 	}
 
 	// Actual Movement:
-	auto* targetTransform{ GetSource()->GetComponent<ge::Transform>() };
-
-	glm::vec3 pos{ targetTransform->GetWorldPosition() };
-
-	pos += m_CurrentWanderDirection * enemyController->GetSpeed() * deltaTime;
-
-	targetTransform->SetLocalPosition({ pos.x, pos.y, 0.f });
-
+	glm::vec3 pos{ m_pSourceTransform->GetWorldPosition() };
+	pos += m_CurrentWanderDirection * m_pEnemyController->GetSpeed() * deltaTime;
+	m_pSourceTransform->SetLocalPosition({ pos.x, pos.y, 0.f });
 }

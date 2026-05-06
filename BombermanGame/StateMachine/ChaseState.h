@@ -5,10 +5,13 @@
 namespace ge
 {
 	class GameObject;
+	class Transform;
 }
 
 namespace bombGame
 {
+	class EnemyComponent;
+
 	class ChaseState final : public ge::State
 	{
 	public:
@@ -24,5 +27,7 @@ namespace bombGame
 		virtual void OnExit() override {};
 
 	private:
+		ge::Transform* m_pSourceTransform{ nullptr }; // Cached ref
+		EnemyComponent* m_pEnemyController{ nullptr }; // Cached ref
 	};
 }

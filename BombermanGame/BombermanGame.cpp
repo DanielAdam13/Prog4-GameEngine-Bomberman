@@ -170,6 +170,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	enemy1GO->AddComponent<ge::Image>(enemy1GO.get())->SetTexture(iceEnemyTexture);
 	enemy1GO->GetComponent<ge::Transform>()->SetLocalPosition({ 500.f, 250.f, 0.f });
 	enemy1GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+
 	enemy1GO->AddComponent<EnemyComponent>(enemy1GO.get(), 60.f)->AddTarget(player1GO.get());
 	enemy1GO->GetComponent<EnemyComponent>()->AddTarget(player2GO.get());
 

@@ -21,7 +21,7 @@ namespace bombGame
 		// Every PlayerComponent Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 13 };
 
-		explicit EnemyComponent(ge::GameObject* owner, float speed = 6.f, float detectionRadius = 200.f);
+		explicit EnemyComponent(ge::GameObject* owner, float speed = 60.f, float detectionRadius = 200.f);
 		~EnemyComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
@@ -29,7 +29,10 @@ namespace bombGame
 		void RenderComponent() const override {};
 
 		std::vector<ge::GameObject*> GetTargets() const noexcept { return m_Targets; }
+		const std::vector<ge::Transform*>& GetTargetTransforms() const noexcept { return m_TargetTransforms; }
 		ge::GameObject* GetTargetAt(int index) const noexcept { return m_Targets[index]; }
+		ge::Transform* GetOwnerTransform() const noexcept { return m_OwnerTransformRef; }
+
 		glm::vec3 GetMoveDirection() const noexcept { return m_CurrentMoveDirection; }
 		float GetSpeed() const noexcept { return m_Speed; }
 		float GetDetectionRadius() const noexcept { return m_DetectionRadius; }
@@ -41,11 +44,12 @@ namespace bombGame
 		bool IsAlive() const noexcept;
 
 	private:
-		std::vector<ge::GameObject*> m_Targets{ nullptr };
-		ge::Transform* m_OwnerTransformRef; // reference
+		std::vector<ge::GameObject*> m_Targets{}; // Cached ref
+		std::vector<ge::Transform*> m_TargetTransforms{}; // Cached ref
+		ge::Transform* m_OwnerTransformRef; // Cached ref
 
-		float m_Speed{ 200.f };
-		glm::vec3 m_CurrentMoveDirection;
+		float m_Speed{ 60.f };
+		glm::vec3 m_CurrentMoveDirection{};
 
 		float m_DetectionRadius{ 200.f };
 

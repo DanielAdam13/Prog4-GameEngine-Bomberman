@@ -6,44 +6,36 @@
 #include <limits>
 
 bombGame::ChaseState::ChaseState(ge::GameObject* pSourcePtr)
-	:ge::State::State(pSourcePtr)
+	:ge::State::State(pSourcePtr),
+	m_pSourceTransform{ pSourcePtr->GetComponent<ge::Transform>() },
+	m_pEnemyController{ pSourcePtr->GetComponent<EnemyComponent>() }
 {
 }
 
 void bombGame::ChaseState::OnUpdate(float deltaTime)
 {
-	auto* sourceTransform{ GetSource()->GetComponent<ge::Transform>() };
-	auto* sourceEnemyController{ GetSource()->GetComponent<EnemyComponent>() };
-
-	glm::vec3 sourcePos{ sourceTransform->GetWorldPosition() };
+	const glm::vec3 sourcePos{ m_pSourceTransform->GetWorldPosition() };
 
 	glm::vec3 directionToClosestTarget{};
-	float closestDistance{ 1000000.f };
+	float closestDistSqr{ std::numeric_limits<float>::max() };
 
-	for (auto target : sourceEnemyController->GetTargets())
+	for (auto* targetTransform : m_pEnemyController->GetTargetTransforms())
 	{
-		const glm::vec3 chaseTargetPos{ target->GetComponent<ge::Transform>()->GetWorldPosition() };
-		const glm::vec3 toTarget{ chaseTargetPos - sourcePos };
-
+		const glm::vec3 toTarget{ targetTransform->GetWorldPosition() - sourcePos };
 		const float distSqr{ glm::dot(toTarget, toTarget) };
 
-		if (distSqr < closestDistance)
+		if (distSqr < closestDistSqr && distSqr > 0.001f) // avoid normalizing a zero vector
 		{
-			closestDistance = distSqr;
-
-			if (distSqr < 0.001f) // avoid normalizing a zero vector
-				return;
-
-			const glm::vec3 chaseDirection{ toTarget / std::sqrt(distSqr) };
-
-			directionToClosestTarget = chaseDirection;
+			closestDistSqr = distSqr;
+			directionToClosestTarget = toTarget / std::sqrt(distSqr);
 		}
 	}
 	
+	if (closestDistSqr == std::numeric_limits<float>::max())
+		return; // guard just in case
 	
-	sourceEnemyController->SetMoveDirection(directionToClosestTarget);
+	m_pEnemyController->SetMoveDirection(directionToClosestTarget);
 
-	sourcePos += directionToClosestTarget * sourceEnemyController->GetSpeed() * deltaTime;
-
-	sourceTransform->SetLocalPosition({ sourcePos.x, sourcePos.y, 0.f });
+	const glm::vec3 newPos{ sourcePos + directionToClosestTarget * m_pEnemyController->GetSpeed() * deltaTime };
+	m_pSourceTransform->SetLocalPosition({ newPos.x, newPos.y, 0.f });
 }

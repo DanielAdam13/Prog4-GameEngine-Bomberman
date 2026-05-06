@@ -8,6 +8,7 @@
 namespace ge
 {
 	class GameObject;
+	class Transform;
 }
 
 namespace bombGame
@@ -19,6 +20,8 @@ namespace bombGame
 		constexpr glm::vec3 Down{ 0.f, 1.f, 0.f };
 		constexpr glm::vec3 Left{ -1.f, 0.f, 0.f };
 	}
+
+	class EnemyComponent;
 
 	class WanderState final : public ge::State
 	{
@@ -41,6 +44,9 @@ namespace bombGame
 
 		float m_WanderTimer;
 		static constexpr inline float DirectionSwitchTimer{ 1.5f };
+
+		ge::Transform* m_pSourceTransform; // Cached ref
+		EnemyComponent* m_pEnemyController; // Cached ref
 	};
 
 	

@@ -27,23 +27,28 @@ std::unique_ptr<ge::GameObject> bombGame::CreateBomb(const glm::vec3& position, 
 
 std::function<bool()> bombGame::MakePlayerInRangePredicate(ge::GameObject* enemy)
 {
-	return [enemy]()->bool
+	// Cache before predicate creation
+	auto* enemyCtrl{ enemy->GetComponent<EnemyComponent>() };
+	auto* enemyTf{ enemy->GetComponent<ge::Transform>() };
+
+	return [enemyCtrl, enemyTf]()->bool
 		{
-			auto* enemyCtrl{ enemy->GetComponent<EnemyComponent>() };
 			if (!enemyCtrl || enemyCtrl->GetTargets().empty())
 				return false;
 
-			const auto enemyPos{ enemy->GetComponent<ge::Transform>()->GetWorldPosition() };
-			const float detRadius{ enemyCtrl->GetDetectionRadius() };
+			const auto& targetTransforms{ enemyCtrl->GetTargetTransforms() };
 
-			for (auto* target : enemyCtrl->GetTargets())
+			const glm::vec3 enemyPos{ enemyTf->GetWorldPosition() };
+			const float radiusSqr{ enemyCtrl->GetDetectionRadius() * enemyCtrl->GetDetectionRadius() };
+			
+			// Check if any target is in range via Transform comp
+			for (auto* targetTf : targetTransforms)
 			{
-				const auto targetPos{ target->GetComponent<ge::Transform>()->GetWorldPosition() };
+				const glm::vec3 targetPos{ targetTf->GetWorldPosition() };
+				const glm::vec2 diff{ targetPos - enemyPos };
 
-				if (glm::distance(glm::vec2{ enemyPos }, glm::vec2{ targetPos }) < detRadius)
-				{
+				if (glm::dot(diff, diff) < radiusSqr) // squared distance
 					return true;
-				}
 			}
 
 			return false;
