@@ -95,7 +95,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	font->SetBold(true);
 	ge::Renderer::GetInstance().SetWindowSize(800, 800);
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
-	constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
+	//constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
 	constexpr SDL_Color colorRed{ SDL_Color{120, 20, 50, 255} };
 	constexpr SDL_Color colorBlue{ SDL_Color{45, 50, 130, 255} };
 	const auto tutFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };

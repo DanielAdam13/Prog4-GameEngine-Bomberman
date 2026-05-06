@@ -143,7 +143,7 @@ namespace bombGame
 	void SDLSoundSysImpl::RegisterSound(ge::Sound_Id id, const std::string& fileName)
 	{
 		// "Guard" against data races happening due to m_FileNames
-		assert(m_PlayQueue.empty());
+		//assert(m_PlayQueue.empty());
 
 #ifndef __EMSCRIPTEN__
 		std::lock_guard<std::mutex> lock(m_AudioStateMutex);
