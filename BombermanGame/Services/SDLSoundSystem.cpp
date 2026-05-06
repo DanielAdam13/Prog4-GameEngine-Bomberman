@@ -56,7 +56,7 @@ namespace bombGame
 #ifndef __EMSCRIPTEN__
 		// Threading:
 		std::queue<PlayRequest> m_PlayQueue{};
-		std::mutex m_Mutex{}; // Mutex needed for locks
+		std::mutex m_AudioStateMutex{}; // Mutex needed for locks
 		std::condition_variable m_Cv{}; // Condition variable to wait on for ExecutePlay()
 		std::atomic<bool> m_ShouldQuit{ false }; // for when window is closed
 		std::thread m_WorkerThread{}; // Thread for Load and Play()
@@ -101,7 +101,7 @@ namespace bombGame
 	{
 #ifndef __EMSCRIPTEN__
 		{
-			std::lock_guard<std::mutex> lock(m_Mutex);
+			std::lock_guard<std::mutex> lock(m_AudioStateMutex);
 			m_ShouldQuit.store(true);
 		} // lock goes out of scope
 		m_Cv.notify_one();
@@ -130,7 +130,7 @@ namespace bombGame
 		ExecutePlay(soundId, std::clamp(volume, 0.f, 1.f));
 #else
 		{
-			std::lock_guard<std::mutex> lock(m_Mutex);
+			std::lock_guard<std::mutex> lock(m_AudioStateMutex);
 			const float clampedVolume{ std::clamp(volume, 0.f, 1.f) };
 			m_PlayQueue.push(PlayRequest{ soundId, clampedVolume });
 		} // lock goes out of scope
@@ -144,6 +144,11 @@ namespace bombGame
 	{
 		// "Guard" against data races happening due to m_FileNames
 		assert(m_PlayQueue.empty());
+
+#ifndef __EMSCRIPTEN__
+		std::lock_guard<std::mutex> lock(m_AudioStateMutex);
+#endif // !__EMSCRIPTEN__
+
 
 		// If a sound was already registered under this id, destroy it FIRST
 		if (auto it{ m_LoadedAudios.find(id) }; it != m_LoadedAudios.end())
@@ -177,26 +182,35 @@ namespace bombGame
 
 	void SDLSoundSysImpl::ExecutePlay(const ge::Sound_Id soundId, const float volume)
 	{
-		// Already loaded:
-		const auto it{ m_LoadedAudios.find(soundId) };
-		MIX_Audio* audio{ (it != m_LoadedAudios.end()) ? it->second : nullptr };
+		MIX_Audio* audio{ nullptr };
 
-		// If doesn't exist -> LOAD by cached filename
-		if (!audio)
 		{
-			const auto fileIt{ m_FileNames.find(soundId) };
+#ifndef __EMSCRIPTEN__
+			std::lock_guard<std::mutex> lock(m_AudioStateMutex);
+#endif // !1
 
-			// If filename has not been registered, early out...
-			if (fileIt == m_FileNames.end())
-			{
-				return;
-			}
+			// Already loaded:
+			const auto it{ m_LoadedAudios.find(soundId) };
+			audio = (it != m_LoadedAudios.end()) ? it->second : nullptr;
 
-			// If filename exists, Load the sound for next time
-			audio = LoadAndCache(soundId, fileIt->second);
+			// If doesn't exist -> LOAD by cached filename
 			if (!audio)
-				return;
-		}
+			{
+				const auto fileIt{ m_FileNames.find(soundId) };
+
+				// If filename has not been registered, early out...
+				if (fileIt == m_FileNames.end())
+				{
+					return;	
+				}
+
+				// If filename exists, Load the sound for next time
+				audio = LoadAndCache(soundId, fileIt->second);
+				if (!audio)
+					return;
+			}
+		} // lock released
+
 
 		// Get track from track pool
 		MIX_Track* track{ m_TrackPool[m_NextTrack] };
@@ -216,7 +230,7 @@ namespace bombGame
 		{
 			PlayRequest request; // don't intialize - this will happen each frame on the worker thread, also - no need
 			{
-				std::unique_lock<std::mutex> lock(m_Mutex);
+				std::unique_lock<std::mutex> lock(m_AudioStateMutex);
 
 				// WAIT UNTIL WHOLE QUEUE IS PROCESSED (ExecutePlay() is called for EVERY PlayRequest)
 				m_Cv.wait(lock, [this]() 

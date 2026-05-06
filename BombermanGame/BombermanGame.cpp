@@ -96,7 +96,8 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	ge::Renderer::GetInstance().SetWindowSize(800, 800);
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
 	constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
-	constexpr SDL_Color colorRed{ SDL_Color{220, 120, 50, 255} };
+	constexpr SDL_Color colorRed{ SDL_Color{120, 20, 50, 255} };
+	constexpr SDL_Color colorBlue{ SDL_Color{45, 50, 130, 255} };
 	const auto tutFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };
 	tutFont->SetBold(true);
 
@@ -111,7 +112,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// -----------------------------------------------
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.f, 3.f, 1.f);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f, 3.5f, 1.f);
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(0.f, 50.f, 0.f);
 	MainGameplayScene.Add(std::move(backgroundGO));
 #if _DEBUG
@@ -124,10 +125,10 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
-		"Use the D-Pad to move the Balloon, X to inflict damage, A to collect", tutFont, colorRed);
+		"D-Pad to move the Balloon | X damage | A score | B bomb", tutFont, colorRed);
 	auto tutorial2GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
-		"Use WASD to move the BomberMan, X to inflict damage, E to collect", tutFont, colorBlack);
+		"WASD to move the BomberMan | X damage | E score | SPACE bomb", tutFont, colorBlue);
 
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
@@ -148,7 +149,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	player1PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
 	player1PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
-	player1GO->AddComponent<BombLayerComponent>(player1GO.get(), 3);
+	player1GO->AddComponent<BombLayerComponent>(player1GO.get(), 1);
 	
 
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
@@ -188,7 +189,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// Health Displays
 	// -----------------------------------------------
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");
-	p1HealthDisplayGO->AddComponent<ge::TextComponent>(p1HealthDisplayGO.get(), "", font, colorBlack);
+	p1HealthDisplayGO->AddComponent<ge::TextComponent>(p1HealthDisplayGO.get(), "", font, colorBlue);
 	p1HealthDisplayGO->AddComponent<HealthDisplayComponent>(p1HealthDisplayGO.get(), player1GO.get());
 	p1HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
@@ -203,7 +204,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// Score Displays
 	// -----------------------------------------------
 	auto p1ScoreDisplayGO = std::make_unique<ge::GameObject>("GO_FirstPlayerScore");
-	p1ScoreDisplayGO->AddComponent<ge::TextComponent>(p1ScoreDisplayGO.get(), "Score: 0", font, colorBlack);
+	p1ScoreDisplayGO->AddComponent<ge::TextComponent>(p1ScoreDisplayGO.get(), "Score: 0", font, colorBlue);
 	p1ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p1ScoreDisplayGO.get(), player1GO.get());
 	p1ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.8f, 0.f });
@@ -235,7 +236,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 		[]() -> float { return CurrentBombExplosion; });
 	setBombCommand1->GetLayedBombEvent().AddObserver(&BombermanSoundManager);
 
-	input.BindKeyboardCommand(SDL_SCANCODE_O, ge::InputManager::InputTrigger::Up,
+	input.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ConditionalCommand>(std::move(setBombCommand1),
 			deathConditionLambda1));
 

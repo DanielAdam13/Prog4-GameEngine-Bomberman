@@ -14,7 +14,10 @@
 std::unique_ptr<ge::GameObject> bombGame::CreateBomb(const glm::vec3& position, ge::Texture2D* texture, float explosionTimer)
 {
 	auto bomb = std::make_unique<ge::GameObject>("GO_Bomb");
-	bomb->GetComponent<ge::Transform>()->SetLocalPosition(position);
+	auto bombTr{ bomb->GetComponent<ge::Transform>() };
+	bombTr->SetLocalPosition(position);
+	bombTr->SetLocalScale(2.f, 2.f, 1.f);
+	
 	bomb->AddComponent<ge::Image>(bomb.get())->SetTexture(texture);
 
 	BombComponent* bombComp{ bomb->AddComponent<BombComponent>(bomb.get(), explosionTimer) };
