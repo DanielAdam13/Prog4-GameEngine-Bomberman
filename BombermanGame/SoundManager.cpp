@@ -11,6 +11,8 @@ bombGame::SoundManager::SoundManager()
 	RegisterMapping(EventId::PLAYER_DIED, SoundIds::BombermanDied, 0.15f);
 	RegisterMapping(EventId::PLAYER_LOST_HEALTH, SoundIds::ExplosionBomb, 0.75f);
 	RegisterMapping(EventId::PLAYER_SCORE_CHANGED, SoundIds::Powerup, 0.15f);
+	RegisterMapping(EventId::LAY_BOMB, SoundIds::LayBomb, 0.15f);
+	RegisterMapping(EventId::EXPLODED_BOMB, SoundIds::ExplosionBomb, 0.15f);
 }
 
 void bombGame::SoundManager::Notify(int eventId, ge::GameObject*)

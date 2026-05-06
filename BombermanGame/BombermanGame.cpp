@@ -20,12 +20,15 @@
 #include "Components/PlayerComponent.h"
 #include "Components/HealthDisplayComponent.h"
 #include "Components/ScoreDisplayComponent.h"
+#include "Components/BombComponent.h"
+#include "Components/BombLayerComponent.h"
 
 #include "Commands/ConditionalCommand.h"
 #include "Commands/MoveCommand.h"
 
 #include "Commands/DamageCommand.h"
 #include "Commands/ScoreCommand.h"
+#include "Commands/LayBombCommand.h"
 
 #include "SoundManager.h"
 
@@ -33,6 +36,9 @@
 
 ge::SoundSystem* bombGame::BombermanGame::StoredSoundSystem{ nullptr };
 bombGame::SoundManager bombGame::BombermanGame::BombermanSoundManager{};
+
+float bombGame::BombermanGame::CurrentBombExplosion{ 2.f };
+ge::GameObject bombGame::BombermanGame::CurrentBombTemplate{ "GO_TempBomb" };
 
 bombGame::BombermanGame::BombermanGame()
 {
@@ -45,7 +51,7 @@ void bombGame::BombermanGame::LoadGame()
 {
 	LoadSound();
 	LoadScenes();
-	StoredSoundSystem->Play(SoundIds::BombermanDied, 0.15f);
+	//StoredSoundSystem->Play(SoundIds::BombermanDied, 0.15f);
 }
 
 void bombGame::BombermanGame::LoadSound()
@@ -65,6 +71,11 @@ void bombGame::BombermanGame::LoadScenes()
 	InitializeMainGameplayScene();
 }
 
+bombGame::SoundManager& bombGame::BombermanGame::GetSoundManager() noexcept
+{
+	return BombermanSoundManager;
+}
+
 void bombGame::BombermanGame::InitializeMainGameplayScene()
 {
 	ge::Scene& MainGameplayScene{ ge::SceneManager::GetInstance().CreateScene() };
@@ -82,6 +93,8 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
 	const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
+	const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
+	
 
 	// Static objects in scene initialization:
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
@@ -123,6 +136,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	player1PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
 	player1PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
+	player1GO->AddComponent<BombLayerComponent>(player1GO.get(), 1);
 	
 
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
@@ -135,6 +149,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	player2PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
 	player2PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
+	player2GO->AddComponent<BombLayerComponent>(player2GO.get(), 2);
 
 
 	// 2. Health Displays:
@@ -177,7 +192,18 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	const float firstPlayerSpeed{ p1PlayerCompRaw->GetSpeed() };
 	const float secondPlayerSpeed{ p2PlayerCompRaw->GetSpeed() };
 
+	auto getExplostionTimerLambda{ []() -> float { return CurrentBombExplosion; } };
+
 	// First player:
+	auto setBombCommand1 = std::make_unique<LayBombCommand>(player1GO.get(), bombTexture,
+		[]() -> float { return CurrentBombExplosion; });
+	setBombCommand1->GetLayedBombEvent().AddObserver(&BombermanSoundManager);
+
+	input.BindKeyboardCommand(SDL_SCANCODE_O, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ConditionalCommand>(std::move(setBombCommand1),
+			deathConditionLambda1));
+
+
 	input.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
 			glm::vec3{ 0.f, -1.f, 0.f }, firstPlayerSpeed),
@@ -204,6 +230,14 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 			deathConditionLambda1));
 
 	// Second player:
+	auto setBombCommand2 = std::make_unique<LayBombCommand>(player2GO.get(), bombTexture,
+		[]() -> float { return CurrentBombExplosion; });
+	setBombCommand2->GetLayedBombEvent().AddObserver(&BombermanSoundManager);
+
+	input.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ConditionalCommand>(std::move(setBombCommand2),
+			deathConditionLambda2));
+
 	input.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
 			glm::vec3{ 0.f, -1.f, 0.f }, secondPlayerSpeed),

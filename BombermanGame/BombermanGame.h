@@ -1,8 +1,11 @@
 #pragma once
 
+#include <memory>
+
 namespace ge
 {
 	class SoundSystem;
+	class GameObject;
 }
 
 namespace bombGame
@@ -24,11 +27,16 @@ namespace bombGame
 		static void LoadSound();
 		static void LoadScenes();
 
+		static SoundManager& GetSoundManager() noexcept;
+
 	private:
 		static ge::SoundSystem* StoredSoundSystem;
 		static SoundManager BombermanSoundManager;
 
 		//static void InitializeFirstScene();
 		static void InitializeMainGameplayScene();
+
+		static float CurrentBombExplosion;
+		static ge::GameObject CurrentBombTemplate;
 	};
 }

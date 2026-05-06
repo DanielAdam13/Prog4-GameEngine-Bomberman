@@ -5,6 +5,7 @@ namespace ge
 {
 	class GameObject;
 	class HealthComponent;
+	class Texture2D;
 }
 
 namespace bombGame

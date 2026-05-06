@@ -4,17 +4,26 @@
 add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Main.cpp"
   "GameEvents.h"
-  "Achievements.h" "Achievements.cpp"
  
   "Components/PlayerComponent.h"        "Components/PlayerComponent.cpp"
   "Components/HealthDisplayComponent.h" "Components/HealthDisplayComponent.cpp"
   "Components/ScoreDisplayComponent.h"  "Components/ScoreDisplayComponent.cpp"
+  "Components/BombComponent.h" "Components/BombComponent.cpp" 
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
+  "Commands/LayBombCommand.h" "Commands/LayBombCommand.cpp"
+
   "Services/SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
-  "BombermanGame.h" "BombermanGame.cpp" "SoundManager.h" "SoundManager.cpp" "StateMachine/WanderState.h" "StateMachine/WanderState.cpp" "StateMachine/ChaseState.h" "StateMachine/ChaseState.cpp" "StateMachine/RunState.h" "StateMachine/RunState.cpp")
+  "BombermanGame.h" "BombermanGame.cpp" 
+  "SoundManager.h" "SoundManager.cpp" 
+
+  "StateMachine/WanderState.h" "StateMachine/WanderState.cpp" 
+  "StateMachine/ChaseState.h" "StateMachine/ChaseState.cpp" 
+  "StateMachine/RunState.h" "StateMachine/RunState.cpp" 
+
+  "Utils.h" "Utils.cpp" "Components/BombLayerComponent.h" "Components/BombLayerComponent.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
