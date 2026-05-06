@@ -24,7 +24,7 @@ namespace bombGame
 
 	private:
 		float m_WindUpDuration;
-		float m_ExplosionTimer{ 0.f };
+		float m_ExplosionTimer;
 
 		ge::Subject m_ExplodedBombEvent;
 	};

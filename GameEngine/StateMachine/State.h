@@ -19,7 +19,7 @@ namespace ge
 		virtual void OnExit() = 0;
 
 	protected:
-		GameObject* GetTarget() const noexcept;
+		GameObject* GetSource() const noexcept;
 
 	private:
 		GameObject* m_TargetPtr{ nullptr };

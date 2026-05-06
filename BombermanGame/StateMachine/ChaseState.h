@@ -20,7 +20,7 @@ namespace bombGame
 		ChaseState& operator=(ChaseState&&) = delete;
 
 		virtual void OnEnter() override {};
-		virtual void OnUpdate(float) override {};
+		virtual void OnUpdate(float) override;
 		virtual void OnExit() override {};
 
 	private:

@@ -29,6 +29,28 @@ void ge::FSMComponent::UpdateComponent(float deltaTime)
 	}
 }
 
+void ge::FSMComponent::Start()
+{
+	if (m_IsRunning || m_StatesContainer.empty())
+		return;
+
+	m_IsRunning = true;
+
+	ChangeState(m_StatesContainer.front().get());
+}
+
+void ge::FSMComponent::Stop()
+{
+	if (!m_IsRunning)
+		return;
+
+	if (m_CurrentState)
+		m_CurrentState->OnExit();
+
+	m_CurrentState = nullptr;
+	m_IsRunning = false;
+}
+
 ge::State* ge::FSMComponent::AddState(std::unique_ptr<State>&& newState)
 {
 	if (!newState)

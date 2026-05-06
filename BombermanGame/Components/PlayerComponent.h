@@ -17,8 +17,8 @@ namespace bombGame
 		~PlayerComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
-		void UpdateComponent(float)      override {}
-		void RenderComponent() const     override {}
+		void UpdateComponent(float) override {}
+		void RenderComponent() const override {}
 
 		float GetSpeed() const noexcept;
 		void SetSpeed(float newSpeed) noexcept;

@@ -28,6 +28,9 @@ namespace ge
 		virtual void UpdateComponent(float) override;
 		virtual void RenderComponent() const override {};
 
+		void Start();
+		void Stop();
+
 		// Rvalue ref to a unique pointer to SHOW ownership transfer
 		State* AddState(std::unique_ptr<State>&& newState);
 		void AddTransition(State* from, State* to, std::function<bool()> evalFunc);
@@ -40,6 +43,8 @@ namespace ge
 		State* m_CurrentState{ nullptr };
 
 		void ChangeState(State* newState);
+
+		bool m_IsRunning{ false };
 
 	};
 }

@@ -5,7 +5,7 @@ ge::State::State(GameObject* pTargetPtr)
 {
 }
 
-ge::GameObject* ge::State::GetTarget() const noexcept
+ge::GameObject* ge::State::GetSource() const noexcept
 {
 	return m_TargetPtr;
 }

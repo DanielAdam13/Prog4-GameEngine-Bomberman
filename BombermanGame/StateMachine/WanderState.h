@@ -2,6 +2,9 @@
 
 #include "StateMachine/State.h"
 
+#include <glm/glm.hpp>
+#include <array>
+
 namespace ge
 {
 	class GameObject;
@@ -9,6 +12,14 @@ namespace ge
 
 namespace bombGame
 {
+	namespace MovementDirections
+	{
+		constexpr glm::vec3 Up{ 0.f, -1.f, 0.f };
+		constexpr glm::vec3 Right{ 1.f, 0.f, 0.f };
+		constexpr glm::vec3 Down{ 0.f, 1.f, 0.f };
+		constexpr glm::vec3 Left{ -1.f, 0.f, 0.f };
+	}
+
 	class WanderState final : public ge::State
 	{
 	public:
@@ -20,9 +31,17 @@ namespace bombGame
 		WanderState& operator=(WanderState&&) = delete;
 
 		virtual void OnEnter() override {};
-		virtual void OnUpdate(float) override {};
+		virtual void OnUpdate(float) override;
 		virtual void OnExit() override {};
 
 	private:
+		glm::vec3 m_CurrentWanderDirection;
+		static constexpr inline std::array<glm::vec3, 4> m_PossibleDirections{
+			MovementDirections::Up, MovementDirections::Right, MovementDirections::Down, MovementDirections::Left };
+
+		float m_WanderTimer;
+		static constexpr inline float DirectionSwitchTimer{ 1.5f };
 	};
+
+	
 }

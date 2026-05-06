@@ -5,8 +5,8 @@
 
 bombGame::BombComponent::BombComponent(ge::GameObject* owner, float explosionTimer)
 	:Component::Component{ owner },
-	m_ExplosionTimer{ 0.f },
-	m_WindUpDuration{ explosionTimer }
+	m_WindUpDuration{ explosionTimer },
+	m_ExplosionTimer{ 0.f }
 {
 }
 

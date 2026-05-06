@@ -9,10 +9,12 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Components/HealthDisplayComponent.h" "Components/HealthDisplayComponent.cpp"
   "Components/ScoreDisplayComponent.h"  "Components/ScoreDisplayComponent.cpp"
   "Components/BombComponent.h" "Components/BombComponent.cpp" 
+  "Components/BombLayerComponent.h" "Components/BombLayerComponent.cpp"
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
   "Commands/LayBombCommand.h" "Commands/LayBombCommand.cpp"
+  "Components/EnemyComponent.h" "Components/EnemyComponent.cpp"
 
   "Services/SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
@@ -23,7 +25,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "StateMachine/ChaseState.h" "StateMachine/ChaseState.cpp" 
   "StateMachine/RunState.h" "StateMachine/RunState.cpp" 
 
-  "Utils.h" "Utils.cpp" "Components/BombLayerComponent.h" "Components/BombLayerComponent.cpp")
+  "Utils.h" "Utils.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
