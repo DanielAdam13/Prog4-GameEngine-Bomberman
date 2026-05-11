@@ -14,7 +14,7 @@ namespace bombGame
 		static constexpr ge::ComponentTypeID StaticTypeID{ 7 };
 
 		explicit PlayerComponent(ge::GameObject* owner, float speed = 120.f);
-		~PlayerComponent() override = default;
+		~PlayerComponent() override;
 
 		void FixedUpdateComponent(float) override {}
 		void UpdateComponent(float) override {}

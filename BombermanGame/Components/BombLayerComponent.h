@@ -1,6 +1,14 @@
 #pragma once
 #include "Components/Component.h"
 #include "Observer.h"
+#include <ObservableSubject.h>
+
+#include <functional>
+
+namespace ge
+{
+    class Texture2D;
+}
 
 namespace bombGame
 {
@@ -12,9 +20,9 @@ namespace bombGame
         // Every Bomb Layer Component Instance shares the same component type ID
         static constexpr ge::ComponentTypeID StaticTypeID{ 12 };
 
-        BombLayerComponent(ge::GameObject* owner, int maxBombs = 1);
+        BombLayerComponent(ge::GameObject* owner, 
+            ge::Texture2D* textureRef, std::function<float()> explosionTimerFn, int maxBombs = 1);
         ~BombLayerComponent() override = default;
-
         BombLayerComponent(const BombLayerComponent&) = delete;
         BombLayerComponent& operator=(const BombLayerComponent&) = delete;
 
@@ -22,20 +30,29 @@ namespace bombGame
         void UpdateComponent(float) override {}
         void RenderComponent() const override {}
 
-        bool CanLayBomb() const noexcept;
+        bool TryLayBomb(const glm::vec3& position);
+
         int GetActiveBombs() const noexcept;
         int GetMaxBombs() const noexcept;
         void SetMaxBombs(int newMaxBombNr) noexcept;
 
-        // Called by LayBombCommand when a bomb is successfully spawned
-        // Subscribes to the bomb's explosion event
-        void RegisterLaidBomb(ge::GameObject* bomb);
-
         // Called when one of the bombs explode
         void Notify(int eventId, ge::GameObject* source) override;
+
+        ge::Subject& GetLaidBombEvent() noexcept;
 
     private:
         int m_MaxBombs;
         int m_ActiveBombs{ 0 };
+        ge::Texture2D* m_TextureBombRef;
+        std::function<float()> m_ExplosionTimerFn;
+
+        ge::Subject m_LaidBombEvent;
+
+        // Private helper
+        bool CanLayBomb() const noexcept;
+
+        // Subscribes to the bomb's explosion event
+        void RegisterLaidBomb(ge::GameObject* bomb);
     };
 }

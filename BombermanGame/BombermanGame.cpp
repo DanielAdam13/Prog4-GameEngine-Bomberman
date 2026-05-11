@@ -149,7 +149,8 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	player1PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
 	player1PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
-	player1GO->AddComponent<BombLayerComponent>(player1GO.get(), 1);
+	player1GO->AddComponent<BombLayerComponent>(player1GO.get(), bombTexture,
+		[]() -> float { return CurrentBombExplosion; }, 1)->GetLaidBombEvent().AddObserver(&BombermanSoundManager);
 	
 
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
@@ -162,7 +163,8 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	player2PlayerComp->GetDamageEvent().AddObserver(&BombermanSoundManager);
 	player2PlayerComp->GetDeadEvent().AddObserver(&BombermanSoundManager);
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&BombermanSoundManager);
-	player2GO->AddComponent<BombLayerComponent>(player2GO.get(), 2);
+	player2GO->AddComponent<BombLayerComponent>(player2GO.get(), bombTexture,
+		[]() -> float { return CurrentBombExplosion; }, 2)->GetLaidBombEvent().AddObserver(&BombermanSoundManager);
 
 	// -----------------------------------------------
 	// Enemy Initialization
@@ -221,44 +223,56 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 #pragma region CommandBinding
 	auto& input{ ge::ServiceLocator::GetInputManager() };
 
-	auto* p1PlayerCompRaw{ player1GO.get()->GetComponent<PlayerComponent>() };
-	auto* p2PlayerCompRaw{ player2GO.get()->GetComponent<PlayerComponent>() };
+	auto* p1GORaw{ player1GO.get() };
+	auto* p2GORaw{ player2GO.get() };
 
 	// Player speeds
-	auto deathConditionLambda1{ [p1PlayerCompRaw]() -> bool { return p1PlayerCompRaw && p1PlayerCompRaw->IsAlive(); } };
-	auto deathConditionLambda2{ [p2PlayerCompRaw]() -> bool { return p2PlayerCompRaw && p2PlayerCompRaw->IsAlive(); } };
+	auto deathConditionLambda1{ [p1GORaw]() -> bool {
+		auto* pc{p1GORaw->GetComponent<PlayerComponent>()};
+		return pc && pc->IsAlive(); } };
+	auto deathConditionLambda2{ [p2GORaw]() -> bool { 
+		auto* pc{p2GORaw->GetComponent<PlayerComponent>()};
+		return pc && pc->IsAlive(); } };
 
-	const float firstPlayerSpeed{ p1PlayerCompRaw->GetSpeed() };
-	const float secondPlayerSpeed{ p2PlayerCompRaw->GetSpeed() };
+	const float firstPlayerSpeed{ p1GORaw->GetComponent<PlayerComponent>()->GetSpeed()};
+	const float secondPlayerSpeed{ p2GORaw->GetComponent<PlayerComponent>()->GetSpeed() };
 
-	// First player:
-	auto setBombCommand1 = std::make_unique<LayBombCommand>(player1GO.get(), bombTexture,
-		[]() -> float { return CurrentBombExplosion; });
-	setBombCommand1->GetLayedBombEvent().AddObserver(&BombermanSoundManager);
+	auto getPlayerSpeedLambda1{ [p1GORaw, firstPlayerSpeed]() -> float 
+		{
+			auto* pc{ p1GORaw->GetComponent<PlayerComponent>() };
+			return pc ? pc->GetSpeed() : firstPlayerSpeed;
+		} };
 
+	auto getPlayerSpeedLambda2{ [p2GORaw, secondPlayerSpeed]() -> float
+		{
+			auto* pc{ p2GORaw->GetComponent<PlayerComponent>() };
+			return pc ? pc->GetSpeed() : secondPlayerSpeed;
+		} };
+
+	// --------------------
+	// First player 
+	// --------------------
 	input.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::move(setBombCommand1),
+		std::make_unique<ge::ConditionalCommand>(std::move(std::make_unique<LayBombCommand>(player1GO.get())),
 			deathConditionLambda1));
-
-
+	// Movement
 	input.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ 0.f, -1.f, 0.f }, firstPlayerSpeed),
+			glm::vec3{ 0.f, -1.f, 0.f }, getPlayerSpeedLambda1),
 			deathConditionLambda1));
 	input.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ -1.f, 0.f, 0.f }, firstPlayerSpeed),
+			glm::vec3{ -1.f, 0.f, 0.f }, getPlayerSpeedLambda1),
 			deathConditionLambda1));
 	input.BindKeyboardCommand(SDL_SCANCODE_S, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ 0.f, 1.f, 0.f }, firstPlayerSpeed),
+			glm::vec3{ 0.f, 1.f, 0.f }, getPlayerSpeedLambda1),
 			deathConditionLambda1));
 	input.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ 1.f, 0.f, 0.f }, firstPlayerSpeed),
+			glm::vec3{ 1.f, 0.f, 0.f }, getPlayerSpeedLambda1),
 			deathConditionLambda1));
-
-	// Player 1 command but target is Player 2 and uses a condition checking if player 1 is dead
+	// Damage and score
 	input.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<DamageCommand>(player2GO.get(), 1),
 			deathConditionLambda1));
@@ -266,33 +280,30 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ScoreCommand>(player1GO.get(), 10),
 			deathConditionLambda1));
 
-	// Second player:
-	auto setBombCommand2 = std::make_unique<LayBombCommand>(player2GO.get(), bombTexture,
-		[]() -> float { return CurrentBombExplosion; });
-	setBombCommand2->GetLayedBombEvent().AddObserver(&BombermanSoundManager);
-
+	// ---------------------
+	// Second player
+	// ---------------------
 	input.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::move(setBombCommand2),
+		std::make_unique<ge::ConditionalCommand>(std::make_unique<LayBombCommand>(player2GO.get()),
 			deathConditionLambda2));
-
+	// Movement
 	input.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ 0.f, -1.f, 0.f }, secondPlayerSpeed),
+			glm::vec3{ 0.f, -1.f, 0.f }, getPlayerSpeedLambda2),
 			deathConditionLambda2));
 	input.BindControllerCommand(ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ -1.f, 0.f, 0.f }, secondPlayerSpeed),
+			glm::vec3{ -1.f, 0.f, 0.f }, getPlayerSpeedLambda2),
 			deathConditionLambda2));
 	input.BindControllerCommand(ge::ControllerButton::DpadDown, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ 0.f, 1.f, 0.f }, secondPlayerSpeed),
+			glm::vec3{ 0.f, 1.f, 0.f }, getPlayerSpeedLambda2),
 			deathConditionLambda2));
 	input.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ 1.f, 0.f, 0.f }, secondPlayerSpeed),
+			glm::vec3{ 1.f, 0.f, 0.f }, getPlayerSpeedLambda2),
 			deathConditionLambda2));
-
-	// Player 2 command but target is Player 1 and uses a condition checking if player 2 is dead
+	// Damage and score
 	input.BindControllerCommand(ge::ControllerButton::X, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<DamageCommand>(player1GO.get(), 1),
 			deathConditionLambda2));

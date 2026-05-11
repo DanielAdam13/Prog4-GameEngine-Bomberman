@@ -34,6 +34,19 @@ PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
 		});
 }
 
+bombGame::PlayerComponent::~PlayerComponent()
+{
+	if (auto* h = GetOwner()->GetComponent<ge::HealthComponent>())
+	{
+		h->SetOnTakingDamage(nullptr);
+		h->SetOnDeath(nullptr);
+	}
+	if (auto* s = GetOwner()->GetComponent<ge::ScoreComponent>()) 
+	{
+		s->SetOnScoreChange(nullptr);
+	}
+}
+
 float PlayerComponent::GetSpeed() const noexcept
 {
 	return m_Speed;

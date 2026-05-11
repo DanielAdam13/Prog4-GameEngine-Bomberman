@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObjectCommand.h"
 #include <glm/glm.hpp>
+#include <functional>
 
 namespace ge
 {
@@ -12,6 +13,7 @@ namespace ge
 	{
 	public:
 		MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed = 80.f);
+		MoveCommand(GameObject* target, const glm::vec3& startingDirection, std::function<float()> speedFunc);
 		~MoveCommand() override = default;
 
 		virtual void Execute(float deltaTime) override;
@@ -25,6 +27,7 @@ namespace ge
 
 		const glm::vec3 m_ConstantMoveDirection;
 		float m_MoveSpeed;
+		std::function<float()> m_SpeedFunc{};
 
 	};
 }
