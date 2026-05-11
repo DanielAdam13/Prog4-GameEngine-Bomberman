@@ -33,7 +33,7 @@ ge::GameObject* bombGame::EnemyState::FindClosestPlayerInRange() const
 		// Don't count dead players
 		auto targetPc{ target->GetComponent<PlayerComponent>() };
 		if (!targetPc || !targetPc->IsAlive())
-			return nullptr;
+			continue;
 
 		const glm::vec3 targetPos{ target->GetComponent<ge::Transform>()->GetWorldPosition() };
 		const glm::vec2 diff{ targetPos - enemyPos };

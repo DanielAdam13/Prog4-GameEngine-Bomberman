@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StateMachine/State.h"
+#include "BaseEnemyState.h"
 
 namespace ge
 {
@@ -9,7 +9,7 @@ namespace ge
 
 namespace bombGame
 {
-	class RunState final : public ge::State
+	class RunState final : public EnemyState
 	{
 	public:
 		RunState(ge::GameObject* pTargetPtr);

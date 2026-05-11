@@ -2,6 +2,8 @@
 
 #include <Services/SoundSystem.h>
 #include <Services/ServiceLocator.h>
+#include "GameObject.h"
+#include "Components/HealthComponent.h"
 
 #include "Services/SoundIds.h"
 #include "GameEvents.h"
@@ -15,11 +17,24 @@ bombGame::SoundManager::SoundManager()
 	RegisterMapping(GameEventId::EXPLODED_BOMB, SoundIds::ExplosionBomb, 0.15f);
 }
 
-void bombGame::SoundManager::Notify(int eventId, ge::GameObject*)
+void bombGame::SoundManager::Notify(int eventId, ge::GameObject* sourceObj)
 {
 	auto it{ m_SoundMappings.find(static_cast<GameEventId>(eventId)) };
 	if (it != m_SoundMappings.end())
 	{
+		// Simple check to not play HURT sound when dying
+		if (eventId == static_cast<GameEventId>(GameEventId::PLAYER_LOST_HEALTH) &&
+			[sourceObj]() -> bool {
+				if (!sourceObj)
+					return true;
+
+				auto* sourceHealth{ sourceObj->GetComponent<ge::HealthComponent>() };
+				return sourceHealth && sourceHealth->GetCurrentHealth() == 0;
+			}())
+		{
+			return;
+		}
+
 		ge::ServiceLocator::GetSoundSystem().Play(it->second.soundId, it->second.volume);
 	}
 }
