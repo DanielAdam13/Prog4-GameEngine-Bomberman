@@ -6,36 +6,50 @@
 #include <limits>
 
 bombGame::ChaseState::ChaseState(ge::GameObject* pSourcePtr)
-	:ge::State::State(pSourcePtr),
-	m_pSourceTransform{ pSourcePtr->GetComponent<ge::Transform>() },
-	m_pEnemyController{ pSourcePtr->GetComponent<EnemyComponent>() }
+	:EnemyState::EnemyState(pSourcePtr)
 {
+}
+
+void bombGame::ChaseState::OnEnter()
+{
+	m_CurrentTarget = FindClosestPlayerInRange();
+	// Set it to max from Enter so the new direction is updated INSTANTLY
+	m_RefreshClosestTimer = m_RefreshClosestInterval;
 }
 
 void bombGame::ChaseState::OnUpdate(float deltaTime)
 {
-	const glm::vec3 sourcePos{ m_pSourceTransform->GetWorldPosition() };
-
-	glm::vec3 directionToClosestTarget{};
-	float closestDistSqr{ std::numeric_limits<float>::max() };
-
-	for (auto* targetTransform : m_pEnemyController->GetTargetTransforms())
+	m_RefreshClosestTimer += deltaTime;
+	if (m_RefreshClosestTimer >= m_RefreshClosestInterval)
 	{
-		const glm::vec3 toTarget{ targetTransform->GetWorldPosition() - sourcePos };
-		const float distSqr{ glm::dot(toTarget, toTarget) };
+		m_RefreshClosestTimer = 0.f;
 
-		if (distSqr < closestDistSqr && distSqr > 0.001f) // avoid normalizing a zero vector
+		ge::GameObject* closest{ FindClosestPlayerInRange() };
+		if (!closest)
 		{
-			closestDistSqr = distSqr;
-			directionToClosestTarget = toTarget / std::sqrt(distSqr);
+			// Transition to Wander
+			GetSourceEnemyComponent()->TransitionToWander();
+			return;
 		}
+
+		if (closest != m_CurrentTarget)
+		{
+			m_CurrentTarget = closest;
+		}
+
+		m_DirectionToClosest = glm::normalize(m_CurrentTarget->GetComponent<ge::Transform>()->GetWorldPosition() -
+			GetSourceTransform()->GetWorldPosition());
 	}
 	
-	if (closestDistSqr == std::numeric_limits<float>::max())
-		return; // guard just in case
-	
-	m_pEnemyController->SetMoveDirection(directionToClosestTarget);
+	GetSourceEnemyComponent()->SetMoveDirection(m_DirectionToClosest);
 
-	const glm::vec3 newPos{ sourcePos + directionToClosestTarget * m_pEnemyController->GetSpeed() * deltaTime };
-	m_pSourceTransform->SetLocalPosition({ newPos.x, newPos.y, 0.f });
+	const glm::vec3 newPos{ GetSourceTransform()->GetWorldPosition() + 
+		m_DirectionToClosest * GetSourceEnemyComponent()->GetSpeed() * deltaTime};
+	GetSourceTransform()->SetLocalPosition({newPos.x, newPos.y, 0.f});
+}
+
+void bombGame::ChaseState::OnExit()
+{
+	m_CurrentTarget = nullptr;
+	m_DirectionToClosest = {};
 }

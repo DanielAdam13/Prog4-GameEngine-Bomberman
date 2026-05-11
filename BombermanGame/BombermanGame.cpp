@@ -24,12 +24,6 @@
 #include "Components/BombLayerComponent.h"
 #include "Components/EnemyComponent.h"
 
-#include "Components/FSMComponent.h"
-#include "StateMachine/ChaseState.h"
-#include "StateMachine/WanderState.h"
-#include "StateMachine/RunState.h"
-#include "StateMachine/Transition.h"
-
 #include "Commands/ConditionalCommand.h"
 #include "Commands/MoveCommand.h"
 
@@ -204,18 +198,10 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 		enemy1Image->GetTexture()->GetSize()) };
 	enemy1BoxColl->AssignTag("Enemy");
 
-	enemy1GO->AddComponent<EnemyComponent>(enemy1GO.get(), 60.f)->AddTarget(player1GO.get());
-	enemy1GO->GetComponent<EnemyComponent>()->AddTarget(player2GO.get());
-
-	auto playerInRangePredicate{ MakePlayerInRangePredicate(enemy1GO.get()) };
-
-	auto* enemyFsm{ enemy1GO->AddComponent<ge::FSMComponent>(enemy1GO.get()) };
-	auto* wanderStateRaw{ enemyFsm->AddState(std::make_unique<WanderState>(enemy1GO.get())) };
-	auto* chaseStateRaw{ enemyFsm->AddState(std::make_unique<ChaseState>(enemy1GO.get())) };
-	enemyFsm->AddTransition(wanderStateRaw, chaseStateRaw, playerInRangePredicate);
-	enemyFsm->AddTransition(chaseStateRaw, wanderStateRaw, [playerInRangePredicate]()->bool {return !playerInRangePredicate(); });
-
-	enemyFsm->Start();
+	auto enemyComp{ enemy1GO->AddComponent<EnemyComponent>(enemy1GO.get(), 60.f) };
+	enemyComp->AddTarget(player1GO.get());
+	enemyComp->AddTarget(player2GO.get());
+	enemyComp->InitializeStates();
 
 	// -----------------------------------------------
 	// Health Displays
@@ -225,6 +211,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	p1HealthDisplayGO->AddComponent<HealthDisplayComponent>(p1HealthDisplayGO.get(), player1GO.get());
 	p1HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
+	p1HealthDisplayGO->AddComponent<ge::BoxCollider>(p1HealthDisplayGO.get(), glm::vec2{ 200.f, 50.f })->AssignTag("Wall");
 
 	auto p2HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P2HealthDisplay");
 	p2HealthDisplayGO->AddComponent<ge::TextComponent>(p2HealthDisplayGO.get(), "", font, colorRed);

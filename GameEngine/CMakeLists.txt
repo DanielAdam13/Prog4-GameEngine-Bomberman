@@ -35,7 +35,7 @@ add_library(gameEngine_lib STATIC
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
   "Commands/MoveStickCommand.h" "Commands/MoveStickCommand.cpp"
   "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp" 
-  "Components/FSMComponent.h" "Components/FSMComponent.cpp"
+  #"Components/FSMComponent.h" "Components/FSMComponent.cpp"
 
   "StateMachine/State.h" "StateMachine/State.cpp"
   "StateMachine/Transition.h" "StateMachine/Transition.cpp" "Structs.h"

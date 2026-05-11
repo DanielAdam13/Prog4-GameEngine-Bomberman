@@ -1,9 +1,14 @@
 #pragma once
 
 #include "Components/Component.h"
+#include "StateMachine/BaseEnemyState.h"
+#include "StateMachine/ChaseState.h"
+#include "StateMachine/WanderState.h"
+#include "StateMachine/RunState.h"
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <memory>
 
 namespace ge
 {
@@ -25,9 +30,15 @@ namespace bombGame
 		~EnemyComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
-		void UpdateComponent(float) override {};
+		void UpdateComponent(float) override;
 		void RenderComponent() const override {};
 
+		// States:
+		void InitializeStates();
+		void TransitionToWander();
+		void TransitionToChase();
+
+		// Targets:
 		std::vector<ge::GameObject*> GetTargets() const noexcept { return m_Targets; }
 		const std::vector<ge::Transform*>& GetTargetTransforms() const noexcept { return m_TargetTransforms; }
 		ge::GameObject* GetTargetAt(int index) const noexcept { return m_Targets[index]; }
@@ -52,6 +63,11 @@ namespace bombGame
 		glm::vec3 m_CurrentMoveDirection{};
 
 		float m_DetectionRadius{ 200.f };
+
+		// States:
+		std::unique_ptr<ChaseState> m_ChaseState;
+		std::unique_ptr<WanderState> m_WanderState;
+		EnemyState* m_CurrentState;
 
 	};
 }

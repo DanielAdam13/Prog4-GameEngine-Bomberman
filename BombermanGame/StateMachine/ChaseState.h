@@ -1,6 +1,7 @@
 #pragma once
+#include "BaseEnemyState.h"
 
-#include "StateMachine/State.h"
+#include <glm/glm.hpp>
 
 namespace ge
 {
@@ -12,7 +13,7 @@ namespace bombGame
 {
 	class EnemyComponent;
 
-	class ChaseState final : public ge::State
+	class ChaseState final : public EnemyState
 	{
 	public:
 		ChaseState(ge::GameObject* pTargetPtr);
@@ -22,12 +23,16 @@ namespace bombGame
 		ChaseState(ChaseState&&) = delete;
 		ChaseState& operator=(ChaseState&&) = delete;
 
-		virtual void OnEnter() override {};
+		virtual void OnEnter() override;
 		virtual void OnUpdate(float) override;
-		virtual void OnExit() override {};
+		virtual void OnExit() override;
 
 	private:
-		ge::Transform* m_pSourceTransform{ nullptr }; // Cached ref
-		EnemyComponent* m_pEnemyController{ nullptr }; // Cached ref
+		ge::GameObject* m_CurrentTarget{ nullptr }; // ref
+		glm::vec3 m_DirectionToClosest{};
+
+		float m_RefreshClosestTimer{ 0.f };
+		static inline constexpr float m_RefreshClosestInterval{ 0.25f };
+		
 	};
 }

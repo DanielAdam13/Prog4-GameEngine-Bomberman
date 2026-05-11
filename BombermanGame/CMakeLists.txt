@@ -24,8 +24,9 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "StateMachine/WanderState.h" "StateMachine/WanderState.cpp" 
   "StateMachine/ChaseState.h" "StateMachine/ChaseState.cpp" 
   "StateMachine/RunState.h" "StateMachine/RunState.cpp" 
+  "StateMachine/BaseEnemyState.h" "StateMachine/BaseEnemyState.cpp"
 
-  "Utils.h" "Utils.cpp")
+  "Utils.h" "Utils.cpp" )
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
