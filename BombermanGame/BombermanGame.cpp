@@ -37,10 +37,15 @@
 #include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
 
+#include "Components/Colliders.h"
+#include "CollisionSystem.h"
+#include <Structs.h>
+
 #include "SoundManager.h"
 #include "Utils.h"
 
 #include <memory>
+
 
 ge::SoundSystem* bombGame::BombermanGame::StoredSoundSystem{ nullptr };
 bombGame::SoundManager bombGame::BombermanGame::BombermanSoundManager{};
@@ -136,13 +141,25 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	MainGameplayScene.Add(std::move(tutorial1GO));
 	MainGameplayScene.Add(std::move(tutorial2GO));
 
+	// Collision
+	ge::CollisionSystem::GetInstance().AddLayerTag("Player");
+	ge::CollisionSystem::GetInstance().AddLayerTag("Wall");
+	ge::CollisionSystem::GetInstance().AddLayerTag("Enemy");
+
 	// -----------------------------------------------
 	// Player Initialization
 	// -----------------------------------------------
 	auto player1GO = std::make_unique<ge::GameObject>("GO_Player1");
-	player1GO->AddComponent<ge::Image>(player1GO.get())->SetTexture(playerTexture);
-	player1GO->GetComponent<ge::Transform>()->SetLocalPosition({ 250.f, 350.f, 0.f });
-	player1GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+	auto player1Image{ player1GO->AddComponent<ge::Image>(player1GO.get()) };
+	player1Image->SetTexture(playerTexture);
+	auto player1Tr{ player1GO->GetComponent<ge::Transform>() }; 
+	player1Tr->SetLocalPosition({ 250.f, 350.f, 0.f });
+	player1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+
+	auto player1BoxColl{ player1GO->AddComponent<ge::BoxCollider>(player1GO.get(), 
+		player1Image->GetTexture()->GetSize()) };
+	player1BoxColl->AssignTag("Player");
+
 	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 3);
 	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), 0);
 	auto player1PlayerComp{ player1GO->AddComponent<PlayerComponent>(player1GO.get(), 120.f) };
@@ -154,9 +171,16 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	
 
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
-	player2GO->AddComponent<ge::Image>(player2GO.get())->SetTexture(balloonTexture);
-	player2GO->GetComponent<ge::Transform>()->SetLocalPosition({ 200.f, 150.f, 0.f });
-	player2GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.f, 2.f, 2.f });
+	auto player2Image{ player2GO->AddComponent<ge::Image>(player2GO.get()) };
+	player2Image->SetTexture(balloonTexture);
+	auto player2Tr{ player2GO->GetComponent<ge::Transform>() };
+	player2Tr->SetLocalPosition({ 200.f, 150.f, 0.f });
+	player2Tr->SetLocalScale({ 2.f, 2.f, 2.f });
+
+	auto player2BoxColl{ player2GO->AddComponent<ge::BoxCollider>(player2GO.get(), 
+		player2Image->GetTexture()->GetSize()) };
+	player2BoxColl->AssignTag("Player");
+
 	player2GO->AddComponent<ge::HealthComponent>(player2GO.get(), 3);
 	player2GO->AddComponent<ge::ScoreComponent>(player2GO.get(), 0);
 	auto player2PlayerComp{ player2GO->AddComponent<PlayerComponent>(player2GO.get(), 240.f) };
@@ -170,9 +194,15 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// Enemy Initialization
 	// -----------------------------------------------
 	auto enemy1GO = std::make_unique<ge::GameObject>("GO_IceEnemy1");
-	enemy1GO->AddComponent<ge::Image>(enemy1GO.get())->SetTexture(iceEnemyTexture);
-	enemy1GO->GetComponent<ge::Transform>()->SetLocalPosition({ 500.f, 250.f, 0.f });
-	enemy1GO->GetComponent<ge::Transform>()->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+	auto enemy1Image{ enemy1GO->AddComponent<ge::Image>(enemy1GO.get()) };
+	enemy1Image->SetTexture(iceEnemyTexture);
+	auto enemy1Tr{ enemy1GO->GetComponent<ge::Transform>() };
+	enemy1Tr->SetLocalPosition({ 500.f, 250.f, 0.f });
+	enemy1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+
+	auto enemy1BoxColl{ enemy1GO->AddComponent<ge::BoxCollider>(enemy1GO.get(), 
+		enemy1Image->GetTexture()->GetSize()) };
+	enemy1BoxColl->AssignTag("Enemy");
 
 	enemy1GO->AddComponent<EnemyComponent>(enemy1GO.get(), 60.f)->AddTarget(player1GO.get());
 	enemy1GO->GetComponent<EnemyComponent>()->AddTarget(player2GO.get());
@@ -253,7 +283,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// First player 
 	// --------------------
 	input.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::move(std::make_unique<LayBombCommand>(player1GO.get())),
+		std::make_unique<ge::ConditionalCommand>(std::make_unique<LayBombCommand>(player1GO.get()),
 			deathConditionLambda1));
 	// Movement
 	input.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,

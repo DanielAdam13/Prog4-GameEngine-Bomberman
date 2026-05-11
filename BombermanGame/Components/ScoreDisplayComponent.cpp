@@ -39,7 +39,7 @@ ScoreDisplayComponent::~ScoreDisplayComponent()
 
 void ScoreDisplayComponent::Notify(int eventId, ge::GameObject*)
 {
-	if (static_cast<EventId>(eventId) == EventId::PLAYER_SCORE_CHANGED)
+	if (static_cast<GameEventId>(eventId) == GameEventId::PLAYER_SCORE_CHANGED)
 	{
 		RefreshText();
 	}

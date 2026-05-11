@@ -28,7 +28,8 @@ add_library(gameEngine_lib STATIC
   "Components/RotatorComponent.h" "Components/RotatorComponent.cpp"
   "Components/HealthComponent.h" "Components/HealthComponent.cpp"
   "Components/ScoreComponent.h" "Components/ScoreComponent.cpp"
- 
+  "Components/Colliders.h" "Components/Colliders.cpp"
+
   "Commands/Command.h"
   "Commands/GameObjectCommand.h"
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
@@ -37,7 +38,9 @@ add_library(gameEngine_lib STATIC
   "Components/FSMComponent.h" "Components/FSMComponent.cpp"
 
   "StateMachine/State.h" "StateMachine/State.cpp"
-  "StateMachine/Transition.h" "StateMachine/Transition.cpp")
+  "StateMachine/Transition.h" "StateMachine/Transition.cpp" "Structs.h"
+
+  "CollisionSystem.h" "CollisionSystem.cpp" "EngineEvents.h")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 

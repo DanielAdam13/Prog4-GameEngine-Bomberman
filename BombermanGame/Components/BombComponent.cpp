@@ -16,7 +16,7 @@ void bombGame::BombComponent::UpdateComponent(float deltaTime)
 	if (m_ExplosionTimer >= m_WindUpDuration)
 	{
 		m_ExplosionTimer = 0.f;
-		m_ExplodedBombEvent.NotifyObservers(EventId::EXPLODED_BOMB, GetOwner());
+		m_ExplodedBombEvent.NotifyObservers(GameEventId::EXPLODED_BOMB, GetOwner());
 
 		//this->MarkForDeletion();
 		GetOwner()->MarkForDeletion();

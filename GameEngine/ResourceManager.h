@@ -1,14 +1,15 @@
 ﻿#pragma once
+#include "Singleton.h"
+#include "Texture2D.h" // needed for map
+#include "Font.h" // needed for map
+
+#include <utility>
 #include <filesystem>
 #include <string>
 #include <memory>
 #include <map>
-#include "Singleton.h"
-#include <utility>
-#include "Texture2D.h"
-#include "Font.h"
-
 #include <string>
+#include <cstdint>
 
 namespace ge
 {
@@ -25,10 +26,6 @@ namespace ge
 		std::string GetFullPath(std::string&& relativePath) const noexcept;
 
 	private:
-		friend class Singleton<ResourceManager>;
-
-		ResourceManager() = default;
-
 		// Resources folder path
 		std::filesystem::path m_DataPath;
 

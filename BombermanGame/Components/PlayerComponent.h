@@ -1,12 +1,15 @@
 #pragma once
 #include "Components/Component.h"
 #include "ObservableSubject.h"
+#include "Observer.h"
+#include "Components/Colliders.h"
+
 #include <glm/glm.hpp>
 
 namespace bombGame
 {
 	// Game-specific Component
-	class PlayerComponent final : public ge::Component
+	class PlayerComponent final : public ge::Component, public ge::IObserver
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
@@ -29,11 +32,16 @@ namespace bombGame
 		ge::Subject& GetDeadEvent() { return m_DeadEvent; }
 		ge::Subject& GetScoreChangeEvent() { return m_ScoreChangeEvent; }
 
+		virtual void Notify(int eventId, ge::GameObject* other) override;
+
 	private:
 		float m_Speed;
 
 		ge::Subject m_DamageEvent;
 		ge::Subject m_DeadEvent;
 		ge::Subject m_ScoreChangeEvent;
+
+		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
+		void OnCollisionExit(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 	};
 }

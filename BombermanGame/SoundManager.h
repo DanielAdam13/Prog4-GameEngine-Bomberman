@@ -34,10 +34,10 @@ namespace bombGame
 		};
 
 		// Simply maps an event id to a sound id, taking volume
-		void RegisterMapping(EventId eventId, ge::Sound_Id soundId, float volume);
+		void RegisterMapping(GameEventId eventId, ge::Sound_Id soundId, float volume);
 
 	private:
-		std::unordered_map<EventId, SoundManager::SoundMapping> m_SoundMappings{};
+		std::unordered_map<GameEventId, SoundManager::SoundMapping> m_SoundMappings{};
 
 	};
 }

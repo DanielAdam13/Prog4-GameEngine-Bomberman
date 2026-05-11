@@ -19,6 +19,7 @@ using namespace ge;
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
+#include "CollisionSystem.h"
 
 // Services:
 #include "Services/ServiceLocator.h"
@@ -151,6 +152,7 @@ void GameEngine::RunOneFrame()
 		m_FrameLag -= m_FixedTimeStep;
 	}
 
+	CollisionSystem::GetInstance().UpdateCollision();
 	SceneManager::GetInstance().Update(m_DeltaTime);
 	Renderer::GetInstance().Render();
 #pragma endregion

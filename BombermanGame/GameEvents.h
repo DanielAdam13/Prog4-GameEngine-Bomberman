@@ -3,9 +3,9 @@
 namespace bombGame
 {
 	// Enum -> int convesion happens automatically
-	enum EventId
+	enum GameEventId
 	{
-		PLAYER_DIED,
+		PLAYER_DIED = 0,
 		PLAYER_LOST_HEALTH,
 		PLAYER_SCORE_CHANGED,
 		LAY_BOMB,

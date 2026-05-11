@@ -29,7 +29,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 
 	RegisterLaidBomb(rawBombGO);
 
-	m_LaidBombEvent.NotifyObservers(EventId::LAY_BOMB, GetOwner());
+	m_LaidBombEvent.NotifyObservers(GameEventId::LAY_BOMB, GetOwner());
 	return true;
 }
 
@@ -66,7 +66,7 @@ void bombGame::BombLayerComponent::RegisterLaidBomb(ge::GameObject* bomb)
 
 void bombGame::BombLayerComponent::Notify(int eventId, ge::GameObject*)
 {
-	if (static_cast<EventId>(eventId) == EventId::EXPLODED_BOMB)
+	if (static_cast<GameEventId>(eventId) == GameEventId::EXPLODED_BOMB)
 	{
 		if (m_ActiveBombs > 0)
 			--m_ActiveBombs;
