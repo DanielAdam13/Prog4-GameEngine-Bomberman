@@ -34,10 +34,13 @@
 
 #include "Components/Colliders.h"
 #include "CollisionSystem.h"
-#include <Structs.h>
+#include "Structs.h"
 
 #include "SoundManager.h"
 #include "Utils.h"
+
+#include "LevelLoader.h"
+#include "LevelBuilder.h"
 
 #include <memory>
 
@@ -91,7 +94,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	ge::Scene& MainGameplayScene{ ge::SceneManager::GetInstance().CreateScene() };
 
 	// -----------------------------------------------
-	// Resources:
+	// Load Resources:
 	// -----------------------------------------------
 	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 28) };
 	font->SetBold(true);
@@ -112,12 +115,13 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// -----------------------------------------------
 	// Static objects in scene initialization:
 	// -----------------------------------------------
+	const glm::vec3 topBgPosition{ 0.f, windowSize.second / 10.7f, 0.f };
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.5f, 
 		windowSize.second / 800.f * 3.5f, 1.f);
 
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(0.f, windowSize.second / 10.7f, 0.f);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(topBgPosition);
 	MainGameplayScene.Add(std::move(backgroundGO));
 #if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
@@ -146,13 +150,24 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	ge::CollisionSystem::GetInstance().AddLayerTag("Enemy");
 
 	// -----------------------------------------------
+	// Level Initialization
+	// -----------------------------------------------
+	levelLoader::LevelLayout layout{ levelLoader::Load("resources/levels/mainLevel1.txt") };
+
+	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / 13 };
+	levelBuilder::BuildStaticGeometry(MainGameplayScene, layout, topBgPosition, tileSize);
+
+	// -----------------------------------------------
 	// Player Initialization
 	// -----------------------------------------------
 	auto player1GO = std::make_unique<ge::GameObject>("GO_Player1");
 	auto player1Image{ player1GO->AddComponent<ge::Image>(player1GO.get()) };
 	player1Image->SetTexture(playerTexture);
 	auto player1Tr{ player1GO->GetComponent<ge::Transform>() }; 
-	player1Tr->SetLocalPosition({ 250.f, 350.f, 0.f });
+	const glm::vec3 player1Pos{
+		topBgPosition.x + layout.player1SpawnPoint.x * tileSize,
+		topBgPosition.y + layout.player1SpawnPoint.y * tileSize, 0.f };
+	player1Tr->SetLocalPosition(player1Pos);
 	player1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 
 	auto player1BoxColl{ player1GO->AddComponent<ge::BoxCollider>(player1GO.get(), 
@@ -173,7 +188,10 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	auto player2Image{ player2GO->AddComponent<ge::Image>(player2GO.get()) };
 	player2Image->SetTexture(balloonTexture);
 	auto player2Tr{ player2GO->GetComponent<ge::Transform>() };
-	player2Tr->SetLocalPosition({ 200.f, 150.f, 0.f });
+	const glm::vec3 player2Pos{
+		topBgPosition.x + layout.player2SpawnPoint.x * tileSize,
+		topBgPosition.y + layout.player2SpawnPoint.y * tileSize, 0.f };
+	player2Tr->SetLocalPosition(player2Pos);
 	player2Tr->SetLocalScale({ 2.f, 2.f, 2.f });
 
 	auto player2BoxColl{ player2GO->AddComponent<ge::BoxCollider>(player2GO.get(), 
@@ -216,7 +234,6 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	p1HealthDisplayGO->AddComponent<HealthDisplayComponent>(p1HealthDisplayGO.get(), player1GO.get());
 	p1HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
-	p1HealthDisplayGO->AddComponent<ge::BoxCollider>(p1HealthDisplayGO.get(), glm::vec2{ 200.f, 50.f })->AssignTag("Wall");
 
 	auto p2HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P2HealthDisplay");
 	p2HealthDisplayGO->AddComponent<ge::TextComponent>(p2HealthDisplayGO.get(), "", font, colorRed);

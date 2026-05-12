@@ -85,7 +85,8 @@ void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 		"GameObject/Component Assignment Week 1",
 		windowX,
 		windowY,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+		SDL_WINDOW_OPENGL 
+		//| SDL_WINDOW_RESIZABLE
 	);
 	if (g_Window == nullptr)
 	{
