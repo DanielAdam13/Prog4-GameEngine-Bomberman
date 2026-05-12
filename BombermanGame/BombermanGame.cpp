@@ -24,6 +24,7 @@
 #include "Components/BombLayerComponent.h"
 #include "Components/EnemyComponent.h"
 
+#include "Commands/ChangeWindowSizeCommand.h"
 #include "Commands/ConditionalCommand.h"
 
 #include "Commands/MoveCommand.h"
@@ -50,15 +51,17 @@ ge::GameObject bombGame::BombermanGame::CurrentBombTemplate{ "GO_TempBomb" };
 bombGame::BombermanGame::BombermanGame()
 {
 	StoredSoundSystem = &ge::ServiceLocator::GetSoundSystem();
+	ge::Renderer::GetInstance().SetWindowSize({ 800, 800 });
 }
 
 bombGame::BombermanGame::~BombermanGame() = default;
 
 void bombGame::BombermanGame::LoadGame()
 {
+	ge::ServiceLocator::GetInputManager().BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 	LoadSound();
 	LoadScenes();
-	//StoredSoundSystem->Play(SoundIds::BombermanDied, 0.15f);
 }
 
 void bombGame::BombermanGame::LoadSound()
@@ -92,7 +95,7 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// -----------------------------------------------
 	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 28) };
 	font->SetBold(true);
-	ge::Renderer::GetInstance().SetWindowSize(800, 800);
+	
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
 	//constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
 	constexpr SDL_Color colorRed{ SDL_Color{120, 20, 50, 255} };
@@ -111,8 +114,10 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// -----------------------------------------------
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f, 3.5f, 1.f);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(0.f, 50.f, 0.f);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.5f, 
+		windowSize.second / 800.f * 3.5f, 1.f);
+
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(0.f, windowSize.second / 10.7f, 0.f);
 	MainGameplayScene.Add(std::move(backgroundGO));
 #if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
@@ -250,21 +255,6 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	auto deathConditionLambda2{ [p2GORaw]() -> bool { 
 		auto* pc{p2GORaw->GetComponent<PlayerComponent>()};
 		return pc && pc->IsAlive(); } };
-
-	const float firstPlayerSpeed{ p1GORaw->GetComponent<PlayerComponent>()->GetSpeed()};
-	const float secondPlayerSpeed{ p2GORaw->GetComponent<PlayerComponent>()->GetSpeed() };
-
-	auto getPlayerSpeedLambda1{ [p1GORaw, firstPlayerSpeed]() -> float 
-		{
-			auto* pc{ p1GORaw->GetComponent<PlayerComponent>() };
-			return pc ? pc->GetSpeed() : firstPlayerSpeed;
-		} };
-
-	auto getPlayerSpeedLambda2{ [p2GORaw, secondPlayerSpeed]() -> float
-		{
-			auto* pc{ p2GORaw->GetComponent<PlayerComponent>() };
-			return pc ? pc->GetSpeed() : secondPlayerSpeed;
-		} };
 
 	// --------------------
 	// First player 

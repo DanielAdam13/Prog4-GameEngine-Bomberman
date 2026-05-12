@@ -34,7 +34,7 @@ int main(int, char* [])
 #else 
 	ge::ServiceLocator::RegisterSoundSystem(std::make_unique<SDLSoundSystem>());
 #endif
-
+	
 	BombermanGame Game{};
 
 	GameEngine::GetInstance().Run(Game.LoadGame);

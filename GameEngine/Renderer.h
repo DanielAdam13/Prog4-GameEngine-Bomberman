@@ -1,6 +1,9 @@
 #pragma once
-#include <SDL3/SDL.h>
 #include "Singleton.h"
+#include "ObservableSubject.h"
+
+#include <SDL3/SDL.h>
+#include <utility>
 
 namespace ge
 {
@@ -12,12 +15,13 @@ namespace ge
 	class Renderer final : public Singleton<Renderer>
 	{
 	public:
-		void Init(SDL_Window* window);
+		void Init(SDL_Window* window, const int windowX, const int windowY);
 		void Render() const;
 		void Destroy();
 
 		void RenderTexture(const Texture2D& texture, float x, float y) const;
 		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height) const;
+		void RenderRectOutline(float x, float y, float w, float h, const SDL_Color& color) const;
 
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; };
 
@@ -26,13 +30,20 @@ namespace ge
 
 		std::pair<int, int> GetWindowSize() const;
 
-		void SetWindowSize(int w, int h);
+		void SetWindowSize(std::pair<int, int>);
+
+		Subject& GetOnScreenResizeEvent() noexcept;
 
 	private:
 		SDL_Renderer* m_Renderer{};
 		SDL_Window* m_Window{}; // Doesn't own
 		SDL_Color m_ClearColor{};
+
+		std::pair<int, int> m_CurrentWindowSize;
+		std::pair<float, float> m_RenderScale;
+		std::pair<float, float> m_ConstantDesignSize;
 	
+		Subject m_OnScreenResizeEvent;
 	};
 }
 

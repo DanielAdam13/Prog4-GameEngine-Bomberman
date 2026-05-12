@@ -111,11 +111,11 @@ ge::BoxCollider::~BoxCollider()
 void ge::BoxCollider::RenderComponent() const
 {
 #if _DEBUG
-	const auto bounds{ GetBounds() };
-	SDL_Renderer* sdl{ Renderer::GetInstance().GetSDLRenderer() };
-	SDL_SetRenderDrawColor(sdl, 255, 0, 0, 255);
-	SDL_FRect r{ bounds.position.x, bounds.position.y, bounds.size.x, bounds.size.y };
-	SDL_RenderRect(sdl, &r);
+	const auto bounds = GetBounds();
+	Renderer::GetInstance().RenderRectOutline(
+		bounds.position.x, bounds.position.y,
+		bounds.size.x, bounds.size.y,
+		SDL_Color{ 255, 0, 0, 255 });
 #endif
 }
 

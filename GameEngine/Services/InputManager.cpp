@@ -11,6 +11,7 @@
 	#include <cmath>
 
 	#include "Commands/GameObjectCommand.h"
+#include <Commands/Command.h>
 
 	namespace ge
 	{
@@ -38,9 +39,9 @@
 
 			bool IsControllerConnected() const noexcept;
 
-			void BindKeyboardCommand(SDL_Scancode key, InputManager::InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
-			void BindControllerCommand(unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
-			void BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command);
+			void BindKeyboardCommand(SDL_Scancode key, InputManager::InputTrigger trigger, std::unique_ptr<Command> command);
+			void BindControllerCommand(unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<Command> command);
+			void BindControllerStickCommand(std::unique_ptr<Command> command);
 
 			void UnbindAll();
 			void UnbindAllKeyboard();
@@ -72,20 +73,20 @@
 			{
 				SDL_Scancode key;
 				InputManager::InputTrigger triggerType;
-				std::unique_ptr<GameObjectCommand> command;
+				std::unique_ptr<Command> command;
 			};
 
 			struct ControllerBinding
 			{
 				unsigned int button;
 				InputManager::InputTrigger triggerType;
-				std::unique_ptr<GameObjectCommand> command;
+				std::unique_ptr<Command> command;
 			};
 
 			std::vector<KeyBoardBinding> m_KeyboardBindings{};
 			std::vector<ControllerBinding> m_ControllerBindings{};
 
-			std::unique_ptr<GameObjectCommand> m_LeftStickCommand{};
+			std::unique_ptr<Command> m_LeftStickCommand{};
 
 	#ifndef _WIN32
 			void MapButton(SDL_GamepadButton sdlButton, unsigned int bit);
@@ -135,15 +136,15 @@
 		{
 			return m_Impl->IsControllerConnected();
 		}
-		void InputManager::BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
+		void InputManager::BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<Command> command)
 		{
 			m_Impl->BindKeyboardCommand(key, trigger, std::move(command));
 		}
-		void InputManager::BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
+		void InputManager::BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<Command> command)
 		{
 			m_Impl->BindControllerCommand(button, trigger, std::move(command));
 		}
-		void InputManager::BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command)
+		void InputManager::BindControllerStickCommand(std::unique_ptr<Command> command)
 		{
 			m_Impl->BindControllerStickCommand(std::move(command));
 		}
@@ -426,17 +427,17 @@
 			return { x, y };
 		}
 
-		void InputManagerImpl::BindKeyboardCommand(SDL_Scancode key, InputManager::InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
+		void InputManagerImpl::BindKeyboardCommand(SDL_Scancode key, InputManager::InputTrigger trigger, std::unique_ptr<Command> command)
 		{
 			m_KeyboardBindings.push_back(KeyBoardBinding{ key, trigger, std::move(command) });
 		}
 
-		void InputManagerImpl::BindControllerCommand(unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<GameObjectCommand> command)
+		void InputManagerImpl::BindControllerCommand(unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<Command> command)
 		{
 			m_ControllerBindings.push_back(ControllerBinding{ button, trigger, std::move(command) });
 		}
 
-		void InputManagerImpl::BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command)
+		void InputManagerImpl::BindControllerStickCommand(std::unique_ptr<Command> command)
 		{
 			m_LeftStickCommand = std::move(command);
 		}

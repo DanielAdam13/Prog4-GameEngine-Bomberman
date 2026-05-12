@@ -12,6 +12,7 @@ namespace ge
 	class InputManagerImpl;
 	class GameObjectCommand;
 	class GameObject;
+	class Command;
 
 	// PIMPL CLASS
 	class InputManager final
@@ -44,9 +45,9 @@ namespace ge
 			Pressed
 		};
 
-		void BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
-		void BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<GameObjectCommand> command);
-		void BindControllerStickCommand(std::unique_ptr<GameObjectCommand> command);
+		void BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<Command> command);
+		void BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<Command> command);
+		void BindControllerStickCommand(std::unique_ptr<Command> command);
 
 		void UnbindAll();
 		void UnbindAllKeyboard();

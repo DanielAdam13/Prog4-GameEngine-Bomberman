@@ -2,6 +2,8 @@
 
 namespace ge
 {
+	class GameObject;
+
 	class Command
 	{
 	public:
@@ -9,6 +11,8 @@ namespace ge
 		virtual ~Command() = default;
 
 		virtual void Execute(float) = 0;
+
+		virtual GameObject* GetCommandTarget() const noexcept { return nullptr; }
 
 	protected:
 

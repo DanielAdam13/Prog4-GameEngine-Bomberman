@@ -79,11 +79,13 @@ void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 	// ---------------------------
 	// SDL Window Creation
 	// ----------------------------
+	static constexpr int windowX{ 800 };
+	static constexpr int windowY{ 800 };
 	g_Window = SDL_CreateWindow(
 		"GameObject/Component Assignment Week 1",
-		1024,
-		576,
-		SDL_WINDOW_OPENGL
+		windowX,
+		windowY,
+		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 	if (g_Window == nullptr)
 	{
@@ -93,9 +95,12 @@ void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 	// ---------------------------
 	// Resource Managerr Initialization
 	// ----------------------------
-	Renderer::GetInstance().Init(g_Window);
+	Renderer::GetInstance().Init(g_Window, windowX, windowY);
 	ResourceManager::GetInstance().Init(dataPath);
 
+	// ---------------------------
+	// Service Locator -> Input and Sound Initialization
+	// ----------------------------
 	ServiceLocator::RegisterInputManager(std::make_unique<ge::InputManager>());
 	ServiceLocator::RegisterSoundSystem(std::make_unique<ge::NullSoundSystem>());
 }

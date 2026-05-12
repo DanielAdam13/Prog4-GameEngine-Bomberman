@@ -1,17 +1,18 @@
-﻿#include <stdexcept>
-#include <cstring>
-#include <iostream>
-#include "Renderer.h"
+﻿#include "Renderer.h"
 #include "SceneManager.h"
 #include "Texture2D.h"
+#include "EngineEvents.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
+#include <stdexcept>
+#include <cstring>
+#include <iostream>
 
 using namespace ge;
 
-void Renderer::Init(SDL_Window* window)
+void Renderer::Init(SDL_Window* window, const int windowX, const int windowY)
 {
 	m_Window = window;
 
@@ -28,6 +29,9 @@ void Renderer::Init(SDL_Window* window)
 		std::cout << "Failed to create the renderer: " << SDL_GetError() << "\n";
 		throw std::runtime_error(std::string("SDL_CreateRenderer Error: ") + SDL_GetError());
 	}
+
+	m_CurrentWindowSize = { windowX, windowY };
+	m_ConstantDesignSize = { static_cast<float>(windowX), static_cast<float>(windowY) };
 
 	// ---- Initialize ImGui ----
 	IMGUI_CHECKVERSION();
@@ -84,20 +88,36 @@ void Renderer::Destroy()
 void Renderer::RenderTexture(const Texture2D& texture, const float x, const float y) const
 {
 	SDL_FRect dst{};
-	dst.x = x;
-	dst.y = y;
-	SDL_GetTextureSize(texture.GetSDLTexture(), &dst.w, &dst.h);
+	float w{};
+	float h{};
+	SDL_GetTextureSize(texture.GetSDLTexture(), &w, &h);
+	dst.x = x * m_RenderScale.first;
+	dst.y = y * m_RenderScale.second;
+	dst.w = w * m_RenderScale.first;
+	dst.h = h * m_RenderScale.second;
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
 
 void Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height) const
 {
 	SDL_FRect dst{};
-	dst.x = x;
-	dst.y = y;
-	dst.w = width;
-	dst.h = height;
+	dst.x = x * m_RenderScale.first;
+	dst.y = y * m_RenderScale.second;
+	dst.w = width * m_RenderScale.first;
+	dst.h = height * m_RenderScale.second;
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
+}
+
+void Renderer::RenderRectOutline(float x, float y, float w, float h, const SDL_Color& color) const
+{
+	SDL_SetRenderDrawColor(m_Renderer, color.r, color.g, color.b, color.a);
+	SDL_FRect r{
+		x * m_RenderScale.first,
+		y * m_RenderScale.second,
+		w * m_RenderScale.first,
+		h * m_RenderScale.second
+	};
+	SDL_RenderRect(m_Renderer, &r);
 }
 
 std::pair<int, int> Renderer::GetWindowSize() const
@@ -107,10 +127,20 @@ std::pair<int, int> Renderer::GetWindowSize() const
 	return std::pair<int, int>(w, h);
 }
 
-void Renderer::SetWindowSize(int w, int h)
+void Renderer::SetWindowSize(std::pair<int, int> newSize)
 {
-	if (w < 50 && h < 50)
+	if (newSize.first < 50 && newSize.second < 50)
 		return;
 
-	SDL_SetWindowSize(m_Window, w, h);
+	m_CurrentWindowSize = newSize;
+	m_RenderScale = { float(newSize.first) / m_ConstantDesignSize.first,
+		float(newSize.second) / m_ConstantDesignSize.second };
+
+	SDL_SetWindowSize(m_Window, newSize.first, newSize.second);
+	m_OnScreenResizeEvent.NotifyObservers(EngineEventId::WINDOWS_RESIZED, nullptr);
+}
+
+Subject& ge::Renderer::GetOnScreenResizeEvent() noexcept
+{
+	return m_OnScreenResizeEvent;
 }
