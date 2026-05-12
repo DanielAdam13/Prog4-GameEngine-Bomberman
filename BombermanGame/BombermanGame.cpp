@@ -25,8 +25,8 @@
 #include "Components/EnemyComponent.h"
 
 #include "Commands/ConditionalCommand.h"
-#include "Commands/MoveCommand.h"
 
+#include "Commands/MoveCommand.h"
 #include "Commands/DamageCommand.h"
 #include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
@@ -270,25 +270,16 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// First player 
 	// --------------------
 	input.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<LayBombCommand>(player1GO.get()),
-			deathConditionLambda1));
+		std::make_unique<LayBombCommand>(player1GO.get()));
 	// Movement
 	input.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ 0.f, -1.f, 0.f }, getPlayerSpeedLambda1),
-			deathConditionLambda1));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }));
 	input.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ -1.f, 0.f, 0.f }, getPlayerSpeedLambda1),
-			deathConditionLambda1));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }));
 	input.BindKeyboardCommand(SDL_SCANCODE_S, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ 0.f, 1.f, 0.f }, getPlayerSpeedLambda1),
-			deathConditionLambda1));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
 	input.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player1GO.get(),
-			glm::vec3{ 1.f, 0.f, 0.f }, getPlayerSpeedLambda1),
-			deathConditionLambda1));
+		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
 	// Damage and score
 	input.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<DamageCommand>(player2GO.get(), 1),
@@ -301,25 +292,16 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// Second player
 	// ---------------------
 	input.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<LayBombCommand>(player2GO.get()),
-			deathConditionLambda2));
+		std::make_unique<LayBombCommand>(player2GO.get()));
 	// Movement
 	input.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ 0.f, -1.f, 0.f }, getPlayerSpeedLambda2),
-			deathConditionLambda2));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }));
 	input.BindControllerCommand(ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ -1.f, 0.f, 0.f }, getPlayerSpeedLambda2),
-			deathConditionLambda2));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }));
 	input.BindControllerCommand(ge::ControllerButton::DpadDown, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ 0.f, 1.f, 0.f }, getPlayerSpeedLambda2),
-			deathConditionLambda2));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
 	input.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ge::MoveCommand>(player2GO.get(),
-			glm::vec3{ 1.f, 0.f, 0.f }, getPlayerSpeedLambda2),
-			deathConditionLambda2));
+		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
 	// Damage and score
 	input.BindControllerCommand(ge::ControllerButton::X, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ConditionalCommand>(std::make_unique<DamageCommand>(player1GO.get(), 1),

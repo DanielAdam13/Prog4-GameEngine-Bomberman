@@ -6,6 +6,11 @@
 
 #include <glm/glm.hpp>
 
+namespace ge
+{
+	class Transform;
+}
+
 namespace bombGame
 {
 	// Game-specific Component
@@ -22,6 +27,8 @@ namespace bombGame
 		void FixedUpdateComponent(float) override {}
 		void UpdateComponent(float) override {}
 		void RenderComponent() const override {}
+
+		void TryMove(const glm::vec3& direction, float deltaTime);
 
 		float GetSpeed() const noexcept;
 		void SetSpeed(float newSpeed) noexcept;
@@ -43,5 +50,11 @@ namespace bombGame
 
 		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 		void OnCollisionExit(ge::GameObject* other, const ge::CollisionLayerTag& tag);
+
+		// Helper for tile-based collision check
+		bool WouldOverlapWall(const glm::vec3& worldPos) const;
+
+		ge::Transform* m_CachedOwnerTransform;
+		ge::BoxCollider* m_CachedBoxCollider;
 	};
 }

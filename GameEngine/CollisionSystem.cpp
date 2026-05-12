@@ -70,6 +70,46 @@ const std::unordered_set<ge::CollisionLayerTag>& ge::CollisionSystem::GetLayerTa
     return m_LayerTags;
 }
 
+bool ge::CollisionSystem::AnyOverlapWithTags(const structs::Rect& bounds, std::initializer_list<CollisionLayerTag> tags) const
+{
+    if (tags.size() == 0)
+        return false;
+
+    for (auto* c : m_Colliders)
+    {
+        // Check if any tag matches 
+        const auto& colliderTag{ c->GetLayerTag() };
+        const bool tagMatches{ std::any_of(tags.begin(), tags.end(),
+            [&colliderTag](const CollisionLayerTag& t)
+            {
+                return t == colliderTag;
+            }) };
+
+        if (!tagMatches)
+            continue;
+
+        // Check for overlaps with a tag is matching
+        switch (c->GetShape())
+        {
+        case Collider::Shape::Box:
+        {
+            auto* box{ static_cast<BoxCollider*>(c) };
+            if (collisionHelpers::Overlaps(bounds, box->GetBounds()))
+                return true;
+            break;
+        }
+        case Collider::Shape::Circle:
+        {
+            auto* circle{ static_cast<CircleCollider*>(c) };
+            if (collisionHelpers::Overlaps(bounds, circle->GetBounds()))
+                return true;
+            break;
+        }
+        }
+    }
+    return false;
+}
+
 bool ge::CollisionSystem::Overlaps(const Collider& a, const Collider& b)
 {
     switch (a.GetShape())

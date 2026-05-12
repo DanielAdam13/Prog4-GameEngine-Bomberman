@@ -4,6 +4,7 @@
 #include "GameEvents.h"
 #include "GameObject.h"
 #include "SceneManager.h"
+#include "Components/PlayerComponent.h"
 #include "Utils.h"
 
 #include <utility>
@@ -19,6 +20,13 @@ bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner,
 
 bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 {
+	// Optional: Check if owner has PlayerComponent and if is alive
+	if (auto* pc = GetOwner()->GetComponent<PlayerComponent>())
+	{
+		if (!pc->IsAlive())
+			return false;
+	}
+
 	if (!CanLayBomb())
 		return false;
 

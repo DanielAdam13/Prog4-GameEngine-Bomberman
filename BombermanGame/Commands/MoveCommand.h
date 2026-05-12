@@ -1,5 +1,6 @@
 #pragma once
-#include "GameObjectCommand.h"
+#include "Commands/GameObjectCommand.h"
+
 #include <glm/glm.hpp>
 #include <functional>
 
@@ -7,13 +8,16 @@ namespace ge
 {
 	class GameObject;
 	class Transform;
+}
 
+namespace bombGame
+{
 	// Engine Command
-	class MoveCommand final : public GameObjectCommand
+	class MoveCommand final : public ge::GameObjectCommand
 	{
 	public:
-		MoveCommand(GameObject* target, const glm::vec3& startingDirection, float moveSpeed = 80.f);
-		MoveCommand(GameObject* target, const glm::vec3& startingDirection, std::function<float()> speedFunc);
+		MoveCommand(ge::GameObject* target, const glm::vec3& startingDirection, float moveSpeed = 80.f);
+		MoveCommand(ge::GameObject* target, const glm::vec3& startingDirection, std::function<float()> speedFunc);
 		~MoveCommand() override = default;
 
 		virtual void Execute(float deltaTime) override;
@@ -23,7 +27,7 @@ namespace ge
 
 	private:
 		void Move(float deltaTime);
-		Transform* m_pTargetTransform;
+		ge::Transform* m_pTargetTransform;
 
 		const glm::vec3 m_ConstantMoveDirection;
 		float m_MoveSpeed;

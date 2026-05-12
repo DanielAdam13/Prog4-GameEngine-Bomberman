@@ -10,7 +10,8 @@
 
 ge::Collider::Collider(GameObject* pOwnerPtr, Shape shape)
 	:Component::Component(pOwnerPtr),
-	m_Shape{ shape }
+	m_Shape{ shape },
+	m_CachedOwnerTransform{ pOwnerPtr->GetComponent<ge::Transform>() }
 {
 	const auto& allLayerTags{ CollisionSystem::GetInstance().GetLayerTags() };
 	auto it{ allLayerTags.find("Default") };
@@ -18,6 +19,11 @@ ge::Collider::Collider(GameObject* pOwnerPtr, Shape shape)
 	{
 		m_LayerTag = *it;
 	}
+}
+
+ge::Transform* ge::Collider::GetOwnerTransform() const noexcept
+{
+	return m_CachedOwnerTransform;
 }
 
 ge::Subject& ge::Collider::GetOnCollisionEnterEvent() noexcept
@@ -124,6 +130,15 @@ ge::structs::Rect ge::BoxCollider::GetBounds() const noexcept
 	return structs::Rect{ 
 		glm::vec2{worldPos.x, worldPos.y} + m_LocalOffset,
 		worldSize };
+}
+
+ge::structs::Rect ge::BoxCollider::GetBoundsAt(const glm::vec3& worldPos) const noexcept
+{
+	const auto worldScale{ GetOwnerTransform()->GetWorldScale() };
+	const glm::vec2 worldSize{ m_Size.x * worldScale.x, m_Size.y * worldScale.y };
+	
+	ge::structs::Rect hyphoteticalRect{ glm::vec2{worldPos.x, worldPos.y} + m_LocalOffset, worldSize };
+	return hyphoteticalRect;
 }
 
 ge::CircleCollider::CircleCollider(GameObject* pOwnerPtr, const structs::Circle& circle)

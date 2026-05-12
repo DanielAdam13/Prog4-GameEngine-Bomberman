@@ -1,10 +1,12 @@
 #pragma once
 #include "Singleton.h"
 #include "Components/Colliders.h"
+#include "Structs.h"
 
 #include <vector>
 #include <string>
 #include <unordered_set>
+#include <initializer_list>
 
 namespace ge
 {
@@ -21,6 +23,9 @@ namespace ge
 		void RemoveLayerTag(const CollisionLayerTag& layerTag);
 
 		const std::unordered_set<CollisionLayerTag>& GetLayerTags() const noexcept;
+
+		// Making use initializer list!!!
+		bool AnyOverlapWithTags(const structs::Rect& bounds, std::initializer_list<CollisionLayerTag> tags) const;
 
 	private:
 		std::vector<Collider*> m_Colliders;

@@ -11,6 +11,8 @@ namespace ge
 {
 	using CollisionLayerTag = std::string;
 
+	class Transform;
+
 	class Collider : public Component
 	{
 	public:
@@ -44,6 +46,7 @@ namespace ge
 
 	protected:
 		Collider(GameObject* pOwnerPtr, Shape shape);
+		Transform* GetOwnerTransform() const noexcept;
 
 	private:
 		Shape m_Shape;
@@ -54,6 +57,8 @@ namespace ge
 
 		std::unordered_set<Collider*> m_CurrentOverlapping;
 		std::unordered_set<Collider*> m_PreviousOverlapping;
+
+		Transform* m_CachedOwnerTransform;
 	};
 
 	class BoxCollider final : public Collider
@@ -75,6 +80,8 @@ namespace ge
 		virtual void RenderComponent() const override;
 
 		structs::Rect GetBounds() const noexcept;
+		// Used for hyphotetical bounds with the parameter acting as Rect::position
+		structs::Rect GetBoundsAt(const glm::vec3& worldPos) const noexcept;
 
 	private:
 		glm::vec2 m_Size;
