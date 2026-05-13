@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Components/Component.h"
-#include "StateMachine/BaseEnemyState.h"
-#include "StateMachine/ChaseState.h"
-#include "StateMachine/WanderState.h"
-#include "StateMachine/RunState.h"
+#include "EnemyStates/BaseEnemyState.h"
+#include "EnemyStates/ChaseState.h"
+#include "EnemyStates/WanderState.h"
+#include "EnemyStates/RunState.h"
 
 #include <glm/glm.hpp>
 #include <vector>

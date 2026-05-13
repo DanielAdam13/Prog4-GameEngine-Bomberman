@@ -71,6 +71,7 @@ void bombGame::BombermanGame::Load()
 
 void bombGame::BombermanGame::Update(float)
 {
+	// Used only for GAME state machine Update
 }
 
 void bombGame::BombermanGame::LoadSound()

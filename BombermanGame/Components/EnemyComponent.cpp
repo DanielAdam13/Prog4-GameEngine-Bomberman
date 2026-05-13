@@ -3,8 +3,8 @@
 #include "GameObject.h"
 #include "Components/HealthComponent.h"
 #include "Components/Transform.h"
-#include "StateMachine/ChaseState.h"
-#include "StateMachine/WanderState.h"
+#include "EnemyStates/ChaseState.h"
+#include "EnemyStates/WanderState.h"
 
 bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, float detectionRadius)
 	:Component::Component(owner),

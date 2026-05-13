@@ -25,7 +25,7 @@ namespace bombGame
 		BombermanGame& operator=(BombermanGame&& other) = delete;
 
 		virtual void Load() override;
-		virtual void Update(float) override;
+		virtual void Update(float) override; // Used only for GAME state machine Update
 		virtual void FixedUpdate(float) override {};
 
 		static SoundManager& GetSoundManager() noexcept;

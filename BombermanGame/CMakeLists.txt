@@ -22,10 +22,10 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "BombermanGame.h" "BombermanGame.cpp" 
   "SoundManager.h" "SoundManager.cpp" 
 
-  "StateMachine/WanderState.h" "StateMachine/WanderState.cpp" 
-  "StateMachine/ChaseState.h" "StateMachine/ChaseState.cpp" 
-  "StateMachine/RunState.h" "StateMachine/RunState.cpp" 
-  "StateMachine/BaseEnemyState.h" "StateMachine/BaseEnemyState.cpp"
+  "EnemyStates/WanderState.h" "EnemyStates/WanderState.cpp" 
+  "EnemyStates/ChaseState.h" "EnemyStates/ChaseState.cpp" 
+  "EnemyStates/RunState.h" "EnemyStates/RunState.cpp" 
+  "EnemyStates/BaseEnemyState.h" "EnemyStates/BaseEnemyState.cpp"
 
   "Utils.h" "Utils.cpp" 
   "LevelLoader.h" "LevelLoader.cpp" 

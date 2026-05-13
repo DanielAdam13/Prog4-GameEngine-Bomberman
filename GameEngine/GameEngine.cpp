@@ -46,7 +46,7 @@ void LogSDLVersion(const std::string& message, int major, int minor, int patch)
 
 void LoopCallback(void* arg)
 {
-	static_cast<GameEngine*>(arg)->RunOneFrame();
+	static_cast<GameEngine*>(arg)->RunOneFrame(*m_Game);
 }
 #endif
 
@@ -118,6 +118,7 @@ GameEngine::~GameEngine()
 
 void GameEngine::Run(IGameApplication& app)
 {
+	m_Game = &app;
 	app.Load(); // App Load
 
 	// MAIN GAME LOOP
