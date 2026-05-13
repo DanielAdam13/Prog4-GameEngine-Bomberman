@@ -41,7 +41,7 @@ add_library(gameEngine_lib STATIC
   "StateMachine/Transition.h" "StateMachine/Transition.cpp" "Structs.h"
 
   "CollisionSystem.h" "CollisionSystem.cpp" 
-  "EngineEvents.h")
+  "EngineEvents.h" "IGameApplication.h")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 

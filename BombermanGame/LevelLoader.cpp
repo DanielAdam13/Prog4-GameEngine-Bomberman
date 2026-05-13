@@ -14,8 +14,8 @@ levelLoader::LevelLayout levelLoader::Load(const std::string& path)
     LevelLayout layout{};
     layout.width = 0;
     layout.height = 0;
-    layout.player1SpawnPoint = { -1, -1 };
-    layout.player2SpawnPoint = { -1, -1 };
+    layout.player1SpawnPoint = { 0, -1 };
+    layout.player2SpawnPoint = { 1, -1 };
 
     std::string line;
     int row{ 0 };
@@ -28,7 +28,7 @@ levelLoader::LevelLayout levelLoader::Load(const std::string& path)
         if (line.empty())
             continue;
 
-        if (layout.width == 0)
+        if (layout.width == 0) // width is the width of the first line
         {
             layout.width = static_cast<int>(line.size());
         }

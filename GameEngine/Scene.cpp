@@ -3,6 +3,11 @@
 
 using namespace ge;
 
+Scene::Scene(const std::string& sceneName)
+	:m_SceneName{sceneName}
+{
+}
+
 void Scene::Add(std::unique_ptr<GameObject> object)
 {
 	assert(object != nullptr && "Cannot add a null GameObject to the scene.");
@@ -130,6 +135,11 @@ void Scene::AddImGuiScene(std::unique_ptr<ImGuiInstance> imguiScene)
 {
 	if (imguiScene)
 		m_ImGuiInstances.emplace_back(std::move(imguiScene));
+}
+
+std::string ge::Scene::GetSceneName() const noexcept
+{
+	return m_SceneName;
 }
 
 void Scene::CleanupDestroyedGameObjects()

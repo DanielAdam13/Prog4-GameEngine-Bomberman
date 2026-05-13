@@ -33,7 +33,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	// Adds BombComponent to the new bomb gameobject
 	auto bomb{ CreateBomb(position, m_TextureBombRef, m_ExplosionTimerFn()) };
 	auto* rawBombGO{ bomb.get() };
-	ge::SceneManager::GetInstance().GetCurrentScene()->Add(std::move(bomb));
+	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 
 	RegisterLaidBomb(rawBombGO);
 

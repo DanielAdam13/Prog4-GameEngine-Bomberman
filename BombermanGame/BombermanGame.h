@@ -1,4 +1,5 @@
 #pragma once
+#include "IGameApplication.h"
 
 #include <memory>
 
@@ -13,7 +14,7 @@ namespace bombGame
 	class SoundManager;
 
 	// Fully static singleton class containing logic of the Bomberman Game itself
-	class BombermanGame final
+	class BombermanGame final : public ge::IGameApplication
 	{
 	public:
 		BombermanGame();
@@ -23,20 +24,30 @@ namespace bombGame
 		BombermanGame& operator=(const BombermanGame& other) = delete;
 		BombermanGame& operator=(BombermanGame&& other) = delete;
 
-		static void LoadGame();
-		static void LoadSound();
-		static void LoadScenes();
+		virtual void Load() override;
+		virtual void Update(float) override;
+		virtual void FixedUpdate(float) override {};
 
 		static SoundManager& GetSoundManager() noexcept;
 
 	private:
+		static void LoadSound();
+		static void LoadScenes();
+
 		static ge::SoundSystem* StoredSoundSystem;
 		static SoundManager BombermanSoundManager;
 
-		//static void InitializeFirstScene();
-		static void InitializeMainGameplayScene();
+		static void InitializeMainMenuScene();
+		static void InitializeGameplayScene();
 
 		static float CurrentBombExplosion;
 		static ge::GameObject CurrentBombTemplate;
 	};
+
+	namespace sceneNames
+	{
+		inline constexpr auto MainMenu{ "MainMenu" };
+		inline constexpr auto Gameplay{ "Gameplay" };
+		inline constexpr auto GameOver{ "GameOver" };
+	}
 }

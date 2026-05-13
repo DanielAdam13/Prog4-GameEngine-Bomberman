@@ -58,6 +58,9 @@ bombGame::PlayerComponent::~PlayerComponent()
 	{
 		s->SetOnScoreChange(nullptr);
 	}
+
+	/*m_CachedBoxCollider->GetOnCollisionEnterEvent().RemoveObserver(this);
+	m_CachedBoxCollider->GetOnCollisionExitEvent().RemoveObserver(this);*/
 }
 
 void bombGame::PlayerComponent::TryMove(const glm::vec3& direction, float deltaTime)

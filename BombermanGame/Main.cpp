@@ -1,18 +1,18 @@
+#include "GameEngine.h"
+#include "BombermanGame.h"
+
+#include "Services/ServiceLocator.h"
+#include "Services/SDLSoundSystem.h"
+#include "Services/LoggingSoundService.h"
+
+#include <memory>
+#include <filesystem>
+
 #include <SDL3/SDL_main.h>
 
 #if _DEBUG && __has_include(<vld.h>)
 #include <vld.h>
 #endif
-
-#include "GameEngine.h"
-#include "BombermanGame.h"
-
-#include <Services/ServiceLocator.h>
-#include "Services/SDLSoundSystem.h"
-#include <Services/LoggingSoundService.h>
-
-#include <memory>
-#include <filesystem>
 
 using namespace ge;
 using namespace bombGame;
@@ -37,6 +37,6 @@ int main(int, char* [])
 	
 	BombermanGame Game{};
 
-	GameEngine::GetInstance().Run(Game.LoadGame);
+	GameEngine::GetInstance().Run(Game);
 	return 0;
 }

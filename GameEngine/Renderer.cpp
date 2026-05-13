@@ -137,7 +137,7 @@ void Renderer::SetWindowSize(std::pair<int, int> newSize)
 		float(newSize.second) / m_ConstantDesignSize.second };
 
 	SDL_SetWindowSize(m_Window, newSize.first, newSize.second);
-	m_OnScreenResizeEvent.NotifyObservers(EngineEventId::WINDOWS_RESIZED, nullptr);
+	m_OnScreenResizeEvent.NotifyObservers(EngineEventId::WINDOW_RESIZED, nullptr);
 }
 
 Subject& ge::Renderer::GetOnScreenResizeEvent() noexcept

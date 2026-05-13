@@ -23,6 +23,10 @@ namespace bombGame
 
 		explicit PlayerComponent(ge::GameObject* owner, float speed = 120.f);
 		~PlayerComponent() override;
+		PlayerComponent(const PlayerComponent&) = delete;
+		PlayerComponent(PlayerComponent&&) = delete;
+		PlayerComponent& operator=(const PlayerComponent&) = delete;
+		PlayerComponent& operator=(PlayerComponent&&) = delete;
 
 		void FixedUpdateComponent(float) override {}
 		void UpdateComponent(float) override {}

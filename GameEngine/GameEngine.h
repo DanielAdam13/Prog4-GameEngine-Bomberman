@@ -1,20 +1,23 @@
 #pragma once
+#include "Singleton.h"
+
 #include <string>
 #include <functional>
 #include <filesystem>
 #include <chrono>
-#include "Singleton.h"
 
 namespace ge
 {
+	class IGameApplication;
+
 	class GameEngine final : public Singleton<GameEngine>
 	{
 	public:
 		void InitializeEngine(const std::filesystem::path& dataPath);
 		
 		~GameEngine();
-		void Run(const std::function<void()>& load);
-		void RunOneFrame();
+		void Run(IGameApplication& app);
+		void RunOneFrame(IGameApplication& app);
 
 		GameEngine(const GameEngine& other) = delete;
 		GameEngine(GameEngine&& other) = delete;

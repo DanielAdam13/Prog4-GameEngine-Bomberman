@@ -29,7 +29,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
 
   "Utils.h" "Utils.cpp" 
   "LevelLoader.h" "LevelLoader.cpp" 
-  "LevelBuilder.h" "LevelBuilder.cpp")
+  "LevelBuilder.h" "LevelBuilder.cpp" 
+  "Commands/SwitchToGameplaySceneCommand.h" "Commands/SwitchToGameplaySceneCommand.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

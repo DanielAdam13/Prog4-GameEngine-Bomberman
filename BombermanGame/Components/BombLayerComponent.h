@@ -23,8 +23,11 @@ namespace bombGame
         BombLayerComponent(ge::GameObject* owner, 
             ge::Texture2D* textureRef, std::function<float()> explosionTimerFn, int maxBombs = 1);
         ~BombLayerComponent() override = default;
+
         BombLayerComponent(const BombLayerComponent&) = delete;
+        BombLayerComponent(BombLayerComponent&&) = delete;
         BombLayerComponent& operator=(const BombLayerComponent&) = delete;
+        BombLayerComponent& operator=(BombLayerComponent&&) = delete;
 
         void FixedUpdateComponent(float) override {}
         void UpdateComponent(float) override {}

@@ -19,6 +19,11 @@ void ge::CollisionSystem::Unregister(Collider* coll)
         m_Colliders.erase(it);
 }
 
+void ge::CollisionSystem::UnregisterAll()
+{
+    m_Colliders.clear();
+}
+
 void ge::CollisionSystem::UpdateCollision()
 {
     // 0. Don't care about invalid colliders

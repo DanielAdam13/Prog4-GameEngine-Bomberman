@@ -27,6 +27,7 @@
 #include "Commands/ChangeWindowSizeCommand.h"
 #include "Commands/ConditionalCommand.h"
 
+#include "Commands/SwitchToGameplaySceneCommand.h"
 #include "Commands/MoveCommand.h"
 #include "Commands/DamageCommand.h"
 #include "Commands/ScoreCommand.h"
@@ -43,6 +44,7 @@
 #include "LevelBuilder.h"
 
 #include <memory>
+#include <utility>
 
 
 ge::SoundSystem* bombGame::BombermanGame::StoredSoundSystem{ nullptr };
@@ -59,12 +61,16 @@ bombGame::BombermanGame::BombermanGame()
 
 bombGame::BombermanGame::~BombermanGame() = default;
 
-void bombGame::BombermanGame::LoadGame()
+void bombGame::BombermanGame::Load()
 {
 	ge::ServiceLocator::GetInputManager().BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 	LoadSound();
 	LoadScenes();
+}
+
+void bombGame::BombermanGame::Update(float)
+{
 }
 
 void bombGame::BombermanGame::LoadSound()
@@ -81,7 +87,8 @@ void bombGame::BombermanGame::LoadSound()
 
 void bombGame::BombermanGame::LoadScenes()
 {
-	InitializeMainGameplayScene();
+	InitializeMainMenuScene();
+	InitializeGameplayScene();
 }
 
 bombGame::SoundManager& bombGame::BombermanGame::GetSoundManager() noexcept
@@ -89,9 +96,33 @@ bombGame::SoundManager& bombGame::BombermanGame::GetSoundManager() noexcept
 	return BombermanSoundManager;
 }
 
-void bombGame::BombermanGame::InitializeMainGameplayScene()
+void bombGame::BombermanGame::InitializeMainMenuScene()
 {
-	ge::Scene& MainGameplayScene{ ge::SceneManager::GetInstance().CreateScene() };
+	ge::Scene& MainMenuScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::MainMenu) };
+
+	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	
+	const auto mainMenuTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_MainMenu1.png") };
+
+	// Static object initalization:
+	auto backgroundGO = std::make_unique<ge::GameObject>("GO_MainMenuBG");
+	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(mainMenuTexture);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.f,
+		windowSize.second / 800.f * 3.3f, 1.f);
+
+	MainMenuScene.Add(std::move(backgroundGO));
+
+	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
+		std::make_unique<SwitchToGamplayCommand>(sceneNames::Gameplay));
+	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
+		std::make_unique<SwitchToGamplayCommand>(sceneNames::Gameplay));
+}
+
+void bombGame::BombermanGame::InitializeGameplayScene()
+{
+	ge::Scene& GameplayScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Gameplay) };
 
 	// -----------------------------------------------
 	// Load Resources:
@@ -122,13 +153,13 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 		windowSize.second / 800.f * 3.5f, 1.f);
 
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(topBgPosition);
-	MainGameplayScene.Add(std::move(backgroundGO));
+	GameplayScene.Add(std::move(backgroundGO));
 #if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
 	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", font, colorRed);
 	textGO->AddComponent<ge::FPSComponent>(textGO.get());
 
-	MainGameplayScene.Add(std::move(textGO));
+	GameplayScene.Add(std::move(textGO));
 #endif
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
@@ -141,8 +172,8 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
 
-	MainGameplayScene.Add(std::move(tutorial1GO));
-	MainGameplayScene.Add(std::move(tutorial2GO));
+	GameplayScene.Add(std::move(tutorial1GO));
+	GameplayScene.Add(std::move(tutorial2GO));
 
 	// Collision
 	ge::CollisionSystem::GetInstance().AddLayerTag("Player");
@@ -152,10 +183,11 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 	// -----------------------------------------------
 	// Level Initialization
 	// -----------------------------------------------
-	levelLoader::LevelLayout layout{ levelLoader::Load("resources/levels/mainLevel1.txt") };
+	levelLoader::LevelLayout layout{ levelLoader::Load(
+		ge::ResourceManager::GetInstance().GetFullPath("levels/mainLevel1.txt")) };
 
 	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / 13 };
-	levelBuilder::BuildStaticGeometry(MainGameplayScene, layout, topBgPosition, tileSize);
+	levelBuilder::BuildStaticGeometry(GameplayScene, layout, topBgPosition, tileSize);
 
 	// -----------------------------------------------
 	// Player Initialization
@@ -318,14 +350,14 @@ void bombGame::BombermanGame::InitializeMainGameplayScene()
 			deathConditionLambda2));
 #pragma endregion
 
-	MainGameplayScene.Add(std::move(player1GO));
-	MainGameplayScene.Add(std::move(player2GO));
+	GameplayScene.Add(std::move(player1GO));
+	GameplayScene.Add(std::move(player2GO));
 
-	MainGameplayScene.Add(std::move(enemy1GO));
+	GameplayScene.Add(std::move(enemy1GO));
 
-	MainGameplayScene.Add(std::move(p1HealthDisplayGO));
-	MainGameplayScene.Add(std::move(p2HealthDisplayGO));
+	GameplayScene.Add(std::move(p1HealthDisplayGO));
+	GameplayScene.Add(std::move(p2HealthDisplayGO));
 
-	MainGameplayScene.Add(std::move(p1ScoreDisplayGO));
-	MainGameplayScene.Add(std::move(p2ScoreDisplayGO));
+	GameplayScene.Add(std::move(p1ScoreDisplayGO));
+	GameplayScene.Add(std::move(p2ScoreDisplayGO));
 }

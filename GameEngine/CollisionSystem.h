@@ -16,6 +16,7 @@ namespace ge
 	public:
 		void Register(Collider* coll);
 		void Unregister(Collider* coll);
+		void UnregisterAll();
 
 		void UpdateCollision();
 

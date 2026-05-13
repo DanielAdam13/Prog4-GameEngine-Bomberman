@@ -1,7 +1,20 @@
+#include "GameEngine.h"
+
+#include "Renderer.h"
+#include "ResourceManager.h"
+#include "SceneManager.h"
+#include "CollisionSystem.h"
+#include "IGameApplication.h"
+
+// Services:
+#include "Services/ServiceLocator.h"
+#include "Services/InputManager.h"
+#include "Services/SoundSystem.h"
+#include "Services/NullSoundSystem.h"
+
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
-
 #include <thread>
 
 #if WIN32
@@ -13,19 +26,7 @@
 //#include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include "GameEngine.h"
 using namespace ge;
-
-#include "Renderer.h"
-#include "ResourceManager.h"
-#include "SceneManager.h"
-#include "CollisionSystem.h"
-
-// Services:
-#include "Services/ServiceLocator.h"
-#include "Services/InputManager.h"
-#include "Services/SoundSystem.h"
-#include "Services/NullSoundSystem.h"
 
 SDL_Window* g_Window{};
 
@@ -115,9 +116,9 @@ GameEngine::~GameEngine()
 	SDL_Quit();
 }
 
-void GameEngine::Run(const std::function<void()>& engineStart)
+void GameEngine::Run(IGameApplication& app)
 {
-	engineStart();
+	app.Load(); // App Load
 
 	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
@@ -126,14 +127,14 @@ void GameEngine::Run(const std::function<void()>& engineStart)
 
 	while (!m_Quit)
 	{
-		RunOneFrame();
+		RunOneFrame(app);
 	}
 #else
 	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
 #endif
 }
 
-void GameEngine::RunOneFrame()
+void GameEngine::RunOneFrame(IGameApplication& app)
 {
 	const auto frameStartTime{ std::chrono::high_resolution_clock::now() };
 
@@ -155,9 +156,11 @@ void GameEngine::RunOneFrame()
 	while (m_FrameLag >= m_FixedTimeStep)
 	{
 		SceneManager::GetInstance().FixedUpdate(m_FixedTimeStep);
+		app.FixedUpdate(m_FixedTimeStep); // App FixedUpdate
 		m_FrameLag -= m_FixedTimeStep;
 	}
 
+	app.Update(m_DeltaTime); // App Update
 	CollisionSystem::GetInstance().UpdateCollision();
 	SceneManager::GetInstance().Update(m_DeltaTime);
 	Renderer::GetInstance().Render();

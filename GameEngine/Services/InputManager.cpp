@@ -1,17 +1,15 @@
-	#include "InputManager.h"
+#include "InputManager.h"
+#include "Commands/Command.h"
 
-	#ifdef _WIN32
-		#define WIN32_LEAN_AND_MEAN
-		#define NOMINMAX
-		#include <Windows.h>
-		#include <Xinput.h>
-	#endif
+#include <backends/imgui_impl_sdl3.h>
+#include <cmath>
 
-	#include <backends/imgui_impl_sdl3.h>
-	#include <cmath>
-
-	#include "Commands/GameObjectCommand.h"
-#include <Commands/Command.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>
+#include <Xinput.h>
+#endif
 
 	namespace ge
 	{
