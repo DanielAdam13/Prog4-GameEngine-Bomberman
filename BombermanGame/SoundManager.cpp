@@ -5,7 +5,7 @@
 #include "GameObject.h"
 #include "Components/HealthComponent.h"
 
-#include "Services/SoundIds.h"
+#include "SoundIds.h"
 #include "GameEvents.h"
 
 bombGame::SoundManager::SoundManager()

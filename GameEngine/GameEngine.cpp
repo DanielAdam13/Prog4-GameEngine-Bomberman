@@ -44,9 +44,15 @@ void LogSDLVersion(const std::string& message, int major, int minor, int patch)
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
 
+struct EmscriptenLoopArg {
+	GameEngine* engine;
+	IGameApplication* app;
+};
+
 void LoopCallback(void* arg)
 {
-	static_cast<GameEngine*>(arg)->RunOneFrame(*m_Game);
+	auto* loopArg = static_cast<EmscriptenLoopArg*>(arg);
+	loopArg->engine->RunOneFrame(*loopArg->app);
 }
 #endif
 
@@ -118,20 +124,17 @@ GameEngine::~GameEngine()
 
 void GameEngine::Run(IGameApplication& app)
 {
-	m_Game = &app;
 	app.Load(); // App Load
 
 	// MAIN GAME LOOP
 #ifndef __EMSCRIPTEN__
-	// Local Variables for Run()
-	auto lastTime{ std::chrono::high_resolution_clock::now() };
-
 	while (!m_Quit)
 	{
 		RunOneFrame(app);
 	}
 #else
-	emscripten_set_main_loop_arg(&LoopCallback, this, 0, true);
+	static EmscriptenLoopArg loopArg{ this, &app };
+	emscripten_set_main_loop_arg(&LoopCallback, &loopArg, 0, true);
 #endif
 }
 

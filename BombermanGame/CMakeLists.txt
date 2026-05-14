@@ -17,7 +17,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/LayBombCommand.h" "Commands/LayBombCommand.cpp"
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
 
-  "Services/SoundIds.h"
+  "SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
   "BombermanGame.h" "BombermanGame.cpp" 
   "SoundManager.h" "SoundManager.cpp" 
@@ -30,7 +30,12 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Utils.h" "Utils.cpp" 
   "LevelLoader.h" "LevelLoader.cpp" 
   "LevelBuilder.h" "LevelBuilder.cpp" 
-  "Commands/SwitchToGameplaySceneCommand.h" "Commands/SwitchToGameplaySceneCommand.cpp")
+  "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
+  
+  "GameStates/GameStateMachine.h" "GameStates/GameStateMachine.cpp" 
+  "GameStates/GameState.h" 
+  "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
+  "GameStates/GameplayState.h" "GameStates/GameplayState.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

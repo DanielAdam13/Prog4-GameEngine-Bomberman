@@ -1,0 +1,79 @@
+#include "MainMenuState.h"
+
+#include "SceneManager.h"
+#include "Scene.h"
+#include "BombermanGame.h"
+#include "Services/ServiceLocator.h"
+#include "Renderer.h"
+#include "ResourceManager.h"
+#include "SoundManager.h"
+#include "SoundIds.h"
+
+#include "Commands/ChangeWindowSizeCommand.h"
+
+#include "GameObject.h"
+#include "Components/Image.h"
+#include "Components/Transform.h"
+#include "Commands/SwitchToGameplayStateCommand.h"
+
+#include <utility>
+#include <memory>
+
+bombGame::MainMenuGameState::MainMenuGameState(BombermanGame& game)
+	:GameState::GameState(game)
+{
+}
+
+void bombGame::MainMenuGameState::OnEnter()
+{
+	// ---------------------
+	// Load Sound specifi sound
+	// ---------------------
+
+	// ---------------------
+	// Load Resources
+	// ---------------------
+	const auto mainMenuTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_MainMenu1.png") };
+	
+	// ---------------------
+	// Initialize Scene
+	// ---------------------
+	ge::Scene& MainMenuScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::MainMenu) };
+
+	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	// Static object initalization:
+	auto backgroundGO = std::make_unique<ge::GameObject>("GO_MainMenuBG");
+	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(mainMenuTexture);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.f,
+		windowSize.second / 800.f * 3.3f, 1.f);
+
+	MainMenuScene.Add(std::move(backgroundGO));
+
+	// ---------------------
+	// Specify Game State Input Bindings
+	// ---------------------
+	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	//inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
+	//	std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
+
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
+		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
+	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
+		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
+}
+
+void bombGame::MainMenuGameState::OnExit()
+{
+	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+	inputManager.UnbindAllController();
+	inputManager.UnbindAllKeyboard();
+
+	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::MainMenu);
+}
+
+std::unique_ptr<bombGame::GameState> bombGame::MainMenuGameState::Update(float deltaTime)
+{
+	deltaTime;
+	return std::unique_ptr<GameState>();
+}

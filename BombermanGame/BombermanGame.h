@@ -1,5 +1,7 @@
 #pragma once
 #include "IGameApplication.h"
+#include "GameStates/GameStateMachine.h"
+#include "SoundManager.h"
 
 #include <memory>
 
@@ -13,7 +15,7 @@ namespace bombGame
 {
 	class SoundManager;
 
-	// Fully static singleton class containing logic of the Bomberman Game itself
+	// Containing logic of the Bomberman Game itself
 	class BombermanGame final : public ge::IGameApplication
 	{
 	public:
@@ -24,24 +26,21 @@ namespace bombGame
 		BombermanGame& operator=(const BombermanGame& other) = delete;
 		BombermanGame& operator=(BombermanGame&& other) = delete;
 
-		virtual void Load() override;
-		virtual void Update(float) override; // Used only for GAME state machine Update
-		virtual void FixedUpdate(float) override {};
+		virtual void Load() override; // Sets Initial state for game state machine
+		virtual void Update(float deltaTime) override; // Used only for GAME state machine Update
+		virtual void FixedUpdate(float fixedDeltaSec) override; // Used only for GAME state machine FixedUpdate
 
-		static SoundManager& GetSoundManager() noexcept;
+		SoundManager& GetSoundManager() noexcept;
+		ge::SoundSystem* GetStoredSoundSystem() noexcept;
+		GameStateMachine& GetStateMachine() noexcept;
 
 	private:
-		static void LoadSound();
-		static void LoadScenes();
+		std::unique_ptr<GameStateMachine> m_GameStateMachine{};
 
-		static ge::SoundSystem* StoredSoundSystem;
-		static SoundManager BombermanSoundManager;
+		ge::SoundSystem* m_StoredSoundSystem{ nullptr };
+		SoundManager m_BombermanSoundManager{};
 
-		static void InitializeMainMenuScene();
-		static void InitializeGameplayScene();
-
-		static float CurrentBombExplosion;
-		static ge::GameObject CurrentBombTemplate;
+		void LoadSound();
 	};
 
 	namespace sceneNames

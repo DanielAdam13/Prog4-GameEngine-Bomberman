@@ -72,16 +72,24 @@ void bombGame::BombLayerComponent::RegisterLaidBomb(ge::GameObject* bomb)
 	++m_ActiveBombs;
 }
 
-void bombGame::BombLayerComponent::Notify(int eventId, ge::GameObject*)
+void bombGame::BombLayerComponent::Notify(int eventId, ge::GameObject* sourceObj)
 {
 	if (static_cast<GameEventId>(eventId) == GameEventId::EXPLODED_BOMB)
 	{
 		if (m_ActiveBombs > 0)
 			--m_ActiveBombs;
+
+		// Per Component notify, not per bomb
+		m_BombExplodedEvent.NotifyObservers(eventId, sourceObj);
 	}
 }
 
 ge::Subject& bombGame::BombLayerComponent::GetLaidBombEvent() noexcept
 {
 	return m_LaidBombEvent;
+}
+
+ge::Subject& bombGame::BombLayerComponent::GetBombExplodedEvent() noexcept
+{
+	return m_BombExplodedEvent;
 }

@@ -43,6 +43,7 @@ namespace bombGame
         void Notify(int eventId, ge::GameObject* source) override;
 
         ge::Subject& GetLaidBombEvent() noexcept;
+        ge::Subject& GetBombExplodedEvent() noexcept;
 
     private:
         int m_MaxBombs;
@@ -51,6 +52,7 @@ namespace bombGame
         std::function<float()> m_ExplosionTimerFn;
 
         ge::Subject m_LaidBombEvent;
+        ge::Subject m_BombExplodedEvent; // Per Component notify, not per bomb
 
         // Private helper
         bool CanLayBomb() const noexcept;
