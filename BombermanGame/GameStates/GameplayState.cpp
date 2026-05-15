@@ -16,6 +16,7 @@
 #include "Commands/DamageCommand.h"
 #include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
+#include "Commands/SwitchToGameplayStateCommand.h"
 
 #include "GameObject.h"
 #include "Components/Image.h"
@@ -144,7 +145,7 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
-	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), bombTexture,
+	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), bombTexture,
 		[]() -> float { return 2.f; }, 1) };
 	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
@@ -171,7 +172,7 @@ void bombGame::GameplayGameState::OnEnter()
 	player2PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
-	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), bombTexture,
+	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), bombTexture,
 		[]() -> float { return 2.f; }, 2) };
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
@@ -227,6 +228,9 @@ void bombGame::GameplayGameState::OnEnter()
 
 	/*inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
+
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_R, ge::InputManager::InputTrigger::Up,
+		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
 
 	auto* p1GORaw{ player1GO.get() };
 	auto* p2GORaw{ player2GO.get() };

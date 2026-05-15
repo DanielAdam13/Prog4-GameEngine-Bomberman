@@ -12,6 +12,8 @@ namespace ge
 
 namespace bombGame
 {
+    class LevelGrid;
+
     // Keeps track of active bombs, increments when a bomb is Registered, decrements by listening to BOMB_EXPLODE
     class BombLayerComponent final : public ge::Component, public ge::IObserver
     {
@@ -20,7 +22,7 @@ namespace bombGame
         // Every Bomb Layer Component Instance shares the same component type ID
         static constexpr ge::ComponentTypeID StaticTypeID{ 12 };
 
-        BombLayerComponent(ge::GameObject* owner, 
+        BombLayerComponent(ge::GameObject* owner, LevelGrid* levelBuilder,
             ge::Texture2D* textureRef, std::function<float()> explosionTimerFn, int maxBombs = 1);
         ~BombLayerComponent() override = default;
 
@@ -50,6 +52,8 @@ namespace bombGame
         int m_ActiveBombs{ 0 };
         ge::Texture2D* m_TextureBombRef;
         std::function<float()> m_ExplosionTimerFn;
+        LevelGrid* m_LevelGridRef; // Cached ref
+
 
         ge::Subject m_LaidBombEvent;
         ge::Subject m_BombExplodedEvent; // Per Component notify, not per bomb

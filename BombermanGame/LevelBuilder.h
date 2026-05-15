@@ -29,7 +29,8 @@ namespace bombGame
 		LevelGrid& operator=(const LevelGrid& other) = delete;
 		LevelGrid& operator=(LevelGrid&& other) = delete;
 
-		std::optional<GridTile> GetGirdTileAt(const glm::vec3& worldPos) const noexcept;
+		std::optional<GridTile> GetGridTileAt(const glm::vec3& worldPos) const noexcept;
+		std::optional<glm::vec2> GetMiddlePointGridAt(const glm::vec3& worldPos) const noexcept;
 
 		glm::vec3 GetLevelTopLeft() const noexcept;
 		levelLoader::LevelLayout GetLevelLayout() const noexcept;
