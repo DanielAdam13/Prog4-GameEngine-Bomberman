@@ -164,7 +164,7 @@ void GameEngine::RunOneFrame(IGameApplication& app)
 		m_FrameLag -= m_FixedTimeStep;
 	}
 
-	app.Update(m_DeltaTime); // App Update
+	app.Update(m_DeltaTime); // App Update -> Game State changes specific for Bomberman
 	CollisionSystem::GetInstance().UpdateCollision();
 	SceneManager::GetInstance().Update(m_DeltaTime);
 	Renderer::GetInstance().Render();

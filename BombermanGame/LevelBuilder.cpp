@@ -3,28 +3,120 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "Components/Colliders.h"
+#include "Components/Image.h"
+#include "Texture2D.h"
 #include "Scene.h"
+#include "Structs.h"
 
 #include <utility>
+#include <memory>
+#include <random>
+#include <glm/glm.hpp>
+#include <optional>
 
-void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const levelLoader::LevelLayout& layout,
-	const glm::vec3& buildTopLeftPos, const float tileSize)
+bombGame::LevelGrid::LevelGrid(const levelLoader::LevelLayout& layout, const glm::vec3& buildTopLeftPos, const float tileSize)
+	:m_LevelLayout{ layout },
+	m_LevelTopLeftPos{ buildTopLeftPos },
+	m_TileSize{ tileSize }
 {
-	for (int row{ 0 }; row < layout.height; ++row)
+}
+
+std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGirdTileAt(const glm::vec3& pos) const noexcept
+{
+	const float localX{ pos.x - m_LevelTopLeftPos.x };
+	const float localY{ pos.y - m_LevelTopLeftPos.y };
+
+	// Out of bounds
+	if (localX < 0.f || localY < 0.f)
+		return std::nullopt;
+
+	const int col{ static_cast<int>(localX / m_TileSize) };
+	const int row{ static_cast<int>(localY / m_TileSize) };
+
+	// Out of bound
+	if (col >= m_LevelLayout.width || row >= m_LevelLayout.height)
+		return std::nullopt;
+
+	const int index{ row * m_LevelLayout.width + col };
+	const auto tileType{ m_LevelLayout.At(col, row) };
+
+	const ge::structs::Rect tileRect{
+		glm::vec2{m_LevelTopLeftPos.x + col * m_TileSize, m_LevelTopLeftPos.y + row * m_TileSize },
+		glm::vec2{m_TileSize, m_TileSize} };
+
+	return GridTile{ tileRect, index, tileType };
+}
+
+glm::vec3 bombGame::LevelGrid::GetLevelTopLeft() const noexcept
+{
+	return m_LevelTopLeftPos;
+}
+
+bombGame::levelLoader::LevelLayout bombGame::LevelGrid::GetLevelLayout() const noexcept
+{
+	return m_LevelLayout;
+}
+
+float bombGame::LevelGrid::GetTileSize() const noexcept
+{
+	return m_TileSize;
+}
+
+void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGrid& grid)
+{
+	for (int row{ 0 }; row < grid.GetLevelLayout().height; ++row)
 	{
-		for (int col{ 0 }; col < layout.width; ++col)
+		for (int col{ 0 }; col < grid.GetLevelLayout().width; ++col)
 		{
-			levelLoader::TileType currentTileType{ layout.At(col, row) };
+			levelLoader::TileType currentTileType{ grid.GetLevelLayout().At(col, row)};
 			if (currentTileType == levelLoader::TileType::Wall)
 			{
-				const int currentIndex{ row * layout.width + col };
+				const int currentIndex{ row * grid.GetLevelLayout().width + col };
 				auto wallGameObject = std::make_unique<ge::GameObject>("GO_Wall" + std::to_string(currentIndex));
-				const glm::vec3 wallPos{ col * tileSize, row * tileSize, 0.f };
-				wallGameObject->GetComponent<ge::Transform>()->SetLocalPosition(buildTopLeftPos + wallPos);
-				auto collider{ wallGameObject->AddComponent<ge::BoxCollider>(wallGameObject.get(), glm::vec2{ tileSize,tileSize }) };
+				const glm::vec3 wallPos{ col * grid.GetTileSize() , row * grid.GetTileSize(), 0.f};
+				wallGameObject->GetComponent<ge::Transform>()->SetLocalPosition(grid.GetLevelTopLeft() + wallPos);
+				auto collider{ wallGameObject->AddComponent<ge::BoxCollider>(wallGameObject.get(),
+					glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, false) };
 				collider->AssignTag("Wall");
 
 				scene.Add(std::move(wallGameObject));
+			}
+		}
+	}
+}
+
+void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, const LevelGrid& grid, 
+	ge::Texture2D* breakableWallTexture, int breakableWallRandomnessIndex)
+{
+	for (int row{ 0 }; row < grid.GetLevelLayout().height; ++row)
+	{
+		for (int col{ 0 }; col < grid.GetLevelLayout().width; ++col)
+		{
+			levelLoader::TileType currentTileType{ grid.GetLevelLayout().At(col, row)};
+
+			// 1 out of [breakableWallRandomnessIndex] chance to spawn a breakable wall on an Empty spot
+			if (currentTileType == levelLoader::TileType::Empty)
+			{
+				static std::mt19937 gen{ std::random_device{}() };
+				static std::uniform_int_distribution<size_t> dist(0, breakableWallRandomnessIndex);
+
+				if (dist(gen) == 0)
+				{
+					const int currentIndex{ row * grid.GetLevelLayout().width + col };
+					auto breakableWallGO = std::make_unique<ge::GameObject>("GO_BreakableWall" + std::to_string(currentIndex));
+					const glm::vec3 brWallPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f};
+					auto breakTr{ breakableWallGO->GetComponent<ge::Transform>() };
+					breakTr->SetLocalPosition(grid.GetLevelTopLeft() + brWallPos);
+					breakTr->SetLocalScale(3.4f, 3.4f, 1.f);
+
+					auto brWallImage{ breakableWallGO->AddComponent<ge::Image>(breakableWallGO.get()) };
+					brWallImage->SetTexture(breakableWallTexture);
+					auto collider{ breakableWallGO->AddComponent<ge::BoxCollider>(breakableWallGO.get(),
+						glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, true) };
+					collider->AssignTag("Wall");
+
+					scene.Add(std::move(breakableWallGO));
+				}
 			}
 		}
 	}

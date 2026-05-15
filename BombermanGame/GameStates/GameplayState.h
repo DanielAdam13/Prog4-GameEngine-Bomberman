@@ -1,11 +1,13 @@
 #pragma once
 #include "GameState.h"
+#include "LevelBuilder.h"
 
 #include <memory>
 
 namespace bombGame
 {
 	class BombermanGame;
+	class LevelGrid;
 
 	class GameplayGameState final : public GameState
 	{
@@ -19,5 +21,6 @@ namespace bombGame
 		virtual void FixedUpdate(float) override {}
 
 	private:
+		std::unique_ptr<LevelGrid> m_LevelGrid; // Exists for the whole gameplay state
 	};
 }

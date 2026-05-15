@@ -72,8 +72,7 @@ void bombGame::MainMenuGameState::OnExit()
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::MainMenu);
 }
 
-std::unique_ptr<bombGame::GameState> bombGame::MainMenuGameState::Update(float deltaTime)
+std::unique_ptr<bombGame::GameState> bombGame::MainMenuGameState::Update(float)
 {
-	deltaTime;
 	return std::unique_ptr<GameState>();
 }

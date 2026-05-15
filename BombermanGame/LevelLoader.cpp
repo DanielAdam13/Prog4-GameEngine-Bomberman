@@ -51,11 +51,11 @@ levelLoader::LevelLayout levelLoader::Load(const std::string& path)
                 layout.tilesContainer.push_back(TileType::Wall);
                 break;
             case '1':
-                layout.tilesContainer.push_back(TileType::Empty);
+                layout.tilesContainer.push_back(TileType::PlayerSpawn);
                 layout.player1SpawnPoint = { col, row };
                 break;
             case '2':
-                layout.tilesContainer.push_back(TileType::Empty);
+                layout.tilesContainer.push_back(TileType::PlayerSpawn);
                 layout.player2SpawnPoint = { col, row };
                 break;
             default:

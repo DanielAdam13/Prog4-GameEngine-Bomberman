@@ -17,7 +17,6 @@
 #include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
 
-
 #include "GameObject.h"
 #include "Components/Image.h"
 #include "Components/Transform.h"
@@ -48,10 +47,11 @@ bombGame::GameplayGameState::GameplayGameState(BombermanGame& game)
 void bombGame::GameplayGameState::OnEnter()
 {
 	SoundManager& bombermanSoundManager{ GetBombermanGame().GetSoundManager() };
+	const auto rendWindowDesignSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
-	// -----------------------------------------------
+	// =================================================
 	// Load Resources
-	// -----------------------------------------------
+	// =================================================
 	const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 28) };
 	font->SetBold(true);
 
@@ -66,10 +66,11 @@ void bombGame::GameplayGameState::OnEnter()
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
 	const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
 	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
+	const auto breakableWallTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BreakableWall.png") };
 
-	// -----------------------------------------------
+	// =================================================
 	// Scene Initialization:
-	// -----------------------------------------------
+	// =================================================
 	
 	// --- Static objects in scene initialization ---
 	ge::Scene& GameplayScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Gameplay) };
@@ -79,8 +80,8 @@ void bombGame::GameplayGameState::OnEnter()
 	const glm::vec3 topBgPosition{ 0.f, windowSize.second / 10.7f, 0.f };
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.5f,
-		windowSize.second / 800.f * 3.5f, 1.f);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / rendWindowDesignSize.first * 3.5f,
+		windowSize.second / rendWindowDesignSize.second * 3.5f, 1.f);
 
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(topBgPosition);
 	GameplayScene.Add(std::move(backgroundGO));
@@ -105,13 +106,22 @@ void bombGame::GameplayGameState::OnEnter()
 	GameplayScene.Add(std::move(tutorial1GO));
 	GameplayScene.Add(std::move(tutorial2GO));
 
+	// -----------------------------------------------
 	// --- Level Initialization ---
+	// -----------------------------------------------
+	
 	levelLoader::LevelLayout layout{ levelLoader::Load(
 		ge::ResourceManager::GetInstance().GetFullPath("levels/mainLevel1.txt")) };
-
 	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / 13 };
-	levelBuilder::BuildStaticGeometry(GameplayScene, layout, topBgPosition, tileSize);
 
+	m_LevelGrid = std::make_unique<LevelGrid>(layout, topBgPosition, tileSize);
+
+	levelBuilder::BuildStaticGeometry(GameplayScene, *m_LevelGrid.get());
+	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallTexture, 6);
+
+	// -----------------------------------------------
+	// Players
+	// -----------------------------------------------
 	// Player 1
 	auto player1GO = std::make_unique<ge::GameObject>("GO_Player1");
 	auto player1Image{ player1GO->AddComponent<ge::Image>(player1GO.get()) };
@@ -209,9 +219,9 @@ void bombGame::GameplayGameState::OnEnter()
 	p2ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.65f, windowSize.second * 0.8f, 0.f });
 
-	// -----------------------------------------------
+	// =================================================
 	// Specify Game State Input Bindings
-	// -----------------------------------------------
+	// =================================================
 #pragma region CommandBinding
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
@@ -297,8 +307,7 @@ void bombGame::GameplayGameState::OnExit()
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Gameplay);
 }
 
-std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float deltaTime)
+std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 {
-	deltaTime;
 	return std::unique_ptr<GameState>();
 }

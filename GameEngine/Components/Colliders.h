@@ -68,7 +68,7 @@ namespace ge
 		// Every BoxCollider Instance shares the same component type ID
 		static constexpr ComponentTypeID StaticTypeID{ 14 };
 
-		BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, const glm::vec2& localOffset = {});
+		BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, bool ignoreOwnerSize = false, const glm::vec2& localOffset = {});
 		~BoxCollider() override;
 
 		BoxCollider(const BoxCollider& other) = delete;
@@ -86,6 +86,8 @@ namespace ge
 	private:
 		glm::vec2 m_Size;
 		glm::vec2 m_LocalOffset;
+
+		bool m_IgnoreOwnerSize;
 
 	};
 

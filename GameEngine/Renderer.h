@@ -33,6 +33,7 @@ namespace ge
 		void SetWindowSize(std::pair<int, int>);
 
 		Subject& GetOnScreenResizeEvent() noexcept;
+		std::pair<float, float> GetWindowDesignSize() const noexcept;
 
 	private:
 		SDL_Renderer* m_Renderer{};

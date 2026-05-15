@@ -30,8 +30,7 @@ Texture2D::Texture2D(const std::string& fullPath)
     if (!m_pTexture)
     {
         throw std::runtime_error(
-            std::string("Failed to create texture from surface: ") + SDL_GetError()
-        );
+            std::string("Failed to create texture from surface: ") + SDL_GetError());
     }
 }
 

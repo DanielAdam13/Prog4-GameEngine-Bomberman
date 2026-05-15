@@ -144,3 +144,8 @@ Subject& ge::Renderer::GetOnScreenResizeEvent() noexcept
 {
 	return m_OnScreenResizeEvent;
 }
+
+std::pair<float, float> ge::Renderer::GetWindowDesignSize() const noexcept
+{
+	return m_ConstantDesignSize;
+}

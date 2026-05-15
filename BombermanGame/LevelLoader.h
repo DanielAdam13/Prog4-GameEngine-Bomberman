@@ -11,7 +11,8 @@ namespace bombGame
 		enum TileType
 		{
 			Empty,
-			Wall
+			Wall,
+			PlayerSpawn
 		};
 
 		struct LevelLayout

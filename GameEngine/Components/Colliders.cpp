@@ -95,10 +95,11 @@ const ge::CollisionLayerTag& ge::Collider::GetLayerTag() const noexcept
 	return m_LayerTag;
 }
 
-ge::BoxCollider::BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, const glm::vec2& localOffset)
+ge::BoxCollider::BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, bool ignoreOwnerSize, const glm::vec2& localOffset)
 	:Collider::Collider(pOwnerPtr, Shape::Box),
 	m_Size{ size },
-	m_LocalOffset{ localOffset }
+	m_LocalOffset{ localOffset },
+	m_IgnoreOwnerSize{ ignoreOwnerSize }
 {
 	CollisionSystem::GetInstance().Register(this);
 }
@@ -124,7 +125,11 @@ ge::structs::Rect ge::BoxCollider::GetBounds() const noexcept
 	// Recompute only when GetBounds CALLED
 	auto* tf{ GetOwner()->GetComponent<ge::Transform>() };
 	const glm::vec3 worldPos{ tf->GetWorldPosition() };
-	const glm::vec3 worldScale{ tf->GetWorldScale() };
+
+	glm::vec3 worldScale{ tf->GetWorldScale() };
+	if (m_IgnoreOwnerSize)
+		worldScale = { 1.f, 1.f, 1.f };
+
 	const glm::vec2 worldSize{ m_Size.x * worldScale.x, m_Size.y * worldScale.y };
 
 	return structs::Rect{ 
@@ -134,7 +139,10 @@ ge::structs::Rect ge::BoxCollider::GetBounds() const noexcept
 
 ge::structs::Rect ge::BoxCollider::GetBoundsAt(const glm::vec3& worldPos) const noexcept
 {
-	const auto worldScale{ GetOwnerTransform()->GetWorldScale() };
+	auto worldScale{ GetOwnerTransform()->GetWorldScale() };
+	if (m_IgnoreOwnerSize)
+		worldScale = { 1.f, 1.f, 1.f };
+
 	const glm::vec2 worldSize{ m_Size.x * worldScale.x, m_Size.y * worldScale.y };
 	
 	ge::structs::Rect hyphoteticalRect{ glm::vec2{worldPos.x, worldPos.y} + m_LocalOffset, worldSize };
