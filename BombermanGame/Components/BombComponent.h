@@ -3,16 +3,21 @@
 
 #include "ObservableSubject.h"
 
+namespace ge
+{
+	class Texture2D;
+}
+
 namespace bombGame
 {
 	class BombComponent final : public ge::Component
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
-		// Every Health Display Component Instance shares the same component type ID
+		// Every Bomb Component Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 11 };
 
-		BombComponent(ge::GameObject* owner, float explosionTimer);
+		BombComponent(ge::GameObject* owner, float explosionTimer, ge::Texture2D* explosionTextureRef);
 		~BombComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
@@ -24,8 +29,10 @@ namespace bombGame
 
 	private:
 		float m_WindUpDuration;
-		float m_ExplosionTimer;
+		float m_WindupTimer;
 
 		ge::Subject m_ExplodedBombEvent;
+
+		ge::Texture2D* m_ExplosionTetxureRef; // Cached ref
 	};
 }

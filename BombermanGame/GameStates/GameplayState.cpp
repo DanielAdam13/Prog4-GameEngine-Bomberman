@@ -66,6 +66,7 @@ void bombGame::GameplayGameState::OnEnter()
 	const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
 	const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
+	const auto explosionTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BombExplosion.png") };
 	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
 	const auto breakableWallTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BreakableWall.png") };
 
@@ -145,7 +146,8 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
-	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), bombTexture,
+	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
+		bombTexture, explosionTexture,
 		[]() -> float { return 2.f; }, 1) };
 	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
@@ -172,7 +174,8 @@ void bombGame::GameplayGameState::OnEnter()
 	player2PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
-	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), bombTexture,
+	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
+		bombTexture, explosionTexture,
 		[]() -> float { return 2.f; }, 2) };
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);

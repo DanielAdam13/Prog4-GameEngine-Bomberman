@@ -1,22 +1,31 @@
 #include "BombComponent.h"
 #include "GameObject.h"
-
+#include "Components/Transform.h"
 #include "GameEvents.h"
+#include "Utils.h"
+#include "SceneManager.h"
 
-bombGame::BombComponent::BombComponent(ge::GameObject* owner, float explosionTimer)
+#include <utility>
+
+bombGame::BombComponent::BombComponent(ge::GameObject* owner, float windupDuration, ge::Texture2D* explosionTextureRef)
 	:Component::Component{ owner },
-	m_WindUpDuration{ explosionTimer },
-	m_ExplosionTimer{ 0.f }
+	m_WindUpDuration{ windupDuration },
+	m_WindupTimer{ 0.f },
+	m_ExplosionTetxureRef{ explosionTextureRef }
 {
 }
 
 void bombGame::BombComponent::UpdateComponent(float deltaTime)
 {
-	m_ExplosionTimer += deltaTime;
-	if (m_ExplosionTimer >= m_WindUpDuration)
+	m_WindupTimer += deltaTime;
+	if (m_WindupTimer >= m_WindUpDuration)
 	{
-		m_ExplosionTimer = 0.f;
+		m_WindupTimer = 0.f;
 		m_ExplodedBombEvent.NotifyObservers(GameEventId::EXPLODED_BOMB, GetOwner());
+
+		auto explosionGO{ spawnUtils::CreateExplosion(
+			GetOwner()->GetComponent<ge::Transform>()->GetWorldPosition(), m_ExplosionTetxureRef, 1.5f) };
+		ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(explosionGO));
 
 		//this->MarkForDeletion();
 		GetOwner()->MarkForDeletion();

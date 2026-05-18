@@ -11,6 +11,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Components/BombComponent.h" "Components/BombComponent.cpp" 
   "Components/BombLayerComponent.h" "Components/BombLayerComponent.cpp"
   "Components/EnemyComponent.h" "Components/EnemyComponent.cpp"
+  "Components/ExplosionComponent.h" "Components/ExplosionComponent.cpp"
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"

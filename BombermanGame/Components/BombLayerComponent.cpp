@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "SceneManager.h"
 #include "Components/PlayerComponent.h"
+#include "Texture2D.h"
 #include "Utils.h"
 #include "LevelBuilder.h"
 
@@ -12,11 +13,13 @@
 #include <optional>
 
 bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid* levelGridRef,
-	ge::Texture2D* textureRef, std::function<float()> explosionTimerFn, int maxBombs)
+	ge::Texture2D* bombTextureRef, ge::Texture2D* explosionTextureRef, 
+	std::function<float()> windupDurationFn, int maxBombs)
 	:Component::Component(owner),
 	m_MaxBombs{ maxBombs },
-	m_TextureBombRef{ textureRef },
-	m_ExplosionTimerFn{ std::move(explosionTimerFn) },
+	m_BombTextureRef{ bombTextureRef },
+	m_ExplosionTextureRef{ explosionTextureRef },
+	m_WindupDurationFn{ std::move(windupDurationFn) },
 	m_LevelGridRef{ levelGridRef }
 {
 }
@@ -36,7 +39,8 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	const auto gridTileMidPos{ m_LevelGridRef->GetMiddlePointGridAt(position) };
 
 	// Adds BombComponent to the new bomb gameobject
-	auto bomb{ CreateBomb(glm::vec3{gridTileMidPos.value().x, gridTileMidPos.value().y, 0.f}, m_TextureBombRef, m_ExplosionTimerFn())};
+	auto bomb{ spawnUtils::CreateBomb({gridTileMidPos->x, gridTileMidPos->y, 0.f},
+		m_BombTextureRef, m_ExplosionTextureRef, m_WindupDurationFn()) };
 	auto* rawBombGO{ bomb.get() };
 	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 

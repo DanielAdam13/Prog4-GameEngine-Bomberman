@@ -24,7 +24,11 @@ namespace ge
 		void SetTexture(Texture2D* textureRef);
 		Texture2D* GetTexture() const noexcept { return m_pTexture; }
 
+		void SetAnchor(const glm::vec2& anchor) noexcept;
+		const glm::vec2 GetAnchor() const noexcept;
+
 	private:
 		Texture2D* m_pTexture{ nullptr }; // Doesn't own
+		glm::vec2 m_Anchor{ 0.f, 0.f };
 	};
 }

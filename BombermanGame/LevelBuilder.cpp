@@ -53,7 +53,7 @@ std::optional<glm::vec2> bombGame::LevelGrid::GetMiddlePointGridAt(const glm::ve
 	const float localY{ worldPos.y - m_LevelTopLeftPos.y };
 
 	// Out of bounds
-	if (localX < 0.f || localY < 0.f)
+	if (localX <= 0.f || localY <= 0.f)
 		return std::nullopt;
 
 	const int col{ static_cast<int>(localX / m_TileSize) };
@@ -63,8 +63,8 @@ std::optional<glm::vec2> bombGame::LevelGrid::GetMiddlePointGridAt(const glm::ve
 	if (col >= m_LevelLayout.width || row >= m_LevelLayout.height)
 		return std::nullopt;
 
-	return glm::vec2{ m_LevelTopLeftPos.x + col * m_TileSize + m_TileSize / 4.f, 
-		m_LevelTopLeftPos.y + row * m_TileSize + m_TileSize / 4.f };
+	return glm::vec2{ m_LevelTopLeftPos.x + col * m_TileSize + m_TileSize / 2.f, 
+		m_LevelTopLeftPos.y + row * m_TileSize + m_TileSize / 2.f };
 }
 
 glm::vec3 bombGame::LevelGrid::GetLevelTopLeft() const noexcept
@@ -127,7 +127,7 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, const Leve
 					const glm::vec3 brWallPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f};
 					auto breakTr{ breakableWallGO->GetComponent<ge::Transform>() };
 					breakTr->SetLocalPosition(grid.GetLevelTopLeft() + brWallPos);
-					breakTr->SetLocalScale(3.4f, 3.4f, 1.f);
+					breakTr->SetLocalScale(3.5f, 3.5f, 1.f);
 
 					auto brWallImage{ breakableWallGO->AddComponent<ge::Image>(breakableWallGO.get()) };
 					brWallImage->SetTexture(breakableWallTexture);
