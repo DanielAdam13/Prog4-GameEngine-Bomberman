@@ -74,9 +74,10 @@ void ge::AnimatorComponent::RenderComponent() const
 	const float topLeftX{ worldPos.x - m_Anchor.x * scaledSize.x };
 	const float topLeftY{ worldPos.y - m_Anchor.y * scaledSize.y };
 
+	const auto srcRect{ m_CachedSpriteSheet->GetFrameRect(m_CurrentAnimation->frames[m_CurrentFrameIdx]) };
 	// Has to use Renderer
 	ge::Renderer::GetInstance().RenderTextureRegion(
-		*m_CachedSpriteSheet->GetTexture(), m_CachedSpriteSheet->GetFrameRect(m_CurrentFrameIdx),
+		*m_CachedSpriteSheet->GetTexture(), srcRect,
 		topLeftX, topLeftY, scaledSize.x, scaledSize.y);
 }
 
@@ -128,4 +129,9 @@ void ge::AnimatorComponent::SetAnchor(const glm::vec2& anchor) noexcept
 const glm::vec2& ge::AnimatorComponent::GetAnchor() const noexcept
 {
 	return m_Anchor;
+}
+
+glm::vec2 ge::AnimatorComponent::GetSingleFrameRectSize() const noexcept
+{
+	return glm::vec2{ m_CachedSpriteSheet->GetFrameWidth(), m_CachedSpriteSheet->GetFrameHeight() };
 }

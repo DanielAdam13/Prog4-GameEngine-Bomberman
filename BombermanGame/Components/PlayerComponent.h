@@ -9,6 +9,8 @@
 namespace ge
 {
 	class Transform;
+	class HealthComponent;
+	class AnimatorComponent;
 }
 
 namespace bombGame
@@ -29,7 +31,7 @@ namespace bombGame
 		PlayerComponent& operator=(PlayerComponent&&) = delete;
 
 		void FixedUpdateComponent(float) override {}
-		void UpdateComponent(float) override {}
+		void UpdateComponent(float) override;
 		void RenderComponent() const override {}
 
 		void TryMove(const glm::vec3& direction, float deltaTime);
@@ -59,6 +61,11 @@ namespace bombGame
 		bool WouldOverlapWall(const glm::vec3& worldPos) const;
 
 		ge::Transform* m_CachedOwnerTransform;
+		ge::HealthComponent* m_CachedHealthComp;
 		ge::BoxCollider* m_CachedBoxCollider;
+		ge::AnimatorComponent* m_CachedAnimator;
+
+		bool m_MovedThisFrame{ false }; // for animation logic
+		glm::vec3 m_LastMoveDir{ 0.f }; // for animation logic
 	};
 }

@@ -38,6 +38,8 @@ namespace ge
 		void SetAnchor(const glm::vec2& anchor) noexcept;
 		const glm::vec2& GetAnchor() const noexcept;
 
+		glm::vec2 GetSingleFrameRectSize() const noexcept;
+
 	private:
 		const SpriteSheet* m_CachedSpriteSheet; // Non-owning, this is a resource managed by ResourceManager
 

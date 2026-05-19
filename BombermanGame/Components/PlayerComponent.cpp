@@ -4,6 +4,7 @@
 #include "Components/ScoreComponent.h"
 #include "Components/Transform.h"
 #include "GameEvents.h"
+#include "Components/AnimatorComponent.h"
 
 #include "Components/Colliders.h"
 #include "CollisionSystem.h"
@@ -20,14 +21,14 @@ PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
 	m_CachedOwnerTransform{ owner->GetComponent<ge::Transform>() }
 {
 	// Bind health callbacks
-	auto* health{ GetOwner()->GetComponent<ge::HealthComponent>()};
-	assert(health && "PlayerComponent requires a HealthComponent on the same GameObject");
+	m_CachedHealthComp = GetOwner()->GetComponent<ge::HealthComponent>();
+	assert(m_CachedHealthComp && "PlayerComponent requires a HealthComponent on the same GameObject");
 
-	health->SetOnTakingDamage([this]() -> void
+	m_CachedHealthComp->SetOnTakingDamage([this]() -> void
 		{
 			m_DamageEvent.NotifyObservers(GameEventId::PLAYER_LOST_HEALTH, GetOwner());
 		});
-	health->SetOnDeath([this]() -> void
+	m_CachedHealthComp->SetOnDeath([this]() -> void
 		{
 			m_DamageEvent.NotifyObservers(GameEventId::PLAYER_DIED, GetOwner());
 		});
@@ -45,14 +46,19 @@ PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
 	assert(m_CachedBoxCollider && "PlayerComponent requires a BoxCollider on the same GameObject");
 	m_CachedBoxCollider->GetOnCollisionEnterEvent().AddObserver(this);
 	m_CachedBoxCollider->GetOnCollisionExitEvent().AddObserver(this);
+
+	m_CachedAnimator = GetOwner()->GetComponent<ge::AnimatorComponent>();
+	assert(m_CachedAnimator && "PlayerComponent requires an Animator Component on the same GameObject");
+
+	m_CachedAnimator->Play("idle");
 }
 
 bombGame::PlayerComponent::~PlayerComponent()
 {
-	if (auto* h = GetOwner()->GetComponent<ge::HealthComponent>())
+	if (m_CachedHealthComp)
 	{
-		h->SetOnTakingDamage(nullptr);
-		h->SetOnDeath(nullptr);
+		m_CachedHealthComp->SetOnTakingDamage(nullptr);
+		m_CachedHealthComp->SetOnDeath(nullptr);
 	}
 	if (auto* s = GetOwner()->GetComponent<ge::ScoreComponent>()) 
 	{
@@ -61,6 +67,36 @@ bombGame::PlayerComponent::~PlayerComponent()
 
 	/*m_CachedBoxCollider->GetOnCollisionEnterEvent().RemoveObserver(this);
 	m_CachedBoxCollider->GetOnCollisionExitEvent().RemoveObserver(this);*/
+}
+
+void bombGame::PlayerComponent::UpdateComponent(float)
+{
+	if (!IsAlive()) 
+	{
+		m_CachedAnimator->Play("death");
+		m_MovedThisFrame = false;
+		return;
+	}
+	// -------------------------------------
+	// Play Movement Animations
+	// -------------------------------------
+	if (m_MovedThisFrame)
+	{
+		if (m_LastMoveDir.y < 0.f)
+			m_CachedAnimator->Play("walk_up");
+		else if (m_LastMoveDir.y > 0.f)
+			m_CachedAnimator->Play("walk_down");
+		else if (m_LastMoveDir.x < 0.f)
+			m_CachedAnimator->Play("walk_left");
+		else if (m_LastMoveDir.x > 0.f)
+			m_CachedAnimator->Play("walk_right");
+	}
+	else
+	{
+		m_CachedAnimator->Play("idle");
+	}
+
+	m_MovedThisFrame = false;
 }
 
 void bombGame::PlayerComponent::TryMove(const glm::vec3& direction, float deltaTime)
@@ -80,6 +116,10 @@ void bombGame::PlayerComponent::TryMove(const glm::vec3& direction, float deltaT
 	if (!WouldOverlapWall(desiredPos))
 	{
 		m_CachedOwnerTransform->SetLocalPosition(desiredPos);
+
+		m_MovedThisFrame = true;
+		m_LastMoveDir = direction;
+
 		return;
 	}
 
@@ -114,8 +154,7 @@ void PlayerComponent::SetSpeed(float newSpeed) noexcept
 
 bool PlayerComponent::IsAlive() const noexcept
 {
-	auto* healthComp{ GetOwner()->GetComponent<ge::HealthComponent>() };
-	return healthComp && !healthComp->IsDead();
+	return !m_CachedHealthComp->IsDead();
 }
 
 void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
@@ -139,6 +178,16 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 	case ge::EngineEventId::COLLISION_EXIT:
 		OnCollisionExit(other, tag);
 		break;
+	case ge::EngineEventId::ANIMATION_FINISHED:
+		// This for after death animation finished
+		// do nothing for now
+		/*if (!IsAlive())
+		{
+
+		}*/
+		break;
+	default:
+		break;
 	}
 }
 
@@ -147,8 +196,8 @@ void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject*, const ge::Coll
 	if (tag == "Enemy" || tag == "Explosion")
 	{
 		// Take damage
-		if (auto* health = GetOwner()->GetComponent<ge::HealthComponent>())
-			health->TakeDamage(1);
+		if (m_CachedHealthComp)
+			m_CachedHealthComp->TakeDamage(1);
 	}
 	else if (tag == "Powerup")
 	{

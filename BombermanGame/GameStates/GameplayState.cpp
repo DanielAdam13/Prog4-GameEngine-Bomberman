@@ -25,7 +25,7 @@
 #include "Components/FPSComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/ScoreComponent.h"
-
+#include "Components/AnimatorComponent.h"
 #include "Components/Colliders.h"
 
 #include "Components/PlayerComponent.h"
@@ -33,6 +33,8 @@
 #include "Components/EnemyComponent.h"
 #include "Components/HealthDisplayComponent.h"
 #include "Components/ScoreDisplayComponent.h"
+
+#include "Animation.h"
 
 #include "LevelLoader.h"
 #include "LevelBuilder.h"
@@ -62,13 +64,16 @@ void bombGame::GameplayGameState::OnEnter()
 	const auto tutFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };
 	tutFont->SetBold(true);
 
-	const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
-	const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
+	//const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
+	//const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
 	const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
 	const auto explosionTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BombExplosion.png") };
 	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
 	const auto breakableWallTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BreakableWall.png") };
+
+	const auto playerSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Player.png", 7, 3) };
+	const auto balloonSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Balloon.png", 11, 1) };
 
 	// =================================================
 	// Scene Initialization:
@@ -126,8 +131,15 @@ void bombGame::GameplayGameState::OnEnter()
 	// -----------------------------------------------
 	// Player 1
 	auto player1GO = std::make_unique<ge::GameObject>("GO_Player1");
-	auto player1Image{ player1GO->AddComponent<ge::Image>(player1GO.get()) };
-	player1Image->SetTexture(playerTexture);
+
+	auto player1Animator{ player1GO->AddComponent<ge::AnimatorComponent>(player1GO.get(), playerSpriteSheet) };
+	player1Animator->AddAnimation({ "idle", {3}, 1, false });
+	player1Animator->AddAnimation({ "walk_left", {0, 1, 2}, 6, true });
+	player1Animator->AddAnimation({ "walk_down", {3, 4, 5}, 6, true });
+	player1Animator->AddAnimation({ "walk_right", {7, 8, 9}, 6, true });
+	player1Animator->AddAnimation({ "walk_up", {10, 11, 12}, 6, true });
+	player1Animator->AddAnimation({ "death", { 14, 15, 16, 17, 18, 19, 20}, 3, false });
+
 	auto player1Tr{ player1GO->GetComponent<ge::Transform>() };
 	const glm::vec3 player1Pos{
 		topBgPosition.x + layout.player1SpawnPoint.x * tileSize,
@@ -136,7 +148,7 @@ void bombGame::GameplayGameState::OnEnter()
 	player1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 
 	auto player1BoxColl{ player1GO->AddComponent<ge::BoxCollider>(player1GO.get(),
-		player1Image->GetTexture()->GetSize()) };
+		player1Animator->GetSingleFrameRectSize()) };
 	player1BoxColl->AssignTag("Player");
 
 	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 3);
@@ -146,6 +158,8 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
+	player1Animator->GetOnAnimationFinishedEvent().AddObserver(player1PlayerComp);
+
 	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
 		bombTexture, explosionTexture,
 		[]() -> float { return 2.f; }, 1) };
@@ -154,8 +168,15 @@ void bombGame::GameplayGameState::OnEnter()
 
 	// Player 2
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
-	auto player2Image{ player2GO->AddComponent<ge::Image>(player2GO.get()) };
-	player2Image->SetTexture(balloonTexture);
+	
+	auto player2Animator{ player2GO->AddComponent<ge::AnimatorComponent>(player2GO.get(), balloonSpriteSheet) };
+	player2Animator->AddAnimation({ "idle", {0}, 1, false });
+	player2Animator->AddAnimation({ "walk_left", {3, 4, 5}, 3, true });
+	player2Animator->AddAnimation({ "walk_down", {3, 4, 5}, 3, true });
+	player2Animator->AddAnimation({ "walk_right", {0, 1, 2}, 3, true });
+	player2Animator->AddAnimation({ "walk_up", {0, 1, 2}, 6, true });
+	player2Animator->AddAnimation({ "death", { 6, 7, 8, 9, 10 }, 3, false });
+
 	auto player2Tr{ player2GO->GetComponent<ge::Transform>() };
 	const glm::vec3 player2Pos{
 		topBgPosition.x + layout.player2SpawnPoint.x * tileSize,
@@ -164,15 +185,17 @@ void bombGame::GameplayGameState::OnEnter()
 	player2Tr->SetLocalScale({ 2.f, 2.f, 2.f });
 
 	auto player2BoxColl{ player2GO->AddComponent<ge::BoxCollider>(player2GO.get(),
-		player2Image->GetTexture()->GetSize()) };
+		player2Animator->GetSingleFrameRectSize()) };
 	player2BoxColl->AssignTag("Player");
 
 	player2GO->AddComponent<ge::HealthComponent>(player2GO.get(), 3);
 	player2GO->AddComponent<ge::ScoreComponent>(player2GO.get(), 0);
-	auto player2PlayerComp{ player2GO->AddComponent<PlayerComponent>(player2GO.get(), 240.f) };
+	auto player2PlayerComp{ player2GO->AddComponent<PlayerComponent>(player2GO.get(), 120.f) };
 	player2PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
+
+	player2Animator->GetOnAnimationFinishedEvent().AddObserver(player2PlayerComp);
 
 	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
 		bombTexture, explosionTexture,
