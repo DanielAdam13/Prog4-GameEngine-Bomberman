@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL_rect.h>
+
 namespace ge
 {
 	class Texture2D;
@@ -22,6 +24,8 @@ namespace ge
 		int GetFrameCount() const noexcept { return m_Columns * m_Rows; }
 		float GetFrameWidth() const noexcept { return m_FrameWidth; }
 		float GetFrameHeight() const noexcept { return m_FrameHeight; }
+
+		SDL_FRect GetFrameRect(int frameIndex) const noexcept;
 
 	private:
 		Texture2D* m_TextureSheet; // Not owning, reference

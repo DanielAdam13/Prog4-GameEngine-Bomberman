@@ -13,9 +13,11 @@ namespace ge
 
 	class Transform;
 
+	// No outside source can initialize base Collider, only dervived classes !!
 	class Collider : public Component
 	{
 	public:
+		Collider() = delete; // !!
 		virtual ~Collider() = default;
 		Collider(const Collider& other) = delete;
 		Collider(Collider&& other) = delete;
@@ -70,11 +72,11 @@ namespace ge
 
 		BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, bool ignoreOwnerSize = false, const glm::vec2& localOffset = {});
 		~BoxCollider() override;
-
 		BoxCollider(const BoxCollider& other) = delete;
 		BoxCollider(BoxCollider&& other) = delete;
 		BoxCollider& operator=(const BoxCollider& other) = delete;
 		BoxCollider& operator=(BoxCollider&& other) = delete;
+
 		virtual void FixedUpdateComponent(float) override {}
 		virtual void UpdateComponent(float) override {}
 		virtual void RenderComponent() const override;

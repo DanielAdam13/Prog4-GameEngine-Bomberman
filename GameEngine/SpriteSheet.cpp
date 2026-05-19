@@ -14,3 +14,12 @@ ge::SpriteSheet::SpriteSheet(Texture2D* spriteTexture, int columns, int rows)
 	m_FrameWidth = m_TextureSheet->GetSize().x / m_Columns;
 	m_FrameHeight = m_TextureSheet->GetSize().y / m_Rows;
 }
+
+SDL_FRect ge::SpriteSheet::GetFrameRect(int frameIndex) const noexcept
+{
+	const int col{ frameIndex % m_Columns };
+	const int row{ frameIndex / m_Columns };
+
+	return SDL_FRect{ col * m_FrameWidth, row * m_FrameHeight, 
+		m_FrameWidth, m_FrameHeight };
+}

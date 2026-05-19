@@ -2,12 +2,17 @@
 #include "Renderer.h"
 #include "GameObject.h"
 #include "Transform.h"
+#include "AnimatorComponent.h"
+
+#include <cassert>
 
 using namespace ge;
 
 Image::Image(GameObject* pOwnerPtr)
 	:Component::Component(pOwnerPtr)
 {
+	assert(!GetOwner()->GetComponent<ge::AnimatorComponent>()
+		&& "Animator component cannot exist on the same object as Image. Choose one.");
 }
 
 void Image::RenderComponent() const
@@ -15,6 +20,7 @@ void Image::RenderComponent() const
 	if (!m_pTexture)
 		return;
 
+	// Scaling + anchor Calculations:
 	auto pOwnerTransform{ GetOwner()->GetComponent<Transform>() };
 	const glm::vec2 worldPos{ pOwnerTransform->GetWorldPosition().x, 
 		pOwnerTransform->GetWorldPosition().y };

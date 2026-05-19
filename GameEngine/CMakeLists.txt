@@ -29,6 +29,7 @@ add_library(gameEngine_lib STATIC
   "Components/HealthComponent.h" "Components/HealthComponent.cpp"
   "Components/ScoreComponent.h" "Components/ScoreComponent.cpp"
   "Components/Colliders.h" "Components/Colliders.cpp"
+  "Components/AnimatorComponent.h" "Components/AnimatorComponent.cpp"
 
   "Commands/Command.h"
   "Commands/GameObjectCommand.h"
