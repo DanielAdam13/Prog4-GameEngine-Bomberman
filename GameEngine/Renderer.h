@@ -22,6 +22,8 @@ namespace ge
 		void RenderTexture(const Texture2D& texture, float x, float y) const;
 		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height) const;
 		void RenderRectOutline(float x, float y, float w, float h, const SDL_Color& color) const;
+		void RenderTextureRegion(const Texture2D& texture, const SDL_FRect& srcRect,
+			float x, float y, float w, float h) const;
 
 		SDL_Renderer* GetSDLRenderer() const { return m_Renderer; };
 

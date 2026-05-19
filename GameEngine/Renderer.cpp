@@ -120,6 +120,17 @@ void Renderer::RenderRectOutline(float x, float y, float w, float h, const SDL_C
 	SDL_RenderRect(m_Renderer, &r);
 }
 
+void ge::Renderer::RenderTextureRegion(const Texture2D& texture, const SDL_FRect& srcRect, float x, float y, float w, float h) const
+{
+	SDL_FRect dst{
+		x * m_RenderScale.first,
+		y * m_RenderScale.second,
+		w * m_RenderScale.first,
+		h * m_RenderScale.second
+	};
+	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), &srcRect, &dst);
+}
+
 std::pair<int, int> Renderer::GetWindowSize() const
 {
 	int w{}, h{};

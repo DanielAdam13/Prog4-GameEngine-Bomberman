@@ -38,6 +38,22 @@ Font* ResourceManager::LoadFont(const std::string& file, uint8_t size)
 	return m_LoadedFonts.at(key).get();
 }
 
+SpriteSheet* ge::ResourceManager::LoadSpriteSheet(const std::string& filePath, int columns, int rows)
+{
+	const auto fullPath{ m_DataPath / filePath };
+	const auto fileName{ fs::path(fullPath).filename().string() };
+
+	auto it{ m_LoadedSpriteSheets.find(fileName) };
+	if (it != m_LoadedSpriteSheets.end())
+		return it->second.get();
+
+	Texture2D* tex{ LoadTexture(filePath) };
+	auto [insertedIt, spriteValue] = m_LoadedSpriteSheets.emplace(fileName,
+		std::make_unique<SpriteSheet>(tex, columns, rows));
+
+	return insertedIt->second.get();
+}
+
 std::string ge::ResourceManager::GetFullPath(std::string&& relativePath) const noexcept
 {
 	return std::string(m_DataPath.string() + relativePath);

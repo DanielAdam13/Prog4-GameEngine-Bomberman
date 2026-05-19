@@ -32,7 +32,6 @@ add_library(gameEngine_lib STATIC
 
   "Commands/Command.h"
   "Commands/GameObjectCommand.h"
-  #"Commands/MoveStickCommand.h" "Commands/MoveStickCommand.cpp"
   "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp" 
   #"Components/FSMComponent.h" "Components/FSMComponent.cpp"
   "Commands/ChangeWindowSizeCommand.h" "Commands/ChangeWindowSizeCommand.cpp"
@@ -41,7 +40,10 @@ add_library(gameEngine_lib STATIC
   "StateMachine/Transition.h" "StateMachine/Transition.cpp" "Structs.h"
 
   "CollisionSystem.h" "CollisionSystem.cpp" 
-  "EngineEvents.h" "IGameApplication.h")
+  "EngineEvents.h" "IGameApplication.h"  
+  
+  "SpriteSheet.h" "SpriteSheet.cpp"
+  "Animation.h")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 
