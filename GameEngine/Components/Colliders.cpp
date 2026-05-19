@@ -112,7 +112,7 @@ ge::BoxCollider::~BoxCollider()
 void ge::BoxCollider::RenderComponent() const
 {
 #if _DEBUG
-	const auto bounds = GetBounds();
+	const auto bounds{ GetBounds() };
 	Renderer::GetInstance().RenderRectOutline(
 		bounds.position.x, bounds.position.y,
 		bounds.size.x, bounds.size.y,

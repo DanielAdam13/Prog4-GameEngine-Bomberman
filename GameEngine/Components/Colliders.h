@@ -90,7 +90,6 @@ namespace ge
 		glm::vec2 m_LocalOffset;
 
 		bool m_IgnoreOwnerSize;
-
 	};
 
 	class CircleCollider final : public Collider

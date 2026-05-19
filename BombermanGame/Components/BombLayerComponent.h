@@ -7,7 +7,7 @@
 
 namespace ge
 {
-    class Texture2D;
+    class SpriteSheet;
 }
 
 namespace bombGame
@@ -23,7 +23,7 @@ namespace bombGame
         static constexpr ge::ComponentTypeID StaticTypeID{ 12 };
 
         BombLayerComponent(ge::GameObject* owner, LevelGrid* levelBuilder,
-            ge::Texture2D* textureRef, ge::Texture2D* explosionTextureRef,
+            ge::SpriteSheet* bombSheetRef, ge::SpriteSheet* explosionSheetRef,
             std::function<float()> windupDurationFn, int maxBombs = 1);
         ~BombLayerComponent() override = default;
 
@@ -51,8 +51,8 @@ namespace bombGame
     private:
         int m_MaxBombs;
         int m_ActiveBombs{ 0 };
-        ge::Texture2D* m_BombTextureRef;
-        ge::Texture2D* m_ExplosionTextureRef;
+        ge::SpriteSheet* m_BombSheetRef;
+        ge::SpriteSheet* m_ExplosionSheetRef;
         std::function<float()> m_WindupDurationFn;
         LevelGrid* m_LevelGridRef; // Cached ref
 

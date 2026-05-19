@@ -16,7 +16,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Anomator Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 16 };
+		static constexpr ComponentTypeID StaticTypeID{ 17 };
 
 		AnimatorComponent(GameObject* ownerPtr, const SpriteSheet* spriteSheet);
 		~AnimatorComponent() override = default;

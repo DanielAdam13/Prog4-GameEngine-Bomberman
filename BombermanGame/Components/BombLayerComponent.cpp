@@ -13,12 +13,12 @@
 #include <optional>
 
 bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid* levelGridRef,
-	ge::Texture2D* bombTextureRef, ge::Texture2D* explosionTextureRef, 
+	ge::SpriteSheet* bombSheetRef, ge::SpriteSheet* explosionSheetRef,
 	std::function<float()> windupDurationFn, int maxBombs)
 	:Component::Component(owner),
 	m_MaxBombs{ maxBombs },
-	m_BombTextureRef{ bombTextureRef },
-	m_ExplosionTextureRef{ explosionTextureRef },
+	m_BombSheetRef{ bombSheetRef },
+	m_ExplosionSheetRef{ explosionSheetRef },
 	m_WindupDurationFn{ std::move(windupDurationFn) },
 	m_LevelGridRef{ levelGridRef }
 {
@@ -40,7 +40,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 
 	// Adds BombComponent to the new bomb gameobject
 	auto bomb{ spawnUtils::CreateBomb({gridTileMidPos->x, gridTileMidPos->y, 0.f},
-		m_BombTextureRef, m_ExplosionTextureRef, m_WindupDurationFn()) };
+		m_BombSheetRef, m_ExplosionSheetRef, m_WindupDurationFn()) };
 	auto* rawBombGO{ bomb.get() };
 	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 

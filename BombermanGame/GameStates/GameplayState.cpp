@@ -67,13 +67,16 @@ void bombGame::GameplayGameState::OnEnter()
 	//const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
 	//const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
-	const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
-	const auto explosionTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BombExplosion.png") };
+	//const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
+	//const auto explosionTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BombExplosion.png") };
 	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
 	const auto breakableWallTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BreakableWall.png") };
 
 	const auto playerSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Player.png", 7, 3) };
 	const auto balloonSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Balloon.png", 11, 1) };
+
+	const auto bombSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Bomb.png", 3, 1) };
+	const auto explosionSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Explosion.png", 2, 2) };
 
 	// =================================================
 	// Scene Initialization:
@@ -145,7 +148,8 @@ void bombGame::GameplayGameState::OnEnter()
 		topBgPosition.x + layout.player1SpawnPoint.x * tileSize,
 		topBgPosition.y + layout.player1SpawnPoint.y * tileSize, 0.f };
 	player1Tr->SetLocalPosition(player1Pos);
-	player1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+	const float playerScale{ m_LevelGrid->GetTileSize() / (playerSpriteSheet->GetFrameWidth() + 1) };
+	player1Tr->SetLocalScale({ playerScale, playerScale, 1.f });
 
 	auto player1BoxColl{ player1GO->AddComponent<ge::BoxCollider>(player1GO.get(),
 		player1Animator->GetSingleFrameRectSize()) };
@@ -161,8 +165,8 @@ void bombGame::GameplayGameState::OnEnter()
 	player1Animator->GetOnAnimationFinishedEvent().AddObserver(player1PlayerComp);
 
 	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
-		bombTexture, explosionTexture,
-		[]() -> float { return 2.f; }, 1) };
+		bombSpriteSheet, explosionSpriteSheet,
+		[]() -> float { return 3.f; }, 1) };
 	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
@@ -171,10 +175,10 @@ void bombGame::GameplayGameState::OnEnter()
 	
 	auto player2Animator{ player2GO->AddComponent<ge::AnimatorComponent>(player2GO.get(), balloonSpriteSheet) };
 	player2Animator->AddAnimation({ "idle", {0}, 1, false });
-	player2Animator->AddAnimation({ "walk_left", {3, 4, 5}, 3, true });
-	player2Animator->AddAnimation({ "walk_down", {3, 4, 5}, 3, true });
-	player2Animator->AddAnimation({ "walk_right", {0, 1, 2}, 3, true });
-	player2Animator->AddAnimation({ "walk_up", {0, 1, 2}, 6, true });
+	player2Animator->AddAnimation({ "walk_left", {3, 4, 5}, 4, true });
+	player2Animator->AddAnimation({ "walk_down", {3, 4, 5}, 4, true });
+	player2Animator->AddAnimation({ "walk_right", {0, 1, 2}, 4, true });
+	player2Animator->AddAnimation({ "walk_up", {0, 1, 2}, 4, true });
 	player2Animator->AddAnimation({ "death", { 6, 7, 8, 9, 10 }, 3, false });
 
 	auto player2Tr{ player2GO->GetComponent<ge::Transform>() };
@@ -198,8 +202,8 @@ void bombGame::GameplayGameState::OnEnter()
 	player2Animator->GetOnAnimationFinishedEvent().AddObserver(player2PlayerComp);
 
 	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
-		bombTexture, explosionTexture,
-		[]() -> float { return 2.f; }, 2) };
+		bombSpriteSheet, explosionSpriteSheet,
+		[]() -> float { return 3.f; }, 2) };
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 

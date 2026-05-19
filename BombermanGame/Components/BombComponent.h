@@ -5,7 +5,7 @@
 
 namespace ge
 {
-	class Texture2D;
+	class SpriteSheet;
 }
 
 namespace bombGame
@@ -17,7 +17,7 @@ namespace bombGame
 		// Every Bomb Component Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 11 };
 
-		BombComponent(ge::GameObject* owner, float explosionTimer, ge::Texture2D* explosionTextureRef);
+		BombComponent(ge::GameObject* owner, float explosionTimer, ge::SpriteSheet* explosionSheetRef);
 		~BombComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
@@ -33,6 +33,6 @@ namespace bombGame
 
 		ge::Subject m_ExplodedBombEvent;
 
-		ge::Texture2D* m_ExplosionTetxureRef; // Cached ref
+		ge::SpriteSheet* m_ExplosionSheetRef; // Cached ref
 	};
 }
