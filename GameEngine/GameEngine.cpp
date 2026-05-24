@@ -70,7 +70,7 @@ void PrintSDLVersion()
 	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version), SDL_VERSIONNUM_MICRO(version));
 }
 
-void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
+void GameEngine::InitializeEngine(const std::filesystem::path& dataPath, const std::string& appName)
 {
 	PrintSDLVersion();
 
@@ -89,7 +89,7 @@ void GameEngine::InitializeEngine(const std::filesystem::path& dataPath)
 	static constexpr int windowX{ 800 };
 	static constexpr int windowY{ 800 };
 	g_Window = SDL_CreateWindow(
-		"GameObject/Component Assignment Week 1",
+		appName.c_str(),
 		windowX,
 		windowY,
 		SDL_WINDOW_OPENGL 

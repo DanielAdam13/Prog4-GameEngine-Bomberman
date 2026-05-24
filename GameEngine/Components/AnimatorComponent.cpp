@@ -84,8 +84,7 @@ void ge::AnimatorComponent::RenderComponent() const
 void ge::AnimatorComponent::AddAnimation(Animation anim)
 {
 	assert(!anim.name.empty() && "Animation needs a name");
-	auto [it, inserted]{ m_Animations.try_emplace(anim.name, std::move(anim))}; // inserted stores the try_emplace result
-	assert(inserted && "Animation with this name already added");
+	m_Animations.try_emplace(anim.name, std::move(anim));
 }
 
 void ge::AnimatorComponent::Play(const std::string& name)

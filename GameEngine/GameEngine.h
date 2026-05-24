@@ -13,7 +13,7 @@ namespace ge
 	class GameEngine final : public Singleton<GameEngine>
 	{
 	public:
-		void InitializeEngine(const std::filesystem::path& dataPath);
+		void InitializeEngine(const std::filesystem::path& dataPath, const std::string& appName);
 		
 		~GameEngine();
 		void Run(IGameApplication& app);

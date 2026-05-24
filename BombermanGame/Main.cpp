@@ -26,7 +26,7 @@ int main(int, char* [])
 	if (!std::filesystem::exists(data_location))
 		data_location = "../resources/";
 #endif
-	GameEngine::GetInstance().InitializeEngine(data_location);
+	GameEngine::GetInstance().InitializeEngine(data_location, "Bomberman");
 
 	// Select Sound System:
 #if _DEBUG

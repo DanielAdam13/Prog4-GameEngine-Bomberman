@@ -152,6 +152,18 @@ void PlayerComponent::SetSpeed(float newSpeed) noexcept
 	m_Speed = newSpeed;
 }
 
+glm::vec3 bombGame::PlayerComponent::GetPlayerMidPoint() const noexcept
+{
+	glm::vec3 midPoint{ m_CachedOwnerTransform->GetWorldPosition() };
+	if (m_CachedAnimator)
+	{
+		midPoint += glm::vec3{ m_CachedAnimator->GetSingleFrameRectSize().x,
+			m_CachedAnimator->GetSingleFrameRectSize().y, 0.f };
+	}
+
+	return midPoint;
+}
+
 bool PlayerComponent::IsAlive() const noexcept
 {
 	return !m_CachedHealthComp->IsDead();

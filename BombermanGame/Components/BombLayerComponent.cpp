@@ -26,9 +26,11 @@ bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGri
 
 bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 {
+	glm::vec3 midReceivedPosition{ position };
 	// Optional: Check if owner has PlayerComponent and if is alive
 	if (auto* pc = GetOwner()->GetComponent<PlayerComponent>())
 	{
+		midReceivedPosition = pc->GetPlayerMidPoint();
 		if (!pc->IsAlive())
 			return false;
 	}
@@ -36,7 +38,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	if (!CanLayBomb())
 		return false;
 
-	const auto gridTileMidPos{ m_LevelGridRef->GetMiddlePointGridAt(position) };
+	const auto gridTileMidPos{ m_LevelGridRef->GetMiddlePointGridAt(midReceivedPosition) };
 
 	// Adds BombComponent to the new bomb gameobject
 	auto bomb{ spawnUtils::CreateBomb({gridTileMidPos->x, gridTileMidPos->y, 0.f},
