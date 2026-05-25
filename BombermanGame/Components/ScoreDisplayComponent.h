@@ -17,7 +17,7 @@ namespace bombGame
 		static constexpr ge::ComponentTypeID StaticTypeID{ 9 };
 
 		ScoreDisplayComponent(ge::GameObject* owner, ge::GameObject* trackedPlayer);
-		~ScoreDisplayComponent() override;
+		~ScoreDisplayComponent() override = default;
 
 		virtual void Notify(int eventId, ge::GameObject*) override;
 

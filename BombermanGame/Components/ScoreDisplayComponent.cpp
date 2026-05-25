@@ -22,19 +22,9 @@ ScoreDisplayComponent::ScoreDisplayComponent(ge::GameObject* owner, ge::GameObje
 
 	auto* playerComp{ m_pTrackedPlayer->GetComponent<PlayerComponent>() };
 	assert(playerComp && "ScoreDisplayComponent: tracked GO has no PlayerComponent");
-
 	playerComp->GetScoreChangeEvent().AddObserver(this);
 
 	RefreshText();
-}
-
-ScoreDisplayComponent::~ScoreDisplayComponent()
-{
-	// Unregistering observers - Subject holds raw pointers
-	/*if (auto* playerComp{ m_pTrackedPlayer->GetComponent<bombGame::PlayerComponent>() })
-	{
-		playerComp->GetScoreChangeEvent().RemoveObserver(this);
-	}*/
 }
 
 void ScoreDisplayComponent::Notify(int eventId, ge::GameObject*)

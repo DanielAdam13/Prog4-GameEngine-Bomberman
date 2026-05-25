@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "ObservableSubject.h"
 
 namespace ge
 {
@@ -23,19 +24,16 @@ namespace ge
 		void TakeDamage(int damageAmount);
 		int GetCurrentHealth() const noexcept;
 		bool IsDead() const noexcept;
-
-		// Could do nothing if m_OnDeath is not set
 		void Die();
 
-		void SetOnTakingDamage(std::function<void()> callback);
-		void SetOnDeath(std::function<void()> callback);
+		Subject& GetOnTakingDamageEvent() noexcept { return m_OnTakingDamageEvent; }
+		Subject& GetOnDeathEvent() noexcept { return m_OnDeathEvent; }
 
 	private:
 		int m_MaxHealth{};
 		int m_CurrentHealth{};
 
-		std::function<void()> m_OnTakingDamage{};
-		std::function<void()> m_OnDeath{};
-
+		Subject m_OnTakingDamageEvent;
+		Subject m_OnDeathEvent;
 	};
 }

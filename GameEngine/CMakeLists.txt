@@ -13,7 +13,7 @@ add_library(gameEngine_lib STATIC
   "SceneManager.h" "SceneManager.cpp"
   "GameObject.h" "GameObject.cpp"
   "ImGuiScene.h" "ImGuiScene.cpp"
-  "Observer.h"
+  "Observer.h" "Observer.cpp"
   "ObservableSubject.h" "ObservableSubject.cpp"
   "Services/ServiceLocator.h" "Services/ServiceLocator.cpp"
   "Services/SoundSystem.h" 

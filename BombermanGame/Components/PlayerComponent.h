@@ -24,7 +24,7 @@ namespace bombGame
 		static constexpr ge::ComponentTypeID StaticTypeID{ 7 };
 
 		explicit PlayerComponent(ge::GameObject* owner, float speed = 120.f);
-		~PlayerComponent() override;
+		~PlayerComponent() override; // does nothing, look at implementation for details
 		PlayerComponent(const PlayerComponent&) = delete;
 		PlayerComponent(PlayerComponent&&) = delete;
 		PlayerComponent& operator=(const PlayerComponent&) = delete;

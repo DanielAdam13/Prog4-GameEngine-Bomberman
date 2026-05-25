@@ -17,7 +17,7 @@ namespace bombGame
 		static constexpr ge::ComponentTypeID StaticTypeID{ 8 };
 
 		HealthDisplayComponent(ge::GameObject* owner, ge::GameObject* trackedPlayer);
-		~HealthDisplayComponent() override;
+		~HealthDisplayComponent() override = default;
 
 		virtual void Notify(int eventId, ge::GameObject*) override;
 

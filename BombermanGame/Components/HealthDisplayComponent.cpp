@@ -22,21 +22,10 @@ HealthDisplayComponent::HealthDisplayComponent(ge::GameObject* owner, ge::GameOb
 
 	auto* playerComp = m_pTrackedPlayer->GetComponent<bombGame::PlayerComponent>();
 	assert(playerComp && "HealthDisplayComponent: tracked GO has no PlayerComponent");
-
 	playerComp->GetDamageEvent().AddObserver(this);
 	playerComp->GetDeadEvent().AddObserver(this);
 
 	RefreshText();
-}
-
-HealthDisplayComponent::~HealthDisplayComponent()
-{
-	// Unregistering observers - Subject holds raw pointers
-	/*if (auto* playerComp{ m_pTrackedPlayer->GetComponent<bombGame::PlayerComponent>() })
-	{
-		playerComp->GetDamageEvent().RemoveObserver(this);
-		playerComp->GetDeadEvent().RemoveObserver(this);
-	}*/
 }
 
 void HealthDisplayComponent::Notify(int eventId, ge::GameObject*)

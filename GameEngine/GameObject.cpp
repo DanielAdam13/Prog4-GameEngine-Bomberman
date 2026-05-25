@@ -14,10 +14,6 @@ GameObject::GameObject(const std::string& name)
 	m_pTransform = GetComponent<Transform>();
 }
 
-GameObject::~GameObject()
-{
-}
-
 void GameObject::FixedUpdate(float fixedTimeStep)
 {
 	for (const auto& comp : m_Components)

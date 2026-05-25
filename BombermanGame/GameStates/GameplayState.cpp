@@ -162,8 +162,6 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
-	player1Animator->GetOnAnimationFinishedEvent().AddObserver(player1PlayerComp);
-
 	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
 		bombSpriteSheet, explosionSpriteSheet,
 		[]() -> float { return 3.f; }, 1) };
@@ -198,8 +196,6 @@ void bombGame::GameplayGameState::OnEnter()
 	player2PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
-
-	player2Animator->GetOnAnimationFinishedEvent().AddObserver(player2PlayerComp);
 
 	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
 		bombSpriteSheet, explosionSpriteSheet,

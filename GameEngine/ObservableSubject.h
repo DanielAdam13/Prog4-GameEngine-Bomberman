@@ -9,12 +9,15 @@ namespace ge
 	class Subject final
 	{
 	public:
-		explicit Subject();
+		Subject() = default;
 		~Subject();
+		Subject(const Subject&) = delete;
+		Subject& operator=(const Subject&) = delete;
+		Subject(Subject&&) = delete;
+		Subject& operator=(Subject&&) = delete;
 
 		void AddObserver(IObserver* observer);
 		void RemoveObserver(IObserver* observer);
-
 		void NotifyObservers(int eventId, ge::GameObject* sourceObject);
 
 	private:

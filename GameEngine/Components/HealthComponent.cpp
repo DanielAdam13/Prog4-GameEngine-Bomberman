@@ -1,4 +1,5 @@
 #include "HealthComponent.h"
+#include "EngineEvents.h"
 
 using namespace ge;
 
@@ -11,13 +12,15 @@ HealthComponent::HealthComponent(ge::GameObject* pOwnerPtr, int maxHealth)
 
 void HealthComponent::TakeDamage(int damageAmount)
 {
+	if (m_CurrentHealth <= 0) 
+		return;
+
 	m_CurrentHealth = std::max(0, m_CurrentHealth - damageAmount);
 
-	if (m_OnTakingDamage)
-		m_OnTakingDamage();
+	m_OnTakingDamageEvent.NotifyObservers(EngineEventId::HEALTH_TAKING_DAMAGE, GetOwner());
 
 	if (m_CurrentHealth <= 0)
-		Die(); // Could do nothing if m_OnDeath is not set
+		Die();
 }
 
 int HealthComponent::GetCurrentHealth() const noexcept
@@ -32,16 +35,5 @@ bool HealthComponent::IsDead() const noexcept
 
 void HealthComponent::Die()
 {
-	if (m_OnDeath) // If there is a bound function
-		m_OnDeath(); // Execute
-}
-
-void HealthComponent::SetOnTakingDamage(std::function<void()> callback)
-{
-	m_OnTakingDamage = callback;
-}
-
-void HealthComponent::SetOnDeath(std::function<void()> callback)
-{
-	m_OnDeath = callback;
+	m_OnDeathEvent.NotifyObservers(EngineEventId::HEALTH_DIED, GetOwner());
 }

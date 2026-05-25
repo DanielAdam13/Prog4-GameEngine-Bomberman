@@ -20,42 +20,39 @@ PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
 	m_Speed{ speed },
 	m_CachedOwnerTransform{ owner->GetComponent<ge::Transform>() }
 {
-	// Bind health callbacks
+	// Subscribe to Health
 	m_CachedHealthComp = GetOwner()->GetComponent<ge::HealthComponent>();
 	assert(m_CachedHealthComp && "PlayerComponent requires a HealthComponent on the same GameObject");
+	m_CachedHealthComp->GetOnTakingDamageEvent().AddObserver(this);
+	m_CachedHealthComp->GetOnDeathEvent().AddObserver(this);
 
-	m_CachedHealthComp->SetOnTakingDamage([this]() -> void
-		{
-			m_DamageEvent.NotifyObservers(GameEventId::PLAYER_LOST_HEALTH, GetOwner());
-		});
-	m_CachedHealthComp->SetOnDeath([this]() -> void
-		{
-			m_DamageEvent.NotifyObservers(GameEventId::PLAYER_DIED, GetOwner());
-		});
-
-	// Bind score callbacks
+	// Subscribe to Score
 	auto* scoreComp{ GetOwner()->GetComponent<ge::ScoreComponent>() };
 	assert(scoreComp && "PlayerComponent requires a ScoreComponent on the same GameObject");
+	scoreComp->GetOnScoreChangedEvent().AddObserver(this);
 
-	scoreComp->SetOnScoreChange([this]()
-		{
-			m_ScoreChangeEvent.NotifyObservers(GameEventId::PLAYER_SCORE_CHANGED, GetOwner());
-		});
-
+	// Subscribe to Box Collider
 	m_CachedBoxCollider = GetOwner()->GetComponent<ge::BoxCollider>();
 	assert(m_CachedBoxCollider && "PlayerComponent requires a BoxCollider on the same GameObject");
 	m_CachedBoxCollider->GetOnCollisionEnterEvent().AddObserver(this);
 	m_CachedBoxCollider->GetOnCollisionExitEvent().AddObserver(this);
 
+	// Subscribe to Animator
 	m_CachedAnimator = GetOwner()->GetComponent<ge::AnimatorComponent>();
 	assert(m_CachedAnimator && "PlayerComponent requires an Animator Component on the same GameObject");
-
+	m_CachedAnimator->GetOnAnimationFinishedEvent().AddObserver(this);
 	m_CachedAnimator->Play("idle");
 }
 
 bombGame::PlayerComponent::~PlayerComponent()
 {
-	if (m_CachedHealthComp)
+	// This destructor CAN BE MADE default but I choose to leave it for a little bit of a history:
+
+	// ------------------------------------------------------------------------------------------------
+
+	// Old, Callback method for calling custom GAME EVENTS from health and score:
+
+	/*if (m_CachedHealthComp)
 	{
 		m_CachedHealthComp->SetOnTakingDamage(nullptr);
 		m_CachedHealthComp->SetOnDeath(nullptr);
@@ -63,9 +60,16 @@ bombGame::PlayerComponent::~PlayerComponent()
 	if (auto* s = GetOwner()->GetComponent<ge::ScoreComponent>()) 
 	{
 		s->SetOnScoreChange(nullptr);
-	}
+	}*/
 
-	/*m_CachedBoxCollider->GetOnCollisionEnterEvent().RemoveObserver(this);
+	// ------------------------------------------------------------------------------------------------
+
+	// Old, this WOULD work if the component cleanup order didn't exist
+	// Sadly, this is not the case
+	// => an IObserver registers its own subjects references and automatically unsubscribes
+
+	/*m_CachedAnimator->GetOnAnimationFinishedEvent().RemoveObserver(this);
+	m_CachedBoxCollider->GetOnCollisionEnterEvent().RemoveObserver(this);
 	m_CachedBoxCollider->GetOnCollisionExitEvent().RemoveObserver(this);*/
 }
 
@@ -184,6 +188,17 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 
 	switch (eventId)
 	{
+		// !!!
+	case ge::EngineEventId::HEALTH_TAKING_DAMAGE:
+		m_DamageEvent.NotifyObservers(GameEventId::PLAYER_LOST_HEALTH, GetOwner());
+		break;
+	case ge::EngineEventId::HEALTH_DIED:
+		m_DeadEvent.NotifyObservers(GameEventId::PLAYER_DIED, GetOwner());
+		break;
+	case ge::EngineEventId::SCORE_CHANGED:
+		m_ScoreChangeEvent.NotifyObservers(GameEventId::PLAYER_SCORE_CHANGED, GetOwner());
+		break;
+		// --------
 	case ge::EngineEventId::COLLISION_ENTER:
 		OnCollisionEnter(other, tag);
 		break;
@@ -193,10 +208,10 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 	case ge::EngineEventId::ANIMATION_FINISHED:
 		// This for after death animation finished
 		// do nothing for now
-		/*if (!IsAlive())
+		if (!IsAlive())
 		{
-
-		}*/
+			GetOwner()->MarkForDeletion();
+		}
 		break;
 	default:
 		break;

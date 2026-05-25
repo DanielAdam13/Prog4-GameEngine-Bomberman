@@ -1,4 +1,5 @@
 #include "ScoreComponent.h"
+#include "EngineEvents.h"
 
 using namespace ge;
 
@@ -12,16 +13,10 @@ void ScoreComponent::ChangeScore(int scoreDiff)
 {
 	m_CurrentScore += scoreDiff;
 
-	if (m_OnScoreChange)
-		m_OnScoreChange();
+	m_OnScoreChangedEvent.NotifyObservers(EngineEventId::SCORE_CHANGED, GetOwner());
 }
 
 int ScoreComponent::GetCurrentScore() const noexcept
 {
 	return m_CurrentScore;
-}
-
-void ScoreComponent::SetOnScoreChange(std::function<void()> callback)
-{
-	m_OnScoreChange = callback;
 }
