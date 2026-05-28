@@ -37,7 +37,7 @@ void ge::Camera::ApplyBounds()
 	// X axis
 	if (mapSize.x <= m_ViewportSize.x)
 	{
-		m_Position.x = m_BoundsMin.x * mapSize.x * 0.5f; // Center of map
+		m_Position.x = m_BoundsMin.x + mapSize.x * 0.5f; // Center of map
 	}
 	else
 	{
@@ -48,7 +48,7 @@ void ge::Camera::ApplyBounds()
 	// Y axis
 	if (mapSize.y <= m_ViewportSize.y)
 	{
-		m_Position.y = m_BoundsMin.y * mapSize.y * 0.5f; // Center of map
+		m_Position.y = m_BoundsMin.y + mapSize.y * 0.5f; // Center of map
 	}
 	else
 	{

@@ -27,6 +27,7 @@
 #include "Components/ScoreComponent.h"
 #include "Components/AnimatorComponent.h"
 #include "Components/Colliders.h"
+#include "Components/CameraFollowComponent.h"
 
 #include "Components/PlayerComponent.h"
 #include "Components/BombLayerComponent.h"
@@ -122,7 +123,7 @@ void bombGame::GameplayGameState::OnEnter()
 	
 	levelLoader::LevelLayout layout{ levelLoader::Load(
 		ge::ResourceManager::GetInstance().GetFullPath("levels/mainLevel1.txt")) };
-	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / 13 };
+	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / layout.height };
 
 	m_LevelGrid = std::make_unique<LevelGrid>(layout, topBgPosition, tileSize);
 
@@ -245,6 +246,28 @@ void bombGame::GameplayGameState::OnEnter()
 	p2ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p2ScoreDisplayGO.get(), player2GO.get());
 	p2ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.65f, windowSize.second * 0.8f, 0.f });
+
+	// =================================================
+	// Camera + Folow
+	// =================================================
+	const float mapWidth{ tileSize * layout.width };
+	const float mapHeight{ tileSize * (layout.height - 1.5f) };
+
+	m_GameplayCamera = std::make_unique<ge::Camera>(glm::vec2{
+		static_cast<float>(ge::Renderer::GetInstance().GetWindowSize().first),
+		static_cast<float>(ge::Renderer::GetInstance().GetWindowSize().second) });
+	m_GameplayCamera->SetBounds(
+		{ topBgPosition.x, topBgPosition.y },
+		{ topBgPosition.x + mapWidth, topBgPosition.y + mapHeight }
+	);
+
+	ge::Renderer::GetInstance().SetActiveCamera(m_GameplayCamera.get());
+
+	auto cameraGO = std::make_unique<ge::GameObject>("GO_Camera");
+	auto* followCam{ cameraGO->AddComponent<ge::CameraFollowComponent>(cameraGO.get(), m_GameplayCamera.get(), 3.f) };
+	followCam->AddTarget(player1GO.get());
+	followCam->AddTarget(player2GO.get());
+	GameplayScene.Add(std::move(cameraGO));
 
 	// =================================================
 	// Specify Game State Input Bindings

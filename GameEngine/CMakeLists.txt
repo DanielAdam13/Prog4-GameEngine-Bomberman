@@ -45,7 +45,8 @@ add_library(gameEngine_lib STATIC
   
   "SpriteSheet.h" "SpriteSheet.cpp"
   "Animation.h" 
-  "Camera.h" "Camera.cpp")
+  "Camera.h" "Camera.cpp" 
+  "Components/CameraFollowComponent.h" "Components/CameraFollowComponent.cpp")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 

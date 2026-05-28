@@ -18,10 +18,10 @@ namespace ge
 	public:
 		explicit GameObject(const std::string& name);
 		~GameObject() = default;
-		GameObject(const GameObject& other) = delete;
-		GameObject(GameObject&& other) = delete;
-		GameObject& operator=(const GameObject& other) = delete;
-		GameObject& operator=(GameObject&& other) = delete;
+		GameObject(const GameObject&) = delete;
+		GameObject(GameObject&&) = delete;
+		GameObject& operator=(const GameObject&) = delete;
+		GameObject& operator=(GameObject&&) = delete;
 		
 		void FixedUpdate(float fixedTimeStep);
 		void Update(float deltaTime);

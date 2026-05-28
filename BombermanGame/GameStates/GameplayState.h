@@ -1,6 +1,7 @@
 #pragma once
 #include "GameState.h"
 #include "LevelBuilder.h"
+#include "Camera.h"
 
 #include <memory>
 
@@ -22,5 +23,6 @@ namespace bombGame
 
 	private:
 		std::unique_ptr<LevelGrid> m_LevelGrid; // Exists for the whole gameplay state
+		std::unique_ptr<ge::Camera> m_GameplayCamera;
 	};
 }

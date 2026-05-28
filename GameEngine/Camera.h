@@ -10,6 +10,10 @@ namespace ge
 	public:
 		Camera(const glm::vec2& viewportSize);
 		~Camera() = default;
+		Camera(const Camera&) = delete;
+		Camera(Camera&&) = delete;
+		Camera& operator=(const Camera&) = delete;
+		Camera& operator=(Camera&&) = delete;
 
 		void SetPosition(const glm::vec2& worldPos);
 		const glm::vec2& GetPosition() const noexcept { return m_Position; }
