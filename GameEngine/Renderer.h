@@ -8,6 +8,7 @@
 namespace ge
 {
 	class Texture2D;
+	class Camera;
 
 	/**
 	 * RAII wrapper for the SDL renderer
@@ -37,6 +38,8 @@ namespace ge
 		Subject& GetOnScreenResizeEvent() noexcept;
 		std::pair<float, float> GetWindowDesignSize() const noexcept;
 
+		void SetActiveCamera(Camera* camera);
+
 	private:
 		SDL_Renderer* m_Renderer{};
 		SDL_Window* m_Window{}; // Doesn't own
@@ -47,6 +50,8 @@ namespace ge
 		std::pair<float, float> m_ConstantDesignSize;
 	
 		Subject m_OnScreenResizeEvent;
+
+		Camera* m_ActiveCamera;
 	};
 }
 

@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "Texture2D.h"
 #include "EngineEvents.h"
+#include "Camera.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
@@ -91,8 +92,10 @@ void Renderer::RenderTexture(const Texture2D& texture, const float x, const floa
 	float w{};
 	float h{};
 	SDL_GetTextureSize(texture.GetSDLTexture(), &w, &h);
-	dst.x = x * m_RenderScale.first;
-	dst.y = y * m_RenderScale.second;
+
+	const glm::vec2 offset{ m_ActiveCamera ? m_ActiveCamera->GetRenderOffset() : glm::vec2{ 0,0 } };
+	dst.x = (x + offset.x) * m_RenderScale.first;
+	dst.y = (y + offset.y) * m_RenderScale.second;
 	dst.w = w * m_RenderScale.first;
 	dst.h = h * m_RenderScale.second;
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
@@ -101,8 +104,10 @@ void Renderer::RenderTexture(const Texture2D& texture, const float x, const floa
 void Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height) const
 {
 	SDL_FRect dst{};
-	dst.x = x * m_RenderScale.first;
-	dst.y = y * m_RenderScale.second;
+
+	const glm::vec2 offset{ m_ActiveCamera ? m_ActiveCamera->GetRenderOffset() : glm::vec2{ 0,0 } };
+	dst.x = (x + offset.x) * m_RenderScale.first;
+	dst.y = (y + offset.y) * m_RenderScale.second;
 	dst.w = width * m_RenderScale.first;
 	dst.h = height * m_RenderScale.second;
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
@@ -111,9 +116,11 @@ void Renderer::RenderTexture(const Texture2D& texture, const float x, const floa
 void Renderer::RenderRectOutline(float x, float y, float w, float h, const SDL_Color& color) const
 {
 	SDL_SetRenderDrawColor(m_Renderer, color.r, color.g, color.b, color.a);
+
+	const glm::vec2 offset{ m_ActiveCamera ? m_ActiveCamera->GetRenderOffset() : glm::vec2{ 0,0 } };
 	SDL_FRect r{
-		x * m_RenderScale.first,
-		y * m_RenderScale.second,
+		(x + offset.x) * m_RenderScale.first,
+		(y + offset.y) * m_RenderScale.second,
 		w * m_RenderScale.first,
 		h * m_RenderScale.second
 	};
@@ -122,9 +129,10 @@ void Renderer::RenderRectOutline(float x, float y, float w, float h, const SDL_C
 
 void ge::Renderer::RenderTextureRegion(const Texture2D& texture, const SDL_FRect& srcRect, float x, float y, float w, float h) const
 {
+	const glm::vec2 offset{ m_ActiveCamera ? m_ActiveCamera->GetRenderOffset() : glm::vec2{ 0,0 } };
 	SDL_FRect dst{
-		x * m_RenderScale.first,
-		y * m_RenderScale.second,
+		(x + offset.x) * m_RenderScale.first,
+		(y + offset.y) * m_RenderScale.second,
 		w * m_RenderScale.first,
 		h * m_RenderScale.second
 	};
@@ -159,4 +167,9 @@ Subject& ge::Renderer::GetOnScreenResizeEvent() noexcept
 std::pair<float, float> ge::Renderer::GetWindowDesignSize() const noexcept
 {
 	return m_ConstantDesignSize;
+}
+
+void ge::Renderer::SetActiveCamera(Camera* camera)
+{
+	m_ActiveCamera = camera;
 }

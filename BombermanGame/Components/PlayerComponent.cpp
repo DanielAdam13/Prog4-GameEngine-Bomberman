@@ -208,10 +208,10 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 	case ge::EngineEventId::ANIMATION_FINISHED:
 		// This for after death animation finished
 		// do nothing for now
-		if (!IsAlive())
+		/*if (!IsAlive())
 		{
 			GetOwner()->MarkForDeletion();
-		}
+		}*/
 		break;
 	default:
 		break;

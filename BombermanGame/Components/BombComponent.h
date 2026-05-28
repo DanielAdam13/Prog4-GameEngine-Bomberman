@@ -22,7 +22,7 @@ namespace bombGame
 
 		void FixedUpdateComponent(float) override {}
 		void UpdateComponent(float) override;
-		void RenderComponent() const override;
+		void RenderComponent() const override {}
 
 		float GetWindupDuration() const noexcept { return m_WindUpDuration; };
 		ge::Subject& GetExplodedBombEvent() { return m_ExplodedBombEvent; }

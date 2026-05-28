@@ -44,7 +44,8 @@ add_library(gameEngine_lib STATIC
   "EngineEvents.h" "IGameApplication.h"  
   
   "SpriteSheet.h" "SpriteSheet.cpp"
-  "Animation.h")
+  "Animation.h" 
+  "Camera.h" "Camera.cpp")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 

@@ -31,7 +31,3 @@ void bombGame::BombComponent::UpdateComponent(float deltaTime)
 		GetOwner()->MarkForDeletion();
 	}
 }
-
-void bombGame::BombComponent::RenderComponent() const
-{
-}
