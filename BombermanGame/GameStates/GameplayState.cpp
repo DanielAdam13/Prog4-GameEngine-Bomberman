@@ -217,6 +217,8 @@ void bombGame::GameplayGameState::OnEnter()
 		enemy1Image->GetTexture()->GetSize()) };
 	enemy1BoxColl->AssignTag("Enemy");
 
+	enemy1GO->AddComponent<ge::HealthComponent>(enemy1GO.get(), 1);
+
 	auto enemyComp{ enemy1GO->AddComponent<EnemyComponent>(enemy1GO.get(), 60.f) };
 	enemyComp->AddTarget(player1GO.get());
 	enemyComp->AddTarget(player2GO.get());

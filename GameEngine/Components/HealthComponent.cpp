@@ -35,5 +35,6 @@ bool HealthComponent::IsDead() const noexcept
 
 void HealthComponent::Die()
 {
+	m_CurrentHealth = 0;
 	m_OnDeathEvent.NotifyObservers(EngineEventId::HEALTH_DIED, GetOwner());
 }

@@ -35,7 +35,7 @@ PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
 	m_CachedBoxCollider = GetOwner()->GetComponent<ge::BoxCollider>();
 	assert(m_CachedBoxCollider && "PlayerComponent requires a BoxCollider on the same GameObject");
 	m_CachedBoxCollider->GetOnCollisionEnterEvent().AddObserver(this);
-	m_CachedBoxCollider->GetOnCollisionExitEvent().AddObserver(this);
+	//m_CachedBoxCollider->GetOnCollisionExitEvent().AddObserver(this);
 
 	// Subscribe to Animator
 	m_CachedAnimator = GetOwner()->GetComponent<ge::AnimatorComponent>();
@@ -178,14 +178,6 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 	if (!other) 
 		return;
 
-	ge::Collider* otherColl{ other->GetComponent<ge::BoxCollider>() };
-	if(!otherColl)
-		otherColl = other->GetComponent<ge::CircleCollider>();
-	if (!otherColl)
-		return;
-
-	const auto& tag{ otherColl->GetLayerTag() };
-
 	switch (eventId)
 	{
 		// !!!
@@ -200,11 +192,18 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 		break;
 		// --------
 	case ge::EngineEventId::COLLISION_ENTER:
+	{
+		ge::Collider* otherColl{ other->GetComponent<ge::BoxCollider>() };
+		if (!otherColl)
+			otherColl = other->GetComponent<ge::CircleCollider>();
+		if (!otherColl)
+			return;
+
+		const auto& tag{ otherColl->GetLayerTag() };
+
 		OnCollisionEnter(other, tag);
 		break;
-	case ge::EngineEventId::COLLISION_EXIT:
-		OnCollisionExit(other, tag);
-		break;
+	}
 	case ge::EngineEventId::ANIMATION_FINISHED:
 		// This for after death animation finished
 		// do nothing for now
@@ -224,17 +223,12 @@ void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject*, const ge::Coll
 	{
 		// Take damage
 		if (m_CachedHealthComp)
-			m_CachedHealthComp->TakeDamage(1);
+			m_CachedHealthComp->Die();
 	}
 	else if (tag == "Powerup")
 	{
 		// Collect —> call an event or call into the powerup's component.
 	}
-}
-
-void bombGame::PlayerComponent::OnCollisionExit(ge::GameObject*, const ge::CollisionLayerTag&)
-{
-	// clean for now
 }
 
 bool bombGame::PlayerComponent::WouldOverlapWall(const glm::vec3& worldPos) const

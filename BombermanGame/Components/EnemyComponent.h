@@ -5,6 +5,9 @@
 #include "EnemyStates/ChaseState.h"
 #include "EnemyStates/WanderState.h"
 #include "EnemyStates/RunState.h"
+#include "Observer.h"
+#include "Components/Colliders.h"
+#include "ObservableSubject.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -14,12 +17,13 @@ namespace ge
 {
 	class GameObject;
 	class Transform;
+	class HealthComponent;
 }
 
 namespace bombGame
 {
 	// Game-specific Component
-	class EnemyComponent final : public ge::Component
+	class EnemyComponent final : public ge::Component, public ge::IObserver
 	{
 	public:
 		// ---- TYPE IDENTIFIER ----
@@ -54,10 +58,16 @@ namespace bombGame
 
 		bool IsAlive() const noexcept;
 
+		virtual void Notify(int eventId, ge::GameObject* other) override;
+
+		ge::Subject& GetDeadEvent() noexcept;;
+
 	private:
 		std::vector<ge::GameObject*> m_Targets{}; // Cached ref
 		std::vector<ge::Transform*> m_TargetTransforms{}; // Cached ref
 		ge::Transform* m_OwnerTransformRef; // Cached ref
+		ge::HealthComponent* m_CachedHealthComp; // Cached ref
+		ge::BoxCollider* m_CachedBoxCollider; // Cached ref
 
 		float m_Speed{ 60.f };
 		glm::vec3 m_CurrentMoveDirection{};
@@ -68,6 +78,10 @@ namespace bombGame
 		std::unique_ptr<ChaseState> m_ChaseState;
 		std::unique_ptr<WanderState> m_WanderState;
 		EnemyState* m_CurrentState;
+
+		ge::Subject m_DeadEvent;
+
+		virtual void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag) override;
 
 	};
 }

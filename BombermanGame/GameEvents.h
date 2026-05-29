@@ -10,6 +10,7 @@ namespace bombGame
 		PLAYER_SCORE_CHANGED,
 		LAY_BOMB,
 		EXPLODED_BOMB,
-		GAME_OVER
+		GAME_OVER,
+		ENEMY_DIED
 	};
 }
