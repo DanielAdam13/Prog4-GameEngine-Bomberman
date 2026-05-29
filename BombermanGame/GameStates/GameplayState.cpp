@@ -65,11 +65,7 @@ void bombGame::GameplayGameState::OnEnter()
 	const auto tutFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 20) };
 	tutFont->SetBold(true);
 
-	//const auto playerTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Player_Bomberman.png") };
-	//const auto balloonTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Balloon_Bomberman.png") };
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
-	//const auto bombTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_Bomb.png") };
-	//const auto explosionTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BombExplosion.png") };
 	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
 	const auto breakableWallTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BreakableWall.png") };
 

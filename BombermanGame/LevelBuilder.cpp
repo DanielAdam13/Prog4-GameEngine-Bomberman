@@ -17,7 +17,8 @@
 bombGame::LevelGrid::LevelGrid(const levelLoader::LevelLayout& layout, const glm::vec3& buildTopLeftPos, const float tileSize)
 	:m_LevelLayout{ layout },
 	m_LevelTopLeftPos{ buildTopLeftPos },
-	m_TileSize{ tileSize }
+	m_TileSize{ tileSize },
+	m_DynamicWalls(layout.width* layout.height, nullptr)
 {
 }
 
@@ -40,6 +41,20 @@ std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGridTileAt(const glm::
 	const int index{ row * m_LevelLayout.width + col };
 	const auto tileType{ m_LevelLayout.At(col, row) };
 
+	const ge::structs::Rect tileRect{
+		glm::vec2{m_LevelTopLeftPos.x + col * m_TileSize, m_LevelTopLeftPos.y + row * m_TileSize },
+		glm::vec2{m_TileSize, m_TileSize} };
+
+	return GridTile{ tileRect, index, tileType };
+}
+
+std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGridTileByCoord(int col, int row) const noexcept
+{
+	if (col < 0 || row < 0 || col >= m_LevelLayout.width || row >= m_LevelLayout.height)
+		return std::nullopt;
+
+	const int index{ row * m_LevelLayout.width + col };
+	const auto tileType{ m_LevelLayout.At(col, row) };
 	const ge::structs::Rect tileRect{
 		glm::vec2{m_LevelTopLeftPos.x + col * m_TileSize, m_LevelTopLeftPos.y + row * m_TileSize },
 		glm::vec2{m_TileSize, m_TileSize} };
@@ -82,6 +97,26 @@ float bombGame::LevelGrid::GetTileSize() const noexcept
 	return m_TileSize;
 }
 
+void bombGame::LevelGrid::RegisterBreakableAt(int col, int row, ge::GameObject* go)
+{
+	m_DynamicWalls[ToIndex(col, row)] = go;
+}
+
+ge::GameObject* bombGame::LevelGrid::GetBreakableWallAt(int col, int row) const noexcept
+{
+	return m_DynamicWalls[ToIndex(col, row)];
+}
+
+void bombGame::LevelGrid::ClearBreakableAt(int col, int row)
+{
+	m_DynamicWalls[ToIndex(col, row)] = nullptr;
+}
+
+int bombGame::LevelGrid::ToIndex(int col, int row) const noexcept
+{
+	return row * m_LevelLayout.width + col;
+}
+
 void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGrid& grid)
 {
 	for (int row{ 0 }; row < grid.GetLevelLayout().height; ++row)
@@ -91,7 +126,7 @@ void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGr
 			levelLoader::TileType currentTileType{ grid.GetLevelLayout().At(col, row)};
 			if (currentTileType == levelLoader::TileType::Wall)
 			{
-				const int currentIndex{ row * grid.GetLevelLayout().width + col };
+				const int currentIndex{ grid.ToIndex(col, row) };
 				auto wallGameObject = std::make_unique<ge::GameObject>("GO_Wall" + std::to_string(currentIndex));
 				const glm::vec3 wallPos{ col * grid.GetTileSize() , row * grid.GetTileSize(), 0.f};
 				wallGameObject->GetComponent<ge::Transform>()->SetLocalPosition(grid.GetLevelTopLeft() + wallPos);
@@ -105,7 +140,7 @@ void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGr
 	}
 }
 
-void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, const LevelGrid& grid, 
+void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid, 
 	ge::Texture2D* breakableWallTexture, int breakableWallRandomnessIndex)
 {
 	for (int row{ 0 }; row < grid.GetLevelLayout().height; ++row)
@@ -122,7 +157,7 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, const Leve
 
 				if (dist(gen) == 0)
 				{
-					const int currentIndex{ row * grid.GetLevelLayout().width + col };
+					const int currentIndex{ grid.ToIndex(col, row) };
 					auto breakableWallGO = std::make_unique<ge::GameObject>("GO_BreakableWall" + std::to_string(currentIndex));
 					const glm::vec3 brWallPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f};
 					auto breakTr{ breakableWallGO->GetComponent<ge::Transform>() };
@@ -133,7 +168,9 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, const Leve
 					brWallImage->SetTexture(breakableWallTexture);
 					auto collider{ breakableWallGO->AddComponent<ge::BoxCollider>(breakableWallGO.get(),
 						glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, true) };
-					collider->AssignTag("Wall");
+					collider->AssignTag("BreakableWall");
+
+					grid.RegisterBreakableAt(col, row, breakableWallGO.get());
 
 					scene.Add(std::move(breakableWallGO));
 				}
