@@ -4,6 +4,7 @@
 #include <ObservableSubject.h>
 
 #include <functional>
+#include <array>
 
 namespace ge
 {
@@ -23,7 +24,7 @@ namespace bombGame
         static constexpr ge::ComponentTypeID StaticTypeID{ 12 };
 
         BombLayerComponent(ge::GameObject* owner, LevelGrid* levelBuilder,
-            ge::SpriteSheet* bombSheetRef, ge::SpriteSheet* explosionSheetRef,
+            ge::SpriteSheet* bombSheetRef, std::array<ge::SpriteSheet*, 3> explosionSheetsRef,
             std::function<float()> windupDurationFn, int maxBombs = 1);
         ~BombLayerComponent() override = default;
 
@@ -52,10 +53,9 @@ namespace bombGame
         int m_MaxBombs;
         int m_ActiveBombs{ 0 };
         ge::SpriteSheet* m_BombSheetRef;
-        ge::SpriteSheet* m_ExplosionSheetRef;
+        std::array<ge::SpriteSheet*, 3> m_ExplosionSheetsRef;
         std::function<float()> m_WindupDurationFn;
         LevelGrid* m_LevelGridRef; // Cached ref
-
 
         ge::Subject m_LaidBombEvent;
         ge::Subject m_BombExplodedEvent; // Per Component notify, not per bomb

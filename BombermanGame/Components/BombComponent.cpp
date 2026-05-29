@@ -7,11 +7,12 @@
 
 #include <utility>
 
-bombGame::BombComponent::BombComponent(ge::GameObject* owner, float windupDuration, ge::SpriteSheet* explosionSheetRef)
+bombGame::BombComponent::BombComponent(ge::GameObject* owner, LevelGrid* grid, float windupDuration, std::array<ge::SpriteSheet*, 3>& explosionSheetRef)
 	:Component::Component{ owner },
 	m_WindUpDuration{ windupDuration },
 	m_WindupTimer{ 0.f },
-	m_ExplosionSheetRef{ explosionSheetRef }
+	m_ExplosionSheetsRef{ explosionSheetRef },
+	m_CachedGrid{ grid }
 {
 }
 
@@ -23,11 +24,10 @@ void bombGame::BombComponent::UpdateComponent(float deltaTime)
 		m_WindupTimer = 0.f;
 		m_ExplodedBombEvent.NotifyObservers(GameEventId::EXPLODED_BOMB, GetOwner());
 
-		auto explosionGO{ spawnUtils::CreateExplosion(
-			GetOwner()->GetComponent<ge::Transform>()->GetWorldPosition(), m_ExplosionSheetRef, 1.f) };
-		ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(explosionGO));
+		spawnUtils::DetonateBombAt(*m_CachedGrid, *ge::SceneManager::GetInstance().GetCurrentActiveScene(),
+			GetOwner()->GetComponent<ge::Transform>()->GetWorldPosition(),
+			m_ExplosionArmLength, m_ExplosionSheetsRef, m_ExplosionLifetime);
 
-		//this->MarkForDeletion();
 		GetOwner()->MarkForDeletion();
 	}
 }

@@ -13,12 +13,12 @@
 #include <optional>
 
 bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid* levelGridRef,
-	ge::SpriteSheet* bombSheetRef, ge::SpriteSheet* explosionSheetRef,
+	ge::SpriteSheet* bombSheetRef, std::array<ge::SpriteSheet*, 3> explosionSheetsRef,
 	std::function<float()> windupDurationFn, int maxBombs)
 	:Component::Component(owner),
 	m_MaxBombs{ maxBombs },
 	m_BombSheetRef{ bombSheetRef },
-	m_ExplosionSheetRef{ explosionSheetRef },
+	m_ExplosionSheetsRef{ explosionSheetsRef },
 	m_WindupDurationFn{ std::move(windupDurationFn) },
 	m_LevelGridRef{ levelGridRef }
 {
@@ -38,11 +38,11 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	if (!CanLayBomb())
 		return false;
 
-	const auto gridTileMidPos{ m_LevelGridRef->GetMiddlePointGridAt(midReceivedPosition) };
+	const auto gridTileMidPos{ m_LevelGridRef->GetMidGridTilePointAt(midReceivedPosition) };
 
 	// Adds BombComponent to the new bomb gameobject
-	auto bomb{ spawnUtils::CreateBomb({gridTileMidPos->x, gridTileMidPos->y, 0.f},
-		m_BombSheetRef, m_ExplosionSheetRef, m_WindupDurationFn()) };
+	auto bomb{ spawnUtils::CreateBomb(m_LevelGridRef, {gridTileMidPos->x, gridTileMidPos->y, 0.f},
+		m_BombSheetRef, m_ExplosionSheetsRef, m_WindupDurationFn()) };
 	auto* rawBombGO{ bomb.get() };
 	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 

@@ -33,7 +33,7 @@ namespace bombGame
 
 		std::optional<GridTile> GetGridTileAt(const glm::vec3& worldPos) const noexcept;
 		std::optional<GridTile> GetGridTileByCoord(int col, int row) const noexcept;
-		std::optional<glm::vec2> GetMiddlePointGridAt(const glm::vec3& worldPos) const noexcept;
+		std::optional<glm::vec2> GetMidGridTilePointAt(const glm::vec3& worldPos) const noexcept;
 
 		glm::vec3 GetLevelTopLeft() const noexcept;
 		levelLoader::LevelLayout GetLevelLayout() const noexcept;

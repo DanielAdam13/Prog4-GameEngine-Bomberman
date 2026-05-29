@@ -42,6 +42,7 @@
 
 #include <utility>
 #include <memory>
+#include <array>
 
 bombGame::GameplayGameState::GameplayGameState(BombermanGame& game)
 	:GameState::GameState(game)
@@ -73,7 +74,10 @@ void bombGame::GameplayGameState::OnEnter()
 	const auto balloonSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Balloon.png", 11, 1) };
 
 	const auto bombSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Bomb.png", 3, 1) };
-	const auto explosionSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Explosion.png", 2, 2) };
+
+	const auto explosionCenterSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_CenterExplosion.png", 4, 1) };
+	const auto explosionHorSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_HorExplosion.png", 4, 2) };
+	const auto explosionVertSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_VertExplosion.png", 4, 2) };
 
 	// =================================================
 	// Scene Initialization:
@@ -159,8 +163,9 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
+	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionHorSpriteSheet, explosionVertSpriteSheet };
 	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
-		bombSpriteSheet, explosionSpriteSheet,
+		bombSpriteSheet, explosions,
 		[]() -> float { return 3.f; }, 1) };
 	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
@@ -195,7 +200,7 @@ void bombGame::GameplayGameState::OnEnter()
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
 	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
-		bombSpriteSheet, explosionSpriteSheet,
+		bombSpriteSheet, explosions,
 		[]() -> float { return 3.f; }, 2) };
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);

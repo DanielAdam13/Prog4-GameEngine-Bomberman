@@ -62,7 +62,7 @@ std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGridTileByCoord(int co
 	return GridTile{ tileRect, index, tileType };
 }
 
-std::optional<glm::vec2> bombGame::LevelGrid::GetMiddlePointGridAt(const glm::vec3& worldPos) const noexcept
+std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointAt(const glm::vec3& worldPos) const noexcept
 {
 	const float localX{ worldPos.x - m_LevelTopLeftPos.x };
 	const float localY{ worldPos.y - m_LevelTopLeftPos.y };

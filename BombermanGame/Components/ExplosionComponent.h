@@ -21,7 +21,7 @@ namespace bombGame
 
 		void FixedUpdateComponent(float) override {}
 		void UpdateComponent(float) override;
-		void RenderComponent() const override;
+		void RenderComponent() const override {}
 
 		float GetExplosionDuration() const noexcept { return m_ExplosionDuration; };
 

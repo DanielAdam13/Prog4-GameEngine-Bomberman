@@ -242,5 +242,5 @@ bool bombGame::PlayerComponent::WouldOverlapWall(const glm::vec3& worldPos) cons
 	// Build and check hyphotetical NEW collider
 	const auto boxBounds{ m_CachedBoxCollider->GetBoundsAt(worldPos) };
 
-	return ge::CollisionSystem::GetInstance().AnyOverlapWithTags(boxBounds, { "Wall" });
+	return ge::CollisionSystem::GetInstance().AnyOverlapWithTags(boxBounds, { "Wall", "BreakableWall" });
 }
