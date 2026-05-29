@@ -15,13 +15,13 @@
 bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, float detectionRadius)
 	:Component::Component(owner),
 	m_OwnerTransformRef{ owner->GetComponent<ge::Transform>() },
-	m_Speed{speed},
+	m_CachedHealthComp{ owner->GetComponent<ge::HealthComponent>() },
+	m_CachedBoxCollider{ owner->GetComponent<ge::BoxCollider>() },
+	m_Speed{ speed },
 	m_DetectionRadius{ detectionRadius },
 	m_ChaseState{ nullptr },
 	m_WanderState{ nullptr },
-	m_CurrentState{ nullptr },
-	m_CachedHealthComp{ owner->GetComponent<ge::HealthComponent>() },
-	m_CachedBoxCollider{ owner->GetComponent<ge::BoxCollider>() }
+	m_CurrentState{ nullptr }
 {
 	assert(m_CachedHealthComp && "Enemy Component requires a HealthComponent on the same GameObject");
 

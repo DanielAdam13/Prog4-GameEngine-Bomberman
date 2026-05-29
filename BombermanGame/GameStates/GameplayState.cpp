@@ -68,7 +68,7 @@ void bombGame::GameplayGameState::OnEnter()
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
 	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
-	const auto breakableWallTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BreakableWall.png") };
+	const auto breakableWallSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_BreakableWall.png", 7, 1) };
 
 	const auto playerSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Player.png", 7, 3) };
 	const auto balloonSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Balloon.png", 11, 1) };
@@ -128,7 +128,7 @@ void bombGame::GameplayGameState::OnEnter()
 	m_LevelGrid = std::make_unique<LevelGrid>(layout, topBgPosition, tileSize);
 
 	levelBuilder::BuildStaticGeometry(GameplayScene, *m_LevelGrid.get());
-	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallTexture, 6);
+	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallSheet, 6);
 
 	// -----------------------------------------------
 	// Players

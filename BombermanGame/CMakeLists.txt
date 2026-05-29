@@ -12,6 +12,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Components/BombLayerComponent.h" "Components/BombLayerComponent.cpp"
   "Components/EnemyComponent.h" "Components/EnemyComponent.cpp"
   "Components/ExplosionComponent.h" "Components/ExplosionComponent.cpp"
+  "Components/BreakableWallComponent.h" "Components/BreakableWallComponent.cpp"
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
@@ -36,7 +37,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/GameStateMachine.h" "GameStates/GameStateMachine.cpp" 
   "GameStates/GameState.h" 
   "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
-  "GameStates/GameplayState.h" "GameStates/GameplayState.cpp")
+  "GameStates/GameplayState.h" "GameStates/GameplayState.cpp"
+  )
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

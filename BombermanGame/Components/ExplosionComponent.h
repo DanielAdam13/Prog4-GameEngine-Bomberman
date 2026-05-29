@@ -1,11 +1,6 @@
 #pragma once
 #include "Components/Component.h"
 
-namespace ge
-{
-	class Texture2D;
-}
-
 namespace bombGame
 {
 	// Simply deletes the game object after a duration, that's all this component does
@@ -23,7 +18,7 @@ namespace bombGame
 		void UpdateComponent(float) override;
 		void RenderComponent() const override {}
 
-		float GetExplosionDuration() const noexcept { return m_ExplosionDuration; };
+		float GetCrumblingDuration() const noexcept { return m_ExplosionDuration; };
 
 	private:
 		float m_ExplosionDuration;

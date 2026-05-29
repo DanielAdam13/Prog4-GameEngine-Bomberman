@@ -3,10 +3,13 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "Components/Colliders.h"
-#include "Components/Image.h"
-#include "Texture2D.h"
 #include "Scene.h"
 #include "Structs.h"
+#include "Components/BreakableWallComponent.h"
+
+#include "Components/AnimatorComponent.h"
+#include "SpriteSheet.h"
+#include "Animation.h"
 
 #include <utility>
 #include <memory>
@@ -141,7 +144,7 @@ void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGr
 }
 
 void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid, 
-	ge::Texture2D* breakableWallTexture, int breakableWallRandomnessIndex)
+	ge::SpriteSheet* breakableWallSheet, int breakableWallRandomnessIndex)
 {
 	for (int row{ 0 }; row < grid.GetLevelLayout().height; ++row)
 	{
@@ -164,9 +167,17 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 					breakTr->SetLocalPosition(grid.GetLevelTopLeft() + brWallPos);
 					breakTr->SetLocalScale(3.5f, 3.5f, 1.f);
 
-					auto brWallImage{ breakableWallGO->AddComponent<ge::Image>(breakableWallGO.get()) };
-					brWallImage->SetTexture(breakableWallTexture);
-					auto collider{ breakableWallGO->AddComponent<ge::BoxCollider>(breakableWallGO.get(),
+					/*auto brWallImage{ breakableWallGO->AddComponent<ge::Image>(breakableWallGO.get()) };
+					brWallImage->SetTexture(breakableWallTexture);*/
+
+					auto* brWallAnimator{breakableWallGO->AddComponent<ge::AnimatorComponent>(breakableWallGO.get(), breakableWallSheet)};
+					brWallAnimator->AddAnimation({ "static", {0}, 1, false });
+					brWallAnimator->AddAnimation({ "crumbling", {0, 1, 2, 3, 4, 5, 6}, 20, false });
+					brWallAnimator->Play("static");
+
+					breakableWallGO->AddComponent<BreakableWallComponent>(breakableWallGO.get(), 0.4f);
+
+					auto* collider{ breakableWallGO->AddComponent<ge::BoxCollider>(breakableWallGO.get(),
 						glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, true) };
 					collider->AssignTag("BreakableWall");
 

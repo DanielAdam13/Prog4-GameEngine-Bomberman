@@ -8,8 +8,8 @@
 namespace ge
 {
 	class Scene;
-	class Texture2D;
 	class GameObject;
+	class SpriteSheet;
 }
 
 namespace bombGame
@@ -65,6 +65,6 @@ namespace bombGame
 		void BuildStaticGeometry(ge::Scene& scene, const LevelGrid& grid);
 		// Generate and push the dynamic walls to the scene and store them in the grid as a reference
 		void GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid,
-			ge::Texture2D* tex, int breakableWallRandomnessIndex);
+			ge::SpriteSheet* breakableWallSheet, int breakableWallRandomnessIndex);
 	}
 }

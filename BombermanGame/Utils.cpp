@@ -8,6 +8,7 @@
 #include "Components/ExplosionComponent.h"
 #include "Scene.h"
 #include "Components/Colliders.h"
+#include "Components/BreakableWallComponent.h"
 
 #include "LevelBuilder.h"
 #include "LevelLoader.h"
@@ -64,9 +65,13 @@ void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 			if (tile->gridTileType == levelLoader::TileType::Wall)
 				break;
 
-			// If Breakable Wall is not nullptr - arm is not spawned and DESTROY wall
+			// If Breakable Wall is not nullptr - CRUMBLE wall and arm is not spawned
 			if (auto* breakableWall = grid.GetBreakableWallAt(currentCol, currentRow))
 			{
+				if (auto* brWallComp = breakableWall->GetComponent<BreakableWallComponent>())
+				{
+					brWallComp->Crumble();
+				}
 				break;
 			}
 
@@ -82,7 +87,6 @@ void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 			CreateExplosion(scene, grid, {gridRectPos.x, gridRectPos.y, 0.f}, sheet, lifetime, animationFrames);
 		}
 	}
-
 }
 
 void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
@@ -95,7 +99,7 @@ void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
 
 	auto* animator{ explosion->AddComponent<ge::AnimatorComponent>(explosion.get(), explosionSheet)};
 	animator->SetAnchor({ 0.5f, 0.5f });
-	animator->AddAnimation({ "explode", animationFrames, 5, false });
+	animator->AddAnimation({ "explode", animationFrames, 10, false });
 	animator->Play("explode");
 
 	explosion->AddComponent<ExplosionComponent>(explosion.get(), activeTimer);
