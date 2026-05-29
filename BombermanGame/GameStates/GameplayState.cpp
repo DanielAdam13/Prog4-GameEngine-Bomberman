@@ -163,7 +163,7 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 
-	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionHorSpriteSheet, explosionVertSpriteSheet };
+	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionVertSpriteSheet, explosionHorSpriteSheet };
 	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
 		bombSpriteSheet, explosions,
 		[]() -> float { return 3.f; }, 1) };

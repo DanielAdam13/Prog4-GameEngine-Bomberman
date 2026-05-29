@@ -19,6 +19,9 @@ namespace bombGame
 		ge::structs::Rect gridRect;
 		int gridTileIndex;
 		levelLoader::TileType gridTileType;
+
+		int col;
+		int row;
 	};
 
 	class LevelGrid final

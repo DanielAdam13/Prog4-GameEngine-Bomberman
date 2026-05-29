@@ -45,7 +45,7 @@ std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGridTileAt(const glm::
 		glm::vec2{m_LevelTopLeftPos.x + col * m_TileSize, m_LevelTopLeftPos.y + row * m_TileSize },
 		glm::vec2{m_TileSize, m_TileSize} };
 
-	return GridTile{ tileRect, index, tileType };
+	return GridTile{ tileRect, index, tileType, col, row };
 }
 
 std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGridTileByCoord(int col, int row) const noexcept
@@ -59,7 +59,7 @@ std::optional<bombGame::GridTile> bombGame::LevelGrid::GetGridTileByCoord(int co
 		glm::vec2{m_LevelTopLeftPos.x + col * m_TileSize, m_LevelTopLeftPos.y + row * m_TileSize },
 		glm::vec2{m_TileSize, m_TileSize} };
 
-	return GridTile{ tileRect, index, tileType };
+	return GridTile{ tileRect, index, tileType, col, row };
 }
 
 std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointAt(const glm::vec3& worldPos) const noexcept

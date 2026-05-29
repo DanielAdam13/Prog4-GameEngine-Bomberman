@@ -10,11 +10,13 @@
 #include "Components/Colliders.h"
 
 #include "LevelBuilder.h"
+#include "LevelLoader.h"
 #include "Animation.h"
 #include "SpriteSheet.h"
 
 #include <utility>
 #include <array>
+#include <vector>
 
 std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid* grid, const glm::vec3& position,
 	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets, float windupDuration)
@@ -37,27 +39,63 @@ std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid* grid
 void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 	const glm::vec3& bombDropCenter, int armLength, const std::array<ge::SpriteSheet*, 3>& explosionSheets, float lifetime)
 {
-	armLength;
-
 	auto bombTile{ grid.GetGridTileAt(bombDropCenter) };
 	if (!bombTile)
 		return;
 
-	CreateExplosion(scene, grid, bombDropCenter, explosionSheets[0], lifetime);
+	const int bombDroppedTileCol{ bombTile->col };
+	const int bombDroppedTileRow{ bombTile->row };
+
+	CreateExplosion(scene, grid, bombDropCenter, explosionSheets[0], lifetime, { 0,1,2,3 });
+
+	constexpr std::pair<int, int> directions[4]{ {-1, 0}, {1, 0}, {0, -1}, {0, 1} };
+	for (auto [dx, dy] : directions)
+	{
+		for (int step{ 1 }; step <= armLength; ++step)
+		{
+			const int currentCol{ bombDroppedTileCol + dx * step };
+			const int currentRow{ bombDroppedTileRow + dy * step };
+
+			auto tile{ grid.GetGridTileByCoord(currentCol, currentRow) };
+			if (!tile)
+				break;
+
+			// If Static wall - arm is not spawned
+			if (tile->gridTileType == levelLoader::TileType::Wall)
+				break;
+
+			// If Breakable Wall is not nullptr - arm is not spawned and DESTROY wall
+			if (auto* breakableWall = grid.GetBreakableWallAt(currentCol, currentRow))
+			{
+				break;
+			}
+
+			// Else, when tile is empty - spawn explosion arm
+			const auto sheet{ (dx == 0) ? 
+				explosionSheets[1] : explosionSheets[2] };
+
+			const std::vector<int> animationFrames{ (dx == -1 || dy == -1) ? 
+				std::vector<int>{0, 1, 2, 3} : std::vector<int>{4, 5, 6, 7} };
+
+			const auto gridRectSize{ tile->gridRect.size };
+			const auto gridRectPos{ tile->gridRect.position + gridRectSize / 2.f };
+			CreateExplosion(scene, grid, {gridRectPos.x, gridRectPos.y, 0.f}, sheet, lifetime, animationFrames);
+		}
+	}
 
 }
 
 void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
-	const glm::vec3& fixedPosition, ge::SpriteSheet* explosionSheet, float activeTimer)
+	const glm::vec3& fixedPosition, ge::SpriteSheet* explosionSheet, float activeTimer, const std::vector<int>& animationFrames)
 {
-	auto explosion = std::make_unique<ge::GameObject>("GO_Explosion");
+	auto explosion = std::make_unique<ge::GameObject>("GO_ExplosionArm");
 	auto* explosionTr{ explosion->GetComponent<ge::Transform>() };
 	explosionTr->SetLocalPosition(fixedPosition);
 	explosionTr->SetLocalScale(3.4f, 3.4f, 1.f);
 
 	auto* animator{ explosion->AddComponent<ge::AnimatorComponent>(explosion.get(), explosionSheet)};
 	animator->SetAnchor({ 0.5f, 0.5f });
-	animator->AddAnimation({ "explode", {0, 1, 2, 3}, 5, false });
+	animator->AddAnimation({ "explode", animationFrames, 5, false });
 	animator->Play("explode");
 
 	explosion->AddComponent<ExplosionComponent>(explosion.get(), activeTimer);
