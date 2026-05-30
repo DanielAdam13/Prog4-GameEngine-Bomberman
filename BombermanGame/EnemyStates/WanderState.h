@@ -34,8 +34,8 @@ namespace bombGame
 		WanderState& operator=(WanderState&&) = delete;
 
 		virtual void OnEnter() override;
-		virtual void OnUpdate(float) override;
 		virtual void OnExit() override;
+		virtual std::unique_ptr<EnemyState> OnUpdate(float) override;
 
 	private:
 		glm::vec3 m_CurrentWanderDirection;

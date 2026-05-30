@@ -2,6 +2,7 @@
 #include "BaseEnemyState.h"
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace ge
 {
@@ -24,8 +25,8 @@ namespace bombGame
 		ChaseState& operator=(ChaseState&&) = delete;
 
 		virtual void OnEnter() override;
-		virtual void OnUpdate(float) override;
 		virtual void OnExit() override;
+		virtual std::unique_ptr<EnemyState> OnUpdate(float) override;
 
 	private:
 		ge::GameObject* m_CurrentTarget{ nullptr }; // ref

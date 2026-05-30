@@ -34,12 +34,9 @@ add_library(gameEngine_lib STATIC
   "Commands/Command.h"
   "Commands/GameObjectCommand.h"
   "Commands/ConditionalCommand.h" "Commands/ConditionalCommand.cpp" 
-  #"Components/FSMComponent.h" "Components/FSMComponent.cpp"
   "Commands/ChangeWindowSizeCommand.h" "Commands/ChangeWindowSizeCommand.cpp"
 
-  "StateMachine/State.h" "StateMachine/State.cpp"
-  "StateMachine/Transition.h" "StateMachine/Transition.cpp" "Structs.h"
-
+  "Structs.h"
   "CollisionSystem.h" "CollisionSystem.cpp" 
   "EngineEvents.h" "IGameApplication.h"  
   

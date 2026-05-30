@@ -138,10 +138,10 @@ void bombGame::GameplayGameState::OnEnter()
 
 	auto player1Animator{ player1GO->AddComponent<ge::AnimatorComponent>(player1GO.get(), playerSpriteSheet) };
 	player1Animator->AddAnimation({ "idle", {3}, 1, false });
-	player1Animator->AddAnimation({ "walk_left", {0, 1, 2}, 6, true });
-	player1Animator->AddAnimation({ "walk_down", {3, 4, 5}, 6, true });
-	player1Animator->AddAnimation({ "walk_right", {7, 8, 9}, 6, true });
-	player1Animator->AddAnimation({ "walk_up", {10, 11, 12}, 6, true });
+	player1Animator->AddAnimation({ "walk_left", {0, 1, 2}, 10, true });
+	player1Animator->AddAnimation({ "walk_down", {3, 4, 5}, 10, true });
+	player1Animator->AddAnimation({ "walk_right", {7, 8, 9}, 10, true });
+	player1Animator->AddAnimation({ "walk_up", {10, 11, 12}, 10, true });
 	player1Animator->AddAnimation({ "death", { 14, 15, 16, 17, 18, 19, 20}, 3, false });
 
 	auto player1Tr{ player1GO->GetComponent<ge::Transform>() };
@@ -158,7 +158,7 @@ void bombGame::GameplayGameState::OnEnter()
 
 	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 3);
 	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), 0);
-	auto player1PlayerComp{ player1GO->AddComponent<PlayerComponent>(player1GO.get(), 120.f) };
+	auto player1PlayerComp{ player1GO->AddComponent<PlayerComponent>(player1GO.get(), 150.f) };
 	player1PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);

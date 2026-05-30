@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "Components/EnemyComponent.h"
-#include <limits>
+#include "WanderState.h"
 
 bombGame::ChaseState::ChaseState(ge::GameObject* pSourcePtr)
 	:EnemyState::EnemyState(pSourcePtr)
@@ -17,39 +17,46 @@ void bombGame::ChaseState::OnEnter()
 	m_RefreshClosestTimer = m_RefreshClosestInterval;
 }
 
-void bombGame::ChaseState::OnUpdate(float deltaTime)
+void bombGame::ChaseState::OnExit()
 {
+	m_CurrentTarget = nullptr;
+	m_DirectionToClosest = {};
+}
+
+std::unique_ptr<bombGame::EnemyState> bombGame::ChaseState::OnUpdate(float deltaTime)
+{
+	// 1. Check for players nearby
 	m_RefreshClosestTimer += deltaTime;
 	if (m_RefreshClosestTimer >= m_RefreshClosestInterval)
 	{
 		m_RefreshClosestTimer = 0.f;
 
-		ge::GameObject* closest{ FindClosestPlayerInRange() };
-		if (!closest)
+		m_CurrentTarget = FindClosestPlayerInRange();
+
+		// 2. Switch to Wander if not Target nearby
+		if (!m_CurrentTarget)
 		{
 			// Transition to Wander
-			GetSourceEnemyComponent()->TransitionToWander();
-			return;
+			return std::make_unique<WanderState>(
+				GetSourceEnemyComponent()->GetOwner());
 		}
 
-		if (closest != m_CurrentTarget)
+		const auto targetPos{ m_CurrentTarget->GetComponent<ge::Transform>()->GetWorldPosition() };
+		const auto myPos{ GetSourceTransform()->GetWorldPosition() };
+		const auto diff{ targetPos - myPos };
+
+		if (glm::length(diff) > 0.0001f)
 		{
-			m_CurrentTarget = closest;
+			m_DirectionToClosest = glm::normalize(diff);
 		}
-
+		
+		// 3. Update direction to closest target
 		m_DirectionToClosest = glm::normalize(m_CurrentTarget->GetComponent<ge::Transform>()->GetWorldPosition() -
 			GetSourceTransform()->GetWorldPosition());
 	}
-	
+
 	GetSourceEnemyComponent()->SetMoveDirection(m_DirectionToClosest);
 
-	const glm::vec3 newPos{ GetSourceTransform()->GetWorldPosition() + 
-		m_DirectionToClosest * GetSourceEnemyComponent()->GetSpeed() * deltaTime};
-	GetSourceTransform()->SetLocalPosition({newPos.x, newPos.y, 0.f});
-}
-
-void bombGame::ChaseState::OnExit()
-{
-	m_CurrentTarget = nullptr;
-	m_DirectionToClosest = {};
+	// 4. Stay in current state
+	return nullptr;
 }

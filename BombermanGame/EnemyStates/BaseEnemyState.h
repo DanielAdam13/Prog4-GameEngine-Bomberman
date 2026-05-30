@@ -1,5 +1,6 @@
 #pragma once
-#include "StateMachine/State.h"
+
+#include <memory>
 
 namespace ge
 {
@@ -11,7 +12,7 @@ namespace bombGame
 {
 	class EnemyComponent;
 
-	class EnemyState : public ge::State
+	class EnemyState
 	{
 	public:
 		EnemyState(ge::GameObject* pTargetPtr);
@@ -20,6 +21,11 @@ namespace bombGame
 		EnemyState& operator=(const EnemyState&) = delete;
 		EnemyState(EnemyState&&) = delete;
 		EnemyState& operator=(EnemyState&&) = delete;
+
+		virtual void OnEnter() = 0;
+		virtual void OnExit() = 0;
+
+		virtual std::unique_ptr<EnemyState> OnUpdate(float) = 0; // Returns potential new state
 
 	protected:
 		ge::GameObject* FindClosestPlayerInRange() const;

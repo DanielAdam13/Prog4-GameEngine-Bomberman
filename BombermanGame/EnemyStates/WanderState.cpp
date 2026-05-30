@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "Components/EnemyComponent.h"
 #include "Components/Transform.h"
+#include "ChaseState.h"
 
 #include <random>
 
@@ -22,7 +23,12 @@ void bombGame::WanderState::OnEnter()
 	GetSourceEnemyComponent()->SetMoveDirection(m_CurrentWanderDirection);
 }
 
-void bombGame::WanderState::OnUpdate(float deltaTime)
+void bombGame::WanderState::OnExit()
+{
+	m_CurrentWanderDirection = {};
+}
+
+std::unique_ptr<bombGame::EnemyState> bombGame::WanderState::OnUpdate(float deltaTime)
 {
 	// 1. Is there a close target check
 	m_PlayerCheckTimer += deltaTime;
@@ -34,31 +40,23 @@ void bombGame::WanderState::OnUpdate(float deltaTime)
 		if (FindClosestPlayerInRange()) 
 		{
 			// Transition to chase
-			GetSourceEnemyComponent()->TransitionToChase();
-			return;
+			return std::make_unique<ChaseState>(GetSourceEnemyComponent()->GetOwner());
 		}
 	}
-	
+
 	// 2. Switch direction logic:
 	m_WanderTimer += deltaTime;
 	if (m_WanderTimer >= DirectionSwitchTimer)
 	{
+		m_WanderTimer -= DirectionSwitchTimer;
+
 		static std::mt19937 gen{ std::random_device{}() };
 		static std::uniform_int_distribution<size_t> dist(0, m_PossibleDirections.size() - 1);
 
 		m_CurrentWanderDirection = m_PossibleDirections[dist(gen)];
 		GetSourceEnemyComponent()->SetMoveDirection(m_CurrentWanderDirection);
-
-		m_WanderTimer -= DirectionSwitchTimer;
 	}
 
-	// Actual Movement:
-	glm::vec3 pos{ GetSourceTransform()->GetWorldPosition() };
-	pos += m_CurrentWanderDirection * GetSourceEnemyComponent()->GetSpeed() * deltaTime;
-	GetSourceTransform()->SetLocalPosition({pos.x, pos.y, 0.f});
-}
-
-void bombGame::WanderState::OnExit()
-{
-	m_CurrentWanderDirection = {};
+	// 3. Stay in current state
+	return nullptr;
 }

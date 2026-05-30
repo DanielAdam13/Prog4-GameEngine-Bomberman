@@ -11,6 +11,8 @@
 #include "GameEvents.h"
 
 #include <cassert>
+#include <utility>
+#include <memory>
 
 bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, float detectionRadius)
 	:Component::Component(owner),
@@ -18,12 +20,11 @@ bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, flo
 	m_CachedHealthComp{ owner->GetComponent<ge::HealthComponent>() },
 	m_CachedBoxCollider{ owner->GetComponent<ge::BoxCollider>() },
 	m_Speed{ speed },
-	m_DetectionRadius{ detectionRadius },
-	m_ChaseState{ nullptr },
-	m_WanderState{ nullptr },
-	m_CurrentState{ nullptr }
+	m_DetectionRadius{ detectionRadius }
 {
 	assert(m_CachedHealthComp && "Enemy Component requires a HealthComponent on the same GameObject");
+	m_CachedHealthComp->GetOnTakingDamageEvent().AddObserver(this);
+	m_CachedHealthComp->GetOnDeathEvent().AddObserver(this);
 
 	assert(m_CachedBoxCollider && "Enemy Component requires a Box Collider on the same GameObject");
  	m_CachedBoxCollider->GetOnCollisionEnterEvent().AddObserver(this);
@@ -31,37 +32,43 @@ bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, flo
 
 void bombGame::EnemyComponent::UpdateComponent(float deltaTime)
 {
+	// 1. Apply ACTUAL State switch - pending transition
+	if (m_TransitionPending) 
+	{
+		if (m_CurrentState) 
+			m_CurrentState->OnExit();
+
+		m_CurrentState = std::move(m_PendingState);
+		m_TransitionPending = false;
+
+		if (m_CurrentState) 
+			m_CurrentState->OnEnter();
+	}
+
 	if (!m_CurrentState)
 		return;
 
-	m_CurrentState->OnUpdate(deltaTime);
+	// 2. Tick current state.
+	// If next does not return nullptr (nullptr means no change):
+	if (auto next = m_CurrentState->OnUpdate(deltaTime))
+	{
+		m_PendingState = std::move(next);
+		m_TransitionPending = true;
+	}
+
+	if (!IsAlive()) 
+		return;
+
+	// Apply movement
+	const auto pos{ m_OwnerTransformRef->GetWorldPosition() };
+	m_OwnerTransformRef->SetLocalPosition(pos + m_CurrentMoveDirection * m_Speed * deltaTime);
 }
 
 void bombGame::EnemyComponent::InitializeStates()
 {
-	m_ChaseState = std::make_unique<ChaseState>(GetOwner());
-	m_WanderState = std::make_unique<WanderState>(GetOwner());
-	m_CurrentState = m_ChaseState.get();
-}
-
-void bombGame::EnemyComponent::TransitionToWander()
-{
+	m_CurrentState = std::make_unique<WanderState>(GetOwner());
 	if (m_CurrentState)
-		m_CurrentState->OnExit();
-
-	m_CurrentState = m_WanderState.get();
-
-	m_CurrentState->OnEnter();
-}
-
-void bombGame::EnemyComponent::TransitionToChase()
-{
-	if (m_CurrentState)
-		m_CurrentState->OnExit();
-
-	m_CurrentState = m_ChaseState.get();
-
-	m_CurrentState->OnEnter();
+		m_CurrentState->OnEnter();
 }
 
 void bombGame::EnemyComponent::AddTarget(ge::GameObject* newTarget) noexcept
@@ -86,6 +93,7 @@ void bombGame::EnemyComponent::Notify(int eventId, ge::GameObject* other)
 	{
 	case ge::EngineEventId::HEALTH_DIED:
 		m_DeadEvent.NotifyObservers(GameEventId::ENEMY_DIED, GetOwner());
+		break;
 	case ge::EngineEventId::COLLISION_ENTER:
 	{
 		ge::Collider* otherColl{ other->GetComponent<ge::BoxCollider>() };

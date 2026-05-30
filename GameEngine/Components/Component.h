@@ -35,9 +35,6 @@ namespace ge
 		bool MarkedForDeletion() const noexcept { return m_DeletionMark; }
 
 	protected:
-		// Empty virtual methods, Component CAN override, do not NEED to
-		virtual void OnCollisionEnter(ge::GameObject*, const std::string&) {}
-		virtual void OnCollisionExit(ge::GameObject*, const std::string&) {}
 		
 	private:
 		// Private so derived classes cannot change, Initialized ONLY on construction

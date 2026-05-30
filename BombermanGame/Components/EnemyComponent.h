@@ -37,30 +37,25 @@ namespace bombGame
 		void UpdateComponent(float) override;
 		void RenderComponent() const override {};
 
-		// States:
 		void InitializeStates();
-		void TransitionToWander();
-		void TransitionToChase();
 
 		// Targets:
-		std::vector<ge::GameObject*> GetTargets() const noexcept { return m_Targets; }
+		const std::vector<ge::GameObject*>& GetTargets() const noexcept { return m_Targets; }
 		const std::vector<ge::Transform*>& GetTargetTransforms() const noexcept { return m_TargetTransforms; }
 		ge::GameObject* GetTargetAt(int index) const noexcept { return m_Targets[index]; }
 		ge::Transform* GetOwnerTransform() const noexcept { return m_OwnerTransformRef; }
-
 		glm::vec3 GetMoveDirection() const noexcept { return m_CurrentMoveDirection; }
 		float GetSpeed() const noexcept { return m_Speed; }
 		float GetDetectionRadius() const noexcept { return m_DetectionRadius; }
+		bool IsAlive() const noexcept;
 
 		void AddTarget(ge::GameObject* newTarget) noexcept;
 		void SetMoveDirection(glm::vec3 direction) noexcept { m_CurrentMoveDirection = direction; }
 		void SetSpeed(float newSpeed) noexcept { m_Speed = newSpeed; }
 
-		bool IsAlive() const noexcept;
-
 		virtual void Notify(int eventId, ge::GameObject* other) override;
 
-		ge::Subject& GetDeadEvent() noexcept;;
+		ge::Subject& GetDeadEvent() noexcept;
 
 	private:
 		std::vector<ge::GameObject*> m_Targets{}; // Cached ref
@@ -75,13 +70,13 @@ namespace bombGame
 		float m_DetectionRadius{ 200.f };
 
 		// States:
-		std::unique_ptr<ChaseState> m_ChaseState;
-		std::unique_ptr<WanderState> m_WanderState;
-		EnemyState* m_CurrentState;
+		std::unique_ptr<EnemyState> m_CurrentState;
+		std::unique_ptr<EnemyState> m_PendingState;
+		bool m_TransitionPending{ false };
 
 		ge::Subject m_DeadEvent;
 
-		virtual void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag) override;
+		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 
 	};
 }

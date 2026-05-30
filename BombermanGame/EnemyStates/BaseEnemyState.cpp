@@ -9,8 +9,7 @@
 #include <glm/glm.hpp>
 
 bombGame::EnemyState::EnemyState(ge::GameObject* pTargetPtr)
-	:ge::State::State(pTargetPtr),
-	m_pEnemyComponent{ pTargetPtr->GetComponent<EnemyComponent>() },
+	:m_pEnemyComponent{ pTargetPtr->GetComponent<EnemyComponent>() },
 	m_pSourceTransform{ pTargetPtr->GetComponent<ge::Transform>() }
 {
 	assert(m_pEnemyComponent && "An Enemy State requires target having an Enemy Component!");

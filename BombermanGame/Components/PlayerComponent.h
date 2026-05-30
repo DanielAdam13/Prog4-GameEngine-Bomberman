@@ -55,7 +55,7 @@ namespace bombGame
 		ge::Subject m_DeadEvent;
 		ge::Subject m_ScoreChangeEvent;
 
-		virtual void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag) override;
+		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 
 		// Helper for tile-based collision check
 		bool WouldOverlapWall(const glm::vec3& worldPos) const;
