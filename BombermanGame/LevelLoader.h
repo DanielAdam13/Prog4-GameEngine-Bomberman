@@ -15,6 +15,7 @@ namespace bombGame
 			PlayerSpawn
 		};
 
+		// Stores the level data read from the FILE for the level (intial static data)
 		struct LevelLayout
 		{
 			int width;

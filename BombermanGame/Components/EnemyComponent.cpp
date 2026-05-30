@@ -99,6 +99,7 @@ void bombGame::EnemyComponent::Notify(int eventId, ge::GameObject* other)
 	case ge::EngineEventId::HEALTH_DIED:
 		m_DeadEvent.NotifyObservers(GameEventId::ENEMY_DIED, GetOwner());
 		m_CachedAnimator->Play("death");
+		GetOwner()->RemoveComponent<ge::BoxCollider>();
 		break;
 	case ge::EngineEventId::COLLISION_ENTER:
 	{

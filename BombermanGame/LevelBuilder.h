@@ -4,12 +4,14 @@
 
 #include <optional>
 #include <vector>
+#include <utility>
 
 namespace ge
 {
 	class Scene;
 	class GameObject;
 	class SpriteSheet;
+	class Texture2D;
 }
 
 namespace bombGame
@@ -24,6 +26,8 @@ namespace bombGame
 		int row;
 	};
 
+	// Generated the Dynamic parts of the level - breakable walls, exit, powerups
+	// and STORES reference to their Game Objects and/or cooridnates
 	class LevelGrid final
 	{
 	public:
@@ -49,6 +53,12 @@ namespace bombGame
 		// Sets the dynamic wall from the container to nullptr
 		void ClearBreakableAt(int col, int row);
 
+		void MarkExitLocationAt(int col, int row);
+		std::pair<int, int> GetExitLocation() const noexcept;
+		bool IsExitTile(int col, int row) const noexcept;
+		void RegisterExit(ge::GameObject* go);
+		ge::GameObject* GetExitObject() const noexcept;
+
 		// Small index helper
 		int ToIndex(int col, int row) const noexcept;
 
@@ -58,6 +68,8 @@ namespace bombGame
 		float m_TileSize;
 
 		std::vector<ge::GameObject*> m_DynamicWalls;
+		ge::GameObject* m_ExitGO;
+		std::pair<int, int> m_ExitCoords{ -1, -1 };
 	};
 
 	namespace levelBuilder
@@ -65,6 +77,6 @@ namespace bombGame
 		void BuildStaticGeometry(ge::Scene& scene, const LevelGrid& grid);
 		// Generate and push the dynamic walls to the scene and store them in the grid as a reference
 		void GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid,
-			ge::SpriteSheet* breakableWallSheet, int breakableWallRandomnessIndex);
+			ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, int breakableWallRandomnessIndex);
 	}
 }

@@ -183,6 +183,7 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 		// !!!
 	case ge::EngineEventId::HEALTH_TAKING_DAMAGE:
 		m_DamageEvent.NotifyObservers(GameEventId::PLAYER_LOST_HEALTH, GetOwner());
+		GetOwner()->RemoveComponent<ge::BoxCollider>();
 		break;
 	case ge::EngineEventId::HEALTH_DIED:
 		m_DeadEvent.NotifyObservers(GameEventId::PLAYER_DIED, GetOwner());

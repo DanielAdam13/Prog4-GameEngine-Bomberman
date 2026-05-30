@@ -20,6 +20,8 @@
 #include <utility>
 #include <array>
 #include <vector>
+#include <glm/glm.hpp>
+#include <memory>
 
 std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid* grid, const glm::vec3& position,
 	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets, float windupDuration)
@@ -152,4 +154,45 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, ge::SpriteShe
 	scene.Add(std::move(enemyGO));
 
 	return enemyRaw;
+}
+
+void bombGame::spawnUtils::SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet)
+{
+	const int currentIndex{ grid.ToIndex(col, row) };
+	auto breakableWallGO = std::make_unique<ge::GameObject>("GO_BreakableWall" + std::to_string(currentIndex));
+	const glm::vec3 brWallPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f };
+	auto breakTr{ breakableWallGO->GetComponent<ge::Transform>() };
+	breakTr->SetLocalPosition(grid.GetLevelTopLeft() + brWallPos);
+	breakTr->SetLocalScale(3.5f, 3.5f, 1.f);
+
+	auto* brWallAnimator{ breakableWallGO->AddComponent<ge::AnimatorComponent>(breakableWallGO.get(), brWallSheet) };
+	brWallAnimator->AddAnimation({ "static", {0}, 1, false });
+	brWallAnimator->AddAnimation({ "crumbling", {0, 1, 2, 3, 4, 5, 6}, 20, false });
+	brWallAnimator->Play("static");
+
+	breakableWallGO->AddComponent<BreakableWallComponent>(breakableWallGO.get(), 0.4f);
+
+	auto* collider{ breakableWallGO->AddComponent<ge::BoxCollider>(breakableWallGO.get(),
+		glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, true) };
+	collider->AssignTag("BreakableWall");
+
+	grid.RegisterBreakableAt(col, row, breakableWallGO.get());
+
+	scene.Add(std::move(breakableWallGO));
+}
+
+void bombGame::spawnUtils::SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int col, int row, ge::Texture2D* exitDoorTexture)
+{
+	auto exitGO = std::make_unique<ge::GameObject>("GO_ExitDoor");
+	const glm::vec3 exitPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f };
+	auto breakTr{ exitGO->GetComponent<ge::Transform>() };
+	breakTr->SetLocalPosition(grid.GetLevelTopLeft() + exitPos);
+	breakTr->SetLocalScale(3.6f, 3.6f, 1.f);
+
+	auto* exitImage{ exitGO->AddComponent<ge::Image>(exitGO.get()) };
+	exitImage->SetTexture(exitDoorTexture);
+
+	scene.Add(std::move(exitGO));
+
+	grid.MarkExitLocationAt(col, row);
 }

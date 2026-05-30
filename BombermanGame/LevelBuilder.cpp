@@ -10,12 +10,14 @@
 #include "Components/AnimatorComponent.h"
 #include "SpriteSheet.h"
 #include "Animation.h"
+#include "Utils.h"
 
 #include <utility>
 #include <memory>
 #include <random>
 #include <glm/glm.hpp>
 #include <optional>
+#include <vector>
 
 bombGame::LevelGrid::LevelGrid(const levelLoader::LevelLayout& layout, const glm::vec3& buildTopLeftPos, const float tileSize)
 	:m_LevelLayout{ layout },
@@ -115,6 +117,31 @@ void bombGame::LevelGrid::ClearBreakableAt(int col, int row)
 	m_DynamicWalls[ToIndex(col, row)] = nullptr;
 }
 
+void bombGame::LevelGrid::MarkExitLocationAt(int col, int row)
+{
+	m_ExitCoords = { col, row };
+}
+
+std::pair<int, int> bombGame::LevelGrid::GetExitLocation() const noexcept
+{
+	return m_ExitCoords;
+}
+
+bool bombGame::LevelGrid::IsExitTile(int col, int row) const noexcept
+{
+	return m_ExitCoords.first == col && m_ExitCoords.second == row;
+}
+
+void bombGame::LevelGrid::RegisterExit(ge::GameObject* go)
+{
+	m_ExitGO = go;
+}
+
+ge::GameObject* bombGame::LevelGrid::GetExitObject() const noexcept
+{
+	return m_ExitGO;
+}
+
 int bombGame::LevelGrid::ToIndex(int col, int row) const noexcept
 {
 	return row * m_LevelLayout.width + col;
@@ -144,46 +171,51 @@ void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGr
 }
 
 void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid, 
-	ge::SpriteSheet* breakableWallSheet, int breakableWallRandomnessIndex)
+	ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, int breakableWallRandomnessIndex)
 {
-	for (int row{ 0 }; row < grid.GetLevelLayout().height; ++row)
+	static std::mt19937 gen{ std::random_device{}() };
+
+	const auto& layout{ grid.GetLevelLayout() };
+
+	// 1. Pick Exit tile
+	std::vector<std::pair<int, int>> emptyTiles;
+	for (int row{ 0 }; row < layout.height; ++row)
 	{
-		for (int col{ 0 }; col < grid.GetLevelLayout().width; ++col)
+		for (int col{ 0 }; col < layout.width; ++col)
 		{
-			levelLoader::TileType currentTileType{ grid.GetLevelLayout().At(col, row)};
+			if (layout.At(col, row) == levelLoader::TileType::Empty)
+			{
+				emptyTiles.emplace_back(col, row);
+			}
+		}
+	}
+	if (emptyTiles.empty()) // Invalid level
+		return;
+
+	std::uniform_int_distribution<size_t> pick(0, emptyTiles.size() - 1);
+	const auto [exitCol, exitRow] { emptyTiles[pick(gen)]};
+
+	spawnUtils::SpawnBreakableWallAt(scene, grid, exitCol, exitRow, breakableWallSheet);
+	spawnUtils::SpawnExitAt(scene, grid, exitCol, exitRow, exitDoorTexture); // Saves exit coordinate to grid internally
+
+	// 2. Spawn random breakable walls
+	static std::uniform_int_distribution<size_t> dist(0, breakableWallRandomnessIndex);
+	for (int row{ 0 }; row < layout.height; ++row)
+	{
+		for (int col{ 0 }; col < layout.width; ++col)
+		{
+			// Skip exit
+			if (row == exitRow && col == exitCol)
+				continue;
+
+			levelLoader::TileType currentTileType{ layout.At(col, row) };
 
 			// 1 out of [breakableWallRandomnessIndex] chance to spawn a breakable wall on an Empty spot
 			if (currentTileType == levelLoader::TileType::Empty)
 			{
-				static std::mt19937 gen{ std::random_device{}() };
-				static std::uniform_int_distribution<size_t> dist(0, breakableWallRandomnessIndex);
-
 				if (dist(gen) == 0)
 				{
-					const int currentIndex{ grid.ToIndex(col, row) };
-					auto breakableWallGO = std::make_unique<ge::GameObject>("GO_BreakableWall" + std::to_string(currentIndex));
-					const glm::vec3 brWallPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f};
-					auto breakTr{ breakableWallGO->GetComponent<ge::Transform>() };
-					breakTr->SetLocalPosition(grid.GetLevelTopLeft() + brWallPos);
-					breakTr->SetLocalScale(3.5f, 3.5f, 1.f);
-
-					/*auto brWallImage{ breakableWallGO->AddComponent<ge::Image>(breakableWallGO.get()) };
-					brWallImage->SetTexture(breakableWallTexture);*/
-
-					auto* brWallAnimator{breakableWallGO->AddComponent<ge::AnimatorComponent>(breakableWallGO.get(), breakableWallSheet)};
-					brWallAnimator->AddAnimation({ "static", {0}, 1, false });
-					brWallAnimator->AddAnimation({ "crumbling", {0, 1, 2, 3, 4, 5, 6}, 20, false });
-					brWallAnimator->Play("static");
-
-					breakableWallGO->AddComponent<BreakableWallComponent>(breakableWallGO.get(), 0.4f);
-
-					auto* collider{ breakableWallGO->AddComponent<ge::BoxCollider>(breakableWallGO.get(),
-						glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, true) };
-					collider->AssignTag("BreakableWall");
-
-					grid.RegisterBreakableAt(col, row, breakableWallGO.get());
-
-					scene.Add(std::move(breakableWallGO));
+					spawnUtils::SpawnBreakableWallAt(scene, grid, col, row, breakableWallSheet);
 				}
 			}
 		}

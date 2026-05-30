@@ -68,6 +68,7 @@ void bombGame::GameplayGameState::OnEnter()
 	tutFont->SetBold(true);
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
+	const auto exitDoorTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_DoorExit.png") };
 	const auto iceEnemySheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_IceEnemy.png", 11, 1) };
 	const auto breakableWallSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_BreakableWall.png", 7, 1) };
 
@@ -129,7 +130,7 @@ void bombGame::GameplayGameState::OnEnter()
 	m_LevelGrid = std::make_unique<LevelGrid>(layout, topBgPosition, tileSize);
 
 	levelBuilder::BuildStaticGeometry(GameplayScene, *m_LevelGrid.get());
-	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallSheet, 6);
+	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallSheet, exitDoorTexture, 6);
 
 	// -----------------------------------------------
 	// Players
