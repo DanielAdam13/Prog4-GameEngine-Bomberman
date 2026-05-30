@@ -69,6 +69,10 @@ void bombGame::GameplayGameState::OnEnter()
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
 	const auto exitDoorTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_DoorExit.png") };
+	/*const auto powerupBombUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupBombUp.png") };
+	const auto powerupFireUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupFireUp.png") };
+	const auto powerupRemoteDetonateTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupRemoteDetonate.png") };*/
+
 	const auto iceEnemySheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_IceEnemy.png", 11, 1) };
 	const auto breakableWallSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_BreakableWall.png", 7, 1) };
 

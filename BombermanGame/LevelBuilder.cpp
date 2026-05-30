@@ -195,8 +195,8 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 	std::uniform_int_distribution<size_t> pick(0, emptyTiles.size() - 1);
 	const auto [exitCol, exitRow] { emptyTiles[pick(gen)]};
 
-	spawnUtils::SpawnBreakableWallAt(scene, grid, exitCol, exitRow, breakableWallSheet);
 	spawnUtils::SpawnExitAt(scene, grid, exitCol, exitRow, exitDoorTexture); // Saves exit coordinate to grid internally
+	spawnUtils::SpawnBreakableWallAt(scene, grid, exitCol, exitRow, breakableWallSheet);
 
 	// 2. Spawn random breakable walls
 	static std::uniform_int_distribution<size_t> dist(0, breakableWallRandomnessIndex);
