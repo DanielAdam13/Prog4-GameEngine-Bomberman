@@ -36,6 +36,7 @@
 #include "Components/ScoreDisplayComponent.h"
 
 #include "Animation.h"
+#include "Utils.h"
 
 #include "LevelLoader.h"
 #include "LevelBuilder.h"
@@ -67,7 +68,7 @@ void bombGame::GameplayGameState::OnEnter()
 	tutFont->SetBold(true);
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
-	const auto iceEnemyTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_IceEnemy.png") };
+	const auto iceEnemySheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_IceEnemy.png", 11, 1) };
 	const auto breakableWallSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_BreakableWall.png", 7, 1) };
 
 	const auto playerSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Player.png", 7, 3) };
@@ -206,23 +207,8 @@ void bombGame::GameplayGameState::OnEnter()
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
 	// ---- Enemy Initialization ----
-	auto enemy1GO = std::make_unique<ge::GameObject>("GO_IceEnemy1");
-	auto enemy1Image{ enemy1GO->AddComponent<ge::Image>(enemy1GO.get()) };
-	enemy1Image->SetTexture(iceEnemyTexture);
-	auto enemy1Tr{ enemy1GO->GetComponent<ge::Transform>() };
-	enemy1Tr->SetLocalPosition({ 500.f, 250.f, 0.f });
-	enemy1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
-
-	auto enemy1BoxColl{ enemy1GO->AddComponent<ge::BoxCollider>(enemy1GO.get(),
-		enemy1Image->GetTexture()->GetSize()) };
-	enemy1BoxColl->AssignTag("Enemy");
-
-	enemy1GO->AddComponent<ge::HealthComponent>(enemy1GO.get(), 1);
-
-	auto enemyComp{ enemy1GO->AddComponent<EnemyComponent>(enemy1GO.get(), 60.f) };
-	enemyComp->AddTarget(player1GO.get());
-	enemyComp->AddTarget(player2GO.get());
-	enemyComp->InitializeStates();
+	spawnUtils::SpawnEnemy(GameplayScene, iceEnemySheet, { player1GO.get(), player2GO.get() });
+	
 
 	// ---- Health Displays ----
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");
@@ -342,8 +328,6 @@ void bombGame::GameplayGameState::OnEnter()
 
 	GameplayScene.Add(std::move(player1GO));
 	GameplayScene.Add(std::move(player2GO));
-
-	GameplayScene.Add(std::move(enemy1GO));
 
 	GameplayScene.Add(std::move(p1HealthDisplayGO));
 	GameplayScene.Add(std::move(p2HealthDisplayGO));

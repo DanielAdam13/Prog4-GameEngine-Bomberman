@@ -7,6 +7,7 @@
 #include "EnemyStates/RunState.h"
 #include "Observer.h"
 #include "Components/Colliders.h"
+#include "Components/AnimatorComponent.h"
 #include "ObservableSubject.h"
 
 #include <glm/glm.hpp>
@@ -63,6 +64,7 @@ namespace bombGame
 		ge::Transform* m_OwnerTransformRef; // Cached ref
 		ge::HealthComponent* m_CachedHealthComp; // Cached ref
 		ge::BoxCollider* m_CachedBoxCollider; // Cached ref
+		ge::AnimatorComponent* m_CachedAnimator; // Cached ref
 
 		float m_Speed{ 60.f };
 		glm::vec3 m_CurrentMoveDirection{};

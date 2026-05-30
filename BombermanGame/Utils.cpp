@@ -9,6 +9,8 @@
 #include "Scene.h"
 #include "Components/Colliders.h"
 #include "Components/BreakableWallComponent.h"
+#include "Components/HealthComponent.h"
+#include "Components/EnemyComponent.h"
 
 #include "LevelBuilder.h"
 #include "LevelLoader.h"
@@ -25,7 +27,7 @@ std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid* grid
 	auto bomb = std::make_unique<ge::GameObject>("GO_Bomb");
 	auto* bombTr{ bomb->GetComponent<ge::Transform>() };
 	bombTr->SetLocalPosition(position);
-	bombTr->SetLocalScale(2.f, 2.f, 1.f);
+	bombTr->SetLocalScale(2.5f, 2.5f, 1.f);
 	
 	auto* animator{ bomb->AddComponent<ge::AnimatorComponent>(bomb.get(), bombSheet) };
 	animator->SetAnchor({ 0.5f, 0.5f });
@@ -95,7 +97,7 @@ void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
 	auto explosion = std::make_unique<ge::GameObject>("GO_ExplosionArm");
 	auto* explosionTr{ explosion->GetComponent<ge::Transform>() };
 	explosionTr->SetLocalPosition(fixedPosition);
-	explosionTr->SetLocalScale(3.4f, 3.4f, 1.f);
+	explosionTr->SetLocalScale(2.5f, 2.5f, 1.f);
 
 	auto* animator{ explosion->AddComponent<ge::AnimatorComponent>(explosion.get(), explosionSheet)};
 	animator->SetAnchor({ 0.5f, 0.5f });
@@ -113,4 +115,41 @@ void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
 		->AssignTag("Explosion");
 
 	scene.Add(std::move(explosion));
+}
+
+ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets)
+{
+	auto enemyGO = std::make_unique<ge::GameObject>("GO_IceEnemy1");
+
+	auto* enemy1Animator{ enemyGO->AddComponent<ge::AnimatorComponent>(enemyGO.get(), enemySpriteSheet) };
+	enemy1Animator->AddAnimation({ "walk_right", {0, 1, 2}, 6, true });
+	enemy1Animator->AddAnimation({ "walk_right", {3, 4, 5}, 6, true });
+	enemy1Animator->AddAnimation({ "death", {6, 7, 8, 9, 10}, 3, false });
+	enemy1Animator->AddAnimation({ "idle", {0}, 1, false });
+
+	auto enemy1Tr{ enemyGO->GetComponent<ge::Transform>() };
+	enemy1Tr->SetLocalPosition({ 500.f, 250.f, 0.f });
+	enemy1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+
+	auto enemy1BoxColl{ enemyGO->AddComponent<ge::BoxCollider>(enemyGO.get(),
+		glm::vec2{enemySpriteSheet->GetFrameWidth(), enemySpriteSheet->GetFrameHeight()}) };
+	enemy1BoxColl->AssignTag("Enemy");
+
+	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), 1);
+
+	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), 60.f) };
+
+	for (auto t : targets)
+	{
+		if (t && !t->MarkedForDeletion())
+		{
+			enemyComp->AddTarget(t);
+		}
+	}
+	enemyComp->InitializeStates();
+
+	auto* enemyRaw{ enemyGO.get() };
+	scene.Add(std::move(enemyGO));
+
+	return enemyRaw;
 }

@@ -19,15 +19,20 @@ bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, flo
 	m_OwnerTransformRef{ owner->GetComponent<ge::Transform>() },
 	m_CachedHealthComp{ owner->GetComponent<ge::HealthComponent>() },
 	m_CachedBoxCollider{ owner->GetComponent<ge::BoxCollider>() },
+	m_CachedAnimator{ owner->GetComponent<ge::AnimatorComponent>() },
 	m_Speed{ speed },
 	m_DetectionRadius{ detectionRadius }
 {
-	assert(m_CachedHealthComp && "Enemy Component requires a HealthComponent on the same GameObject");
+	assert(m_CachedHealthComp && "EnemyComponent requires a HealthComponent on the same GameObject");
 	m_CachedHealthComp->GetOnTakingDamageEvent().AddObserver(this);
 	m_CachedHealthComp->GetOnDeathEvent().AddObserver(this);
 
-	assert(m_CachedBoxCollider && "Enemy Component requires a Box Collider on the same GameObject");
+	assert(m_CachedBoxCollider && "EnemyComponent requires a Box Collider on the same GameObject");
  	m_CachedBoxCollider->GetOnCollisionEnterEvent().AddObserver(this);
+
+	assert(m_CachedAnimator && "EnemyComponent requires an Animator Component on the same GameObject");
+	m_CachedAnimator->GetOnAnimationFinishedEvent().AddObserver(this);
+	m_CachedAnimator->Play("idle");
 }
 
 void bombGame::EnemyComponent::UpdateComponent(float deltaTime)
@@ -56,10 +61,10 @@ void bombGame::EnemyComponent::UpdateComponent(float deltaTime)
 		m_TransitionPending = true;
 	}
 
-	if (!IsAlive()) 
+	// Apply movement
+	if (!IsAlive())
 		return;
 
-	// Apply movement
 	const auto pos{ m_OwnerTransformRef->GetWorldPosition() };
 	m_OwnerTransformRef->SetLocalPosition(pos + m_CurrentMoveDirection * m_Speed * deltaTime);
 }
@@ -93,6 +98,7 @@ void bombGame::EnemyComponent::Notify(int eventId, ge::GameObject* other)
 	{
 	case ge::EngineEventId::HEALTH_DIED:
 		m_DeadEvent.NotifyObservers(GameEventId::ENEMY_DIED, GetOwner());
+		m_CachedAnimator->Play("death");
 		break;
 	case ge::EngineEventId::COLLISION_ENTER:
 	{
@@ -107,6 +113,12 @@ void bombGame::EnemyComponent::Notify(int eventId, ge::GameObject* other)
 		OnCollisionEnter(other, tag);
 		break;
 	}
+	case ge::EngineEventId::ANIMATION_FINISHED:
+		if (!IsAlive())
+		{
+			GetOwner()->MarkForDeletion();
+		}
+		break;
 	}
 }
 
