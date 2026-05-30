@@ -134,10 +134,12 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 
 	auto enemy1Tr{ enemyGO->GetComponent<ge::Transform>() };
 	enemy1Tr->SetLocalPosition(spawnPos);
-	enemy1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
+	enemy1Tr->SetLocalScale({ 2.7f, 2.7f, 1.f });
 
+	const float gridTileSize{ grid->GetTileSize() };
 	auto enemy1BoxColl{ enemyGO->AddComponent<ge::BoxCollider>(enemyGO.get(),
-		glm::vec2{enemySpriteSheet->GetFrameWidth(), enemySpriteSheet->GetFrameHeight()}) };
+		glm::vec2{gridTileSize, gridTileSize}, true,
+		glm::vec2{-gridTileSize * 0.5f , -gridTileSize * 0.5f})};
 	enemy1BoxColl->AssignTag("Enemy");
 
 	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), health);

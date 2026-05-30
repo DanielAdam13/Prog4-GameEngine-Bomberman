@@ -68,7 +68,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every BoxCollider Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 14 };
+		static constexpr ComponentTypeID StaticTypeID{ 17 };
 
 		BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, bool ignoreOwnerSize = false, const glm::vec2& localOffset = {});
 		~BoxCollider() override;
