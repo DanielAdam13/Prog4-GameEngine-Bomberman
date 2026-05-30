@@ -41,6 +41,7 @@ namespace bombGame
 		std::optional<GridTile> GetGridTileAt(const glm::vec3& worldPos) const noexcept;
 		std::optional<GridTile> GetGridTileByCoord(int col, int row) const noexcept;
 		std::optional<glm::vec2> GetMidGridTilePointAt(const glm::vec3& worldPos) const noexcept;
+		std::optional<glm::vec2> GetMidGridTilePointAt(int col, int row);
 
 		glm::vec3 GetLevelTopLeft() const noexcept;
 		levelLoader::LevelLayout GetLevelLayout() const noexcept;
@@ -61,6 +62,9 @@ namespace bombGame
 
 		// Small index helper
 		int ToIndex(int col, int row) const noexcept;
+
+		// Returns true if the tile is of type Wall or if a Breakable wall exists on this tile
+		bool IsBlocked(const GridTile& tile) const noexcept;
 
 	private:
 		levelLoader::LevelLayout m_LevelLayout;

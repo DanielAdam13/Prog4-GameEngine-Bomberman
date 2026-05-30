@@ -26,7 +26,6 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
 
   "EnemyStates/WanderState.h" "EnemyStates/WanderState.cpp" 
   "EnemyStates/ChaseState.h" "EnemyStates/ChaseState.cpp" 
-  "EnemyStates/RunState.h" "EnemyStates/RunState.cpp" 
   "EnemyStates/BaseEnemyState.h" "EnemyStates/BaseEnemyState.cpp"
 
   "Utils.h" "Utils.cpp" 

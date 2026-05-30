@@ -65,7 +65,9 @@ namespace bombGame
 		ge::BoxCollider* m_CachedBoxCollider;
 		ge::AnimatorComponent* m_CachedAnimator;
 
-		bool m_MovedThisFrame{ false }; // for animation logic
+		bool m_MovedThisFrame{ false }; // Flag for animation logic
 		glm::vec3 m_LastMoveDir{ 0.f }; // for animation logic
+
+		void UpdateAnimationLogic();
 	};
 }

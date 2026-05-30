@@ -5,6 +5,7 @@
 #include "Components/Transform.h"
 #include "EnemyStates/ChaseState.h"
 #include "EnemyStates/WanderState.h"
+#include "LevelBuilder.h"
 
 #include "Components/Colliders.h"
 #include "EngineEvents.h"
@@ -14,12 +15,13 @@
 #include <utility>
 #include <memory>
 
-bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, float speed, float detectionRadius)
+bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, float speed, float detectionRadius)
 	:Component::Component(owner),
 	m_OwnerTransformRef{ owner->GetComponent<ge::Transform>() },
 	m_CachedHealthComp{ owner->GetComponent<ge::HealthComponent>() },
 	m_CachedBoxCollider{ owner->GetComponent<ge::BoxCollider>() },
 	m_CachedAnimator{ owner->GetComponent<ge::AnimatorComponent>() },
+	m_LevelGrid{ levelGrid },
 	m_Speed{ speed },
 	m_DetectionRadius{ detectionRadius }
 {
@@ -61,12 +63,33 @@ void bombGame::EnemyComponent::UpdateComponent(float deltaTime)
 		m_TransitionPending = true;
 	}
 
-	// Apply movement
 	if (!IsAlive())
 		return;
 
+	// ===================================
+	// Apply movement
+	// ===================================
+	
+	// 3. Pick new Tile to move to
+	if (!m_HasTileTarget)
+	{
+		PickNextTileTarget();
+	}
+
+	// 4. Move toward the tile target
 	const auto pos{ m_OwnerTransformRef->GetWorldPosition() };
 	m_OwnerTransformRef->SetLocalPosition(pos + m_CurrentMoveDirection * m_Speed * deltaTime);
+
+	// 5. Check arrival
+	if (m_HasTileTarget && HasArrivedAtTargetTile())
+	{
+		// Snap position to tile center
+		GetOwnerTransform()->SetLocalPosition({ m_TargetTileCenter->x, m_TargetTileCenter->y, 0.f });
+		m_HasTileTarget = false;
+	}
+
+	// 6. After everything, animate
+	UpdateAnimationLogic();
 }
 
 void bombGame::EnemyComponent::InitializeStates()
@@ -128,6 +151,49 @@ ge::Subject& bombGame::EnemyComponent::GetDeadEvent() noexcept
 	return m_DeadEvent;
 }
 
+void bombGame::EnemyComponent::PickNextTileTarget()
+{
+	const auto currentTile{ m_LevelGrid->GetGridTileAt(GetOwnerTransform()->GetWorldPosition()) };
+	if (!currentTile) // If invalid tile, early out
+		return;
+
+	const glm::vec3 dir{ m_CurrentState->ChooseDirectionAtIntersection(*currentTile) };
+
+	// If state wants us to stop, early out
+	if (dir == glm::vec3{ 0, 0, 0 })
+	{
+		m_CurrentMoveDirection = { 0, 0, 0 };
+		m_HasTileTarget = false;
+		return;
+	}
+
+	const int nextCol{ currentTile->col + static_cast<int>(dir.x) };
+	const int nextRow{ currentTile->row + static_cast<int>(dir.y) };
+	auto nextTile{ m_LevelGrid->GetGridTileByCoord(nextCol, nextRow) };
+
+	// Just in case check. States should not return blocked directions but still:
+	if (!nextTile || m_LevelGrid->IsBlocked(*nextTile))
+	{
+		m_CurrentMoveDirection = { 0, 0, 0 };
+		m_HasTileTarget = false;
+		return;
+	}
+
+	m_TargetTileCenter = m_LevelGrid->GetMidGridTilePointAt(nextCol, nextRow);
+	m_CurrentMoveDirection = dir;
+	m_HasTileTarget = true;
+}
+
+bool bombGame::EnemyComponent::HasArrivedAtTargetTile() const
+{
+	const auto pos{ GetOwnerTransform()->GetWorldPosition() };
+	const auto diff{ glm::vec2{*m_TargetTileCenter} - glm::vec2{pos.x, pos.y} };
+
+	static constexpr float arrivalEpsilon{ 2.f };
+
+	return glm::length(diff) < arrivalEpsilon;
+}
+
 void bombGame::EnemyComponent::OnCollisionEnter(ge::GameObject*, const ge::CollisionLayerTag& tag)
 {
 	if (tag == "Explosion")
@@ -135,4 +201,21 @@ void bombGame::EnemyComponent::OnCollisionEnter(ge::GameObject*, const ge::Colli
 		if(m_CachedHealthComp)
 			m_CachedHealthComp->Die();
 	}
+}
+
+void bombGame::EnemyComponent::UpdateAnimationLogic()
+{
+	if (!m_CachedAnimator)
+		return;
+
+	if (m_CurrentMoveDirection.y < -0.5f)
+		m_CachedAnimator->Play("walk_left");
+	else if (m_CurrentMoveDirection.y > 0.5f)
+		m_CachedAnimator->Play("walk_right");
+	else if (m_CurrentMoveDirection.x < -0.5f)
+		m_CachedAnimator->Play("walk_left");
+	else if (m_CurrentMoveDirection.x > 0.5f)
+		m_CachedAnimator->Play("walk_right");
+	else
+		m_CachedAnimator->Play("idle");
 }

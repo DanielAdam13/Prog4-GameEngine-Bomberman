@@ -13,15 +13,8 @@ namespace ge
 
 namespace bombGame
 {
-	namespace MovementDirections
-	{
-		constexpr glm::vec3 Up{ 0.f, -1.f, 0.f };
-		constexpr glm::vec3 Right{ 1.f, 0.f, 0.f };
-		constexpr glm::vec3 Down{ 0.f, 1.f, 0.f };
-		constexpr glm::vec3 Left{ -1.f, 0.f, 0.f };
-	}
-
 	class EnemyComponent;
+	struct GridTile;
 
 	class WanderState final : public EnemyState
 	{
@@ -34,16 +27,14 @@ namespace bombGame
 		WanderState& operator=(WanderState&&) = delete;
 
 		virtual void OnEnter() override;
-		virtual void OnExit() override;
+		virtual void OnExit() override {}
 		virtual std::unique_ptr<EnemyState> OnUpdate(float) override;
 
-	private:
-		glm::vec3 m_CurrentWanderDirection;
-		static constexpr inline std::array<glm::vec3, 4> m_PossibleDirections{
-			MovementDirections::Up, MovementDirections::Right, MovementDirections::Down, MovementDirections::Left };
+		// Wander State: picks a random walkable direction
+		virtual glm::vec3 ChooseDirectionAtIntersection(const GridTile& currentTile) override;
 
+	private:
 		float m_WanderTimer{ 0.f };
-		static constexpr inline float DirectionSwitchTimer{ 1.5f };
 
 		float m_PlayerCheckTimer{ 0.f };
 		static constexpr inline float m_PlayerCheckInterval{ 0.25f };

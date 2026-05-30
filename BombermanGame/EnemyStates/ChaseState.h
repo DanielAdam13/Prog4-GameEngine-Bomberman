@@ -28,8 +28,11 @@ namespace bombGame
 		virtual void OnExit() override;
 		virtual std::unique_ptr<EnemyState> OnUpdate(float) override;
 
+		// Chase State: picks the direction that minimizes the distance to player
+		virtual glm::vec3 ChooseDirectionAtIntersection(const GridTile& currentTile) override;
+
 	private:
-		ge::GameObject* m_CurrentTarget{ nullptr }; // ref
+		ge::GameObject* m_CurrentTarget{ nullptr }; // Cached ref
 		glm::vec3 m_DirectionToClosest{};
 
 		float m_RefreshClosestTimer{ 0.f };

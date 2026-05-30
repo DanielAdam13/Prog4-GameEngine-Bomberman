@@ -4,7 +4,6 @@
 #include "EnemyStates/BaseEnemyState.h"
 #include "EnemyStates/ChaseState.h"
 #include "EnemyStates/WanderState.h"
-#include "EnemyStates/RunState.h"
 #include "Observer.h"
 #include "Components/Colliders.h"
 #include "Components/AnimatorComponent.h"
@@ -13,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
+#include <optional>
 
 namespace ge
 {
@@ -23,6 +23,8 @@ namespace ge
 
 namespace bombGame
 {
+	class LevelGrid;
+
 	// Game-specific Component
 	class EnemyComponent final : public ge::Component, public ge::IObserver
 	{
@@ -31,7 +33,7 @@ namespace bombGame
 		// Every PlayerComponent Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 13 };
 
-		explicit EnemyComponent(ge::GameObject* owner, float speed = 60.f, float detectionRadius = 200.f);
+		explicit EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, float speed = 60.f, float detectionRadius = 200.f);
 		~EnemyComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
@@ -48,28 +50,35 @@ namespace bombGame
 		glm::vec3 GetMoveDirection() const noexcept { return m_CurrentMoveDirection; }
 		float GetSpeed() const noexcept { return m_Speed; }
 		float GetDetectionRadius() const noexcept { return m_DetectionRadius; }
+		LevelGrid* GetLevelGrid() const noexcept { return m_LevelGrid; } // For states
+
 		bool IsAlive() const noexcept;
 
 		void AddTarget(ge::GameObject* newTarget) noexcept;
-		void SetMoveDirection(glm::vec3 direction) noexcept { m_CurrentMoveDirection = direction; }
-		void SetSpeed(float newSpeed) noexcept { m_Speed = newSpeed; }
 
 		virtual void Notify(int eventId, ge::GameObject* other) override;
-
 		ge::Subject& GetDeadEvent() noexcept;
 
 	private:
 		std::vector<ge::GameObject*> m_Targets{}; // Cached ref
 		std::vector<ge::Transform*> m_TargetTransforms{}; // Cached ref
+
 		ge::Transform* m_OwnerTransformRef; // Cached ref
 		ge::HealthComponent* m_CachedHealthComp; // Cached ref
 		ge::BoxCollider* m_CachedBoxCollider; // Cached ref
 		ge::AnimatorComponent* m_CachedAnimator; // Cached ref
 
-		float m_Speed{ 60.f };
+		LevelGrid* m_LevelGrid{ nullptr }; // Ref
+
+		// Movement related data:
+		const float m_Speed{ 60.f };
+		const float m_DetectionRadius{ 200.f };
 		glm::vec3 m_CurrentMoveDirection{};
 
-		float m_DetectionRadius{ 200.f };
+		void PickNextTileTarget();
+		bool m_HasTileTarget{ false };
+		std::optional<glm::vec2> m_TargetTileCenter;
+		bool HasArrivedAtTargetTile() const;
 
 		// States:
 		std::unique_ptr<EnemyState> m_CurrentState;
@@ -79,6 +88,8 @@ namespace bombGame
 		ge::Subject m_DeadEvent;
 
 		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
+
+		void UpdateAnimationLogic();
 
 	};
 }

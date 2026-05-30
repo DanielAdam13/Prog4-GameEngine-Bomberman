@@ -31,7 +31,9 @@ namespace bombGame
 		void CreateExplosion(ge::Scene& scene, const LevelGrid& grid,
 			const glm::vec3& fixedPosition,	ge::SpriteSheet* texture, float lifetime, const std::vector<int>& animationFrames);
 
-		ge::GameObject* SpawnEnemy(ge::Scene& scene, ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets);
+		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
+			ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets, 
+			const glm::vec3& spawnPos, float speed, int health);
 
 		void SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet);
 		void SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int col, int row, ge::Texture2D* exitdoorTexture);

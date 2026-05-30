@@ -8,24 +8,14 @@
 #include <random>
 
 bombGame::WanderState::WanderState(ge::GameObject* pSourcePtr)
-	:EnemyState::EnemyState(pSourcePtr),
-	m_CurrentWanderDirection{ m_PossibleDirections[0] }
+	:EnemyState::EnemyState(pSourcePtr)
 {
-	// Set at start
-	GetSourceEnemyComponent()->SetMoveDirection(m_CurrentWanderDirection);
 }
 
 void bombGame::WanderState::OnEnter()
 {
 	m_WanderTimer = 0.f;
 	m_PlayerCheckTimer = 0.f;
-	m_CurrentWanderDirection = m_PossibleDirections[1];
-	GetSourceEnemyComponent()->SetMoveDirection(m_CurrentWanderDirection);
-}
-
-void bombGame::WanderState::OnExit()
-{
-	m_CurrentWanderDirection = {};
 }
 
 std::unique_ptr<bombGame::EnemyState> bombGame::WanderState::OnUpdate(float deltaTime)
@@ -44,19 +34,22 @@ std::unique_ptr<bombGame::EnemyState> bombGame::WanderState::OnUpdate(float delt
 		}
 	}
 
-	// 2. Switch direction logic:
-	m_WanderTimer += deltaTime;
-	if (m_WanderTimer >= DirectionSwitchTimer)
-	{
-		m_WanderTimer -= DirectionSwitchTimer;
+	// Movement is handled through ChooseDirectionAtIntersection calls in EnemyComponent
 
-		static std::mt19937 gen{ std::random_device{}() };
-		static std::uniform_int_distribution<size_t> dist(0, m_PossibleDirections.size() - 1);
-
-		m_CurrentWanderDirection = m_PossibleDirections[dist(gen)];
-		GetSourceEnemyComponent()->SetMoveDirection(m_CurrentWanderDirection);
-	}
-
-	// 3. Stay in current state
+	// 2. Stay in current state
 	return nullptr;
+}
+
+glm::vec3 bombGame::WanderState::ChooseDirectionAtIntersection(const GridTile& currentTile)
+{
+	auto* grid{ GetSourceEnemyComponent()->GetLevelGrid() };
+	auto options{ CollectWalkableNeighbors(*grid, currentTile, GetSourceEnemyComponent()->GetMoveDirection()) };
+
+	// Trapped
+	if (options.empty())
+		return { 0, 0, 0 };
+
+	static std::mt19937 gen{ std::random_device{}() };
+	std::uniform_int_distribution<size_t> pick(0, options.size() - 1);
+	return options[pick(gen)];
 }

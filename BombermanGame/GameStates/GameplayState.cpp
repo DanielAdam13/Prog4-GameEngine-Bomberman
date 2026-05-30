@@ -212,8 +212,11 @@ void bombGame::GameplayGameState::OnEnter()
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
 	// ---- Enemy Initialization ----
-	spawnUtils::SpawnEnemy(GameplayScene, iceEnemySheet, { player1GO.get(), player2GO.get() });
-	
+	const auto spawnTileCenter = m_LevelGrid->GetMidGridTilePointAt(7, 5);
+
+	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(), 
+		iceEnemySheet, {player1GO.get(), player2GO.get()}, 
+		{ spawnTileCenter->x, spawnTileCenter->y, 0.f }, 100.f, 1);
 
 	// ---- Health Displays ----
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");

@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "Components/EnemyComponent.h"
 #include "Components/PlayerComponent.h"
+#include "LevelBuilder.h"
 
 #include <cassert>
 #include <limits>
@@ -57,4 +58,32 @@ bombGame::EnemyComponent* bombGame::EnemyState::GetSourceEnemyComponent() const 
 ge::Transform* bombGame::EnemyState::GetSourceTransform() const noexcept
 {
 	return m_pSourceTransform;
+}
+
+std::vector<glm::vec3> bombGame::EnemyState::CollectWalkableNeighbors(const LevelGrid& grid, 
+	const GridTile& currentTile, const glm::vec3& currentDir) const
+{
+	std::vector<glm::vec3> options;
+	
+	// Look for VALID directions.
+	// A valid direction would mean - neighbour is a valid tile, tile is not Wall, tile is not BREAKABLE wall, direction is not the same
+	for (auto [dx, dy] : m_PossibleDirections)
+	{
+		auto neighbour{ grid.GetGridTileByCoord(currentTile.col + dx, currentTile.row + dy) };
+		if (!neighbour)
+			continue;
+		if (neighbour->gridTileType == levelLoader::TileType::Wall)
+			continue;
+		if (grid.GetBreakableWallAt(currentTile.col + dx, currentTile.row + dy))
+			continue;
+
+		const glm::vec3 dir{ dx, dy, 0 };
+
+		if (dir == -currentDir)
+			continue;
+
+		options.push_back(dir);
+	}
+
+	return options;
 }

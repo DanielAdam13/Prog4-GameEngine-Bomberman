@@ -43,14 +43,25 @@ This should be used as a generic/base condition because it is the top-most level
 
 # Bomberman Architectural Choices
 
-The Bomb Laying problem:
+### The Bomb Laying problem
 
 Where should a bomb be created? All Update logic happens in Components and it is indeed a separate "mechanic", so in a Bomb Component? Should it be in the Player Component? Maybe the game could store a "prototype" bomb Game Object? All of these are bad ideas.
+
 A player would need to PRESS a button in order to lay a bomb. That means that it is intuitive to do it in a Lay Bomb Command. The bomb can be created once the Execute method fires.
 Now comes the problem, WHEN should we spawn a bomb? The Bomberman game does not allow two (without powerups) bombs to exists at the same time (for a single player). As explained in the Commands section above, this Lay Bomb Command is very specific, meaning that we SHOULD evaluate the Can Spawn Bomb condition INSIDE its Execute method. 
+
 I decided to solve this issue by creating a specific Component for laying a bomb which basically tracks the active bombs. It increments when a bomb is REGISTERED and decrements by listening/OBSERVING the Bomb_Explosion Game event.
 
+### Enemy AI
+An enemy needs to walk in the grid based level. For that, logic for movement to Tile Target is implemented. 
+Movement setting happens in Enemy Component, actual direction choice is done in the States + the state switching still happens inside the States themselves.
 
+As before, setting the Position of the enemy Game Object happens from Enemy Component with it now including the Move to Tile logic.
+How the directions are calculated happens from the States via a virtual method ChooseDirectionAtIntersection.
+This method is then called from the Enemy Component when a target tile is reached.
+
+The enemy is moving between centers of the tile.
+When a target is reached, the position is clamped to the mid point to prevent overshooting.
 
 ## Windows version
 

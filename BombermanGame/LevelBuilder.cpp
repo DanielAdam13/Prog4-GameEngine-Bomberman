@@ -83,7 +83,16 @@ std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointAt(const glm::v
 	if (col >= m_LevelLayout.width || row >= m_LevelLayout.height)
 		return std::nullopt;
 
-	return glm::vec2{ m_LevelTopLeftPos.x + col * m_TileSize + m_TileSize / 2.f, 
+	return glm::vec2{ m_LevelTopLeftPos.x + col * m_TileSize + m_TileSize * 0.5f, 
+		m_LevelTopLeftPos.y + row * m_TileSize + m_TileSize * 0.5f };
+}
+
+std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointAt(int col, int row)
+{
+	if (col >= m_LevelLayout.width || row >= m_LevelLayout.height)
+		return std::nullopt;
+
+	return glm::vec2{ m_LevelTopLeftPos.x + col * m_TileSize + m_TileSize / 2.f,
 		m_LevelTopLeftPos.y + row * m_TileSize + m_TileSize / 2.f };
 }
 
@@ -145,6 +154,15 @@ ge::GameObject* bombGame::LevelGrid::GetExitObject() const noexcept
 int bombGame::LevelGrid::ToIndex(int col, int row) const noexcept
 {
 	return row * m_LevelLayout.width + col;
+}
+
+bool bombGame::LevelGrid::IsBlocked(const GridTile& tile) const noexcept
+{
+	if (tile.gridTileType == levelLoader::TileType::Wall)
+		return true;
+	if (this->GetBreakableWallAt(tile.col, tile.row))
+		return true;
+	return false;
 }
 
 void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGrid& grid)

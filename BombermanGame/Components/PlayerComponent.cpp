@@ -75,36 +75,12 @@ bombGame::PlayerComponent::~PlayerComponent()
 
 void bombGame::PlayerComponent::UpdateComponent(float)
 {
-	if (!IsAlive()) 
-	{
-		m_CachedAnimator->Play("death");
-		m_MovedThisFrame = false;
-		return;
-	}
-	// -------------------------------------
-	// Play Movement Animations
-	// -------------------------------------
-	if (m_MovedThisFrame)
-	{
-		if (m_LastMoveDir.y < 0.f)
-			m_CachedAnimator->Play("walk_up");
-		else if (m_LastMoveDir.y > 0.f)
-			m_CachedAnimator->Play("walk_down");
-		else if (m_LastMoveDir.x < 0.f)
-			m_CachedAnimator->Play("walk_left");
-		else if (m_LastMoveDir.x > 0.f)
-			m_CachedAnimator->Play("walk_right");
-	}
-	else
-	{
-		m_CachedAnimator->Play("idle");
-	}
-
-	m_MovedThisFrame = false;
+	UpdateAnimationLogic();
 }
 
 void bombGame::PlayerComponent::TryMove(const glm::vec3& direction, float deltaTime)
 {
+	// Stop movement
 	if (!IsAlive())
 		return;
 
@@ -187,6 +163,7 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 		break;
 	case ge::EngineEventId::HEALTH_DIED:
 		m_DeadEvent.NotifyObservers(GameEventId::PLAYER_DIED, GetOwner());
+		m_CachedAnimator->Play("death");
 		break;
 	case ge::EngineEventId::SCORE_CHANGED:
 		m_ScoreChangeEvent.NotifyObservers(GameEventId::PLAYER_SCORE_CHANGED, GetOwner());
@@ -238,4 +215,37 @@ bool bombGame::PlayerComponent::WouldOverlapWall(const glm::vec3& worldPos) cons
 	const auto boxBounds{ m_CachedBoxCollider->GetBoundsAt(worldPos) };
 
 	return ge::CollisionSystem::GetInstance().AnyOverlapWithTags(boxBounds, { "Wall", "BreakableWall" });
+}
+
+void bombGame::PlayerComponent::UpdateAnimationLogic()
+{
+	if (!IsAlive())
+	{
+		m_MovedThisFrame = false;
+		return;
+	}
+
+	if (!m_CachedAnimator)
+		return;
+
+	// -------------------------------------
+	// Play Movement Animations
+	// -------------------------------------
+	if (m_MovedThisFrame)
+	{
+		if (m_LastMoveDir.y < 0.f)
+			m_CachedAnimator->Play("walk_up");
+		else if (m_LastMoveDir.y > 0.f)
+			m_CachedAnimator->Play("walk_down");
+		else if (m_LastMoveDir.x < 0.f)
+			m_CachedAnimator->Play("walk_left");
+		else if (m_LastMoveDir.x > 0.f)
+			m_CachedAnimator->Play("walk_right");
+	}
+	else
+	{
+		m_CachedAnimator->Play("idle");
+	}
+
+	m_MovedThisFrame = false;
 }

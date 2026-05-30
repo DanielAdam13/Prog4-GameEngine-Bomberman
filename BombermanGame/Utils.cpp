@@ -119,27 +119,30 @@ void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
 	scene.Add(std::move(explosion));
 }
 
-ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets)
+ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
+	ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets,
+	const glm::vec3& spawnPos, float speed, int health)
 {
 	auto enemyGO = std::make_unique<ge::GameObject>("GO_IceEnemy1");
 
 	auto* enemy1Animator{ enemyGO->AddComponent<ge::AnimatorComponent>(enemyGO.get(), enemySpriteSheet) };
-	enemy1Animator->AddAnimation({ "walk_right", {0, 1, 2}, 6, true });
-	enemy1Animator->AddAnimation({ "walk_right", {3, 4, 5}, 6, true });
+	enemy1Animator->AddAnimation({ "walk_right", {0, 1, 2}, 4, true });
+	enemy1Animator->AddAnimation({ "walk_left", {3, 4, 5}, 4, true });
 	enemy1Animator->AddAnimation({ "death", {6, 7, 8, 9, 10}, 3, false });
 	enemy1Animator->AddAnimation({ "idle", {0}, 1, false });
+	enemy1Animator->SetAnchor({ 0.5f, 0.5f });
 
 	auto enemy1Tr{ enemyGO->GetComponent<ge::Transform>() };
-	enemy1Tr->SetLocalPosition({ 500.f, 250.f, 0.f });
+	enemy1Tr->SetLocalPosition(spawnPos);
 	enemy1Tr->SetLocalScale({ 2.5f, 2.5f, 2.5f });
 
 	auto enemy1BoxColl{ enemyGO->AddComponent<ge::BoxCollider>(enemyGO.get(),
 		glm::vec2{enemySpriteSheet->GetFrameWidth(), enemySpriteSheet->GetFrameHeight()}) };
 	enemy1BoxColl->AssignTag("Enemy");
 
-	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), 1);
+	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), health);
 
-	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), 60.f) };
+	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), grid, speed) };
 
 	for (auto t : targets)
 	{
