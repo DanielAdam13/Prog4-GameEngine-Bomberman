@@ -126,15 +126,16 @@ void bombGame::GameplayGameState::OnEnter()
 	// -----------------------------------------------
 	// --- Level Initialization ---
 	// -----------------------------------------------
-	
+	const stageLoader::StageDescriptor& stage{ stageLoader::Load(GetBombermanGame().GetCurrentGameSession().currentStageIndex)};
+
 	levelLoader::LevelLayout layout{ levelLoader::Load(
-		ge::ResourceManager::GetInstance().GetFullPath("levels/mainLevel1.txt")) };
+		ge::ResourceManager::GetInstance().GetFullPath("levels/" + stage.layoutFile)) };
 	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / layout.height };
 
 	m_LevelGrid = std::make_unique<LevelGrid>(layout, topBgPosition, tileSize);
 
 	levelBuilder::BuildStaticGeometry(GameplayScene, *m_LevelGrid.get());
-	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallSheet, exitDoorTexture, 6);
+	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallSheet, exitDoorTexture, stage.breakableDensity);
 
 	// -----------------------------------------------
 	// Players

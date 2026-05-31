@@ -69,6 +69,11 @@ bombGame::GameStateMachine& bombGame::BombermanGame::GetStateMachine() noexcept
 	return *m_GameStateMachine;
 }
 
+bombGame::BombermanGame::GameSession bombGame::BombermanGame::GetCurrentGameSession() const noexcept
+{
+	return m_CurrentGameSession;
+}
+
 void bombGame::BombermanGame::LoadSound()
 {
 	m_StoredSoundSystem->RegisterSound(SoundIds::ExplosionBomb, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomb_explosion.wav"));

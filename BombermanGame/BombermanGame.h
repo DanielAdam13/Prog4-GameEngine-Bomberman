@@ -2,8 +2,10 @@
 #include "IGameApplication.h"
 #include "GameStates/GameStateMachine.h"
 #include "SoundManager.h"
+#include "PowerupType.h"
 
 #include <memory>
+#include <vector>
 
 namespace ge
 {
@@ -34,6 +36,16 @@ namespace bombGame
 		ge::SoundSystem* GetStoredSoundSystem() noexcept;
 		GameStateMachine& GetStateMachine() noexcept;
 
+		struct GameSession
+		{
+			int currentStageIndex{ 0 };
+			int playerLives{ 2 };
+			int totalScore{ 0 };
+			std::vector<PowerupType> storedPowerups;
+		};
+
+		GameSession GetCurrentGameSession() const noexcept;
+
 	private:
 		std::unique_ptr<GameStateMachine> m_GameStateMachine{};
 
@@ -41,6 +53,8 @@ namespace bombGame
 		SoundManager m_BombermanSoundManager{};
 
 		void LoadSound();
+
+		GameSession m_CurrentGameSession{};
 	};
 
 	namespace sceneNames
