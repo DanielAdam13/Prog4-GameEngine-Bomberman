@@ -58,8 +58,8 @@ namespace bombGame
 			MovementDirections::Up, MovementDirections::Right, MovementDirections::Down, MovementDirections::Left };
 		
 	private:
-		EnemyComponent* m_pEnemyComponent{ nullptr }; // Cached ref
-		ge::Transform* m_pSourceTransform{ nullptr }; // Cahced ref
+		EnemyComponent* m_CachedEnemyComponent{ nullptr }; // Cached ref
+		ge::Transform* m_CachedSourceTransform{ nullptr }; // Cahced ref
 
 	};
 }

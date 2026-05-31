@@ -179,7 +179,7 @@ void bombGame::EnemyComponent::PickNextTileTarget()
 		return;
 	}
 
-	m_TargetTileCenter = m_LevelGrid->GetMidGridTilePointAt(nextCol, nextRow);
+	m_TargetTileCenter = m_LevelGrid->GetMidGridTilePointByCoord(nextCol, nextRow);
 	m_CurrentMoveDirection = dir;
 	m_HasTileTarget = true;
 }

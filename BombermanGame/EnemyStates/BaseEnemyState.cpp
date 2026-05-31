@@ -10,22 +10,22 @@
 #include <glm/glm.hpp>
 
 bombGame::EnemyState::EnemyState(ge::GameObject* pTargetPtr)
-	:m_pEnemyComponent{ pTargetPtr->GetComponent<EnemyComponent>() },
-	m_pSourceTransform{ pTargetPtr->GetComponent<ge::Transform>() }
+	:m_CachedEnemyComponent{ pTargetPtr->GetComponent<EnemyComponent>() },
+	m_CachedSourceTransform{ pTargetPtr->GetComponent<ge::Transform>() }
 {
-	assert(m_pEnemyComponent && "An Enemy State requires target having an Enemy Component!");
+	assert(m_CachedEnemyComponent && "An Enemy State requires target having an Enemy Component!");
 }
 
 ge::GameObject* bombGame::EnemyState::FindClosestPlayerInRange() const
 {
-	const float range{ m_pEnemyComponent->GetDetectionRadius() };
+	const float range{ m_CachedEnemyComponent->GetDetectionRadius() };
 	const float rangeSqr{ range * range };
-	const auto enemyPos{ m_pSourceTransform->GetWorldPosition() };
+	const auto enemyPos{ m_CachedSourceTransform->GetWorldPosition() };
 
 	ge::GameObject* closestTarget{ nullptr };
 	float closestDistSqr{ std::numeric_limits<float>::max() };
 
-	for (auto* target : m_pEnemyComponent->GetTargets())
+	for (auto* target : m_CachedEnemyComponent->GetTargets())
 	{
 		if (!target)
 			return nullptr;
@@ -52,12 +52,12 @@ ge::GameObject* bombGame::EnemyState::FindClosestPlayerInRange() const
 
 bombGame::EnemyComponent* bombGame::EnemyState::GetSourceEnemyComponent() const noexcept
 {
-	return m_pEnemyComponent;
+	return m_CachedEnemyComponent;
 }
 
 ge::Transform* bombGame::EnemyState::GetSourceTransform() const noexcept
 {
-	return m_pSourceTransform;
+	return m_CachedSourceTransform;
 }
 
 std::vector<glm::vec3> bombGame::EnemyState::CollectWalkableNeighbors(const LevelGrid& grid, 

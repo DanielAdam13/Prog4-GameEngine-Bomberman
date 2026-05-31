@@ -43,9 +43,13 @@ void HealthDisplayComponent::Notify(int eventId, ge::GameObject*)
 
 void HealthDisplayComponent::RefreshText()
 {
+	if (!m_pTrackedPlayer)
+		return;
+
 	auto* healthComp{ m_pTrackedPlayer->GetComponent<ge::HealthComponent>() };
 
-	if (!healthComp || !m_pCachedText) return;
+	if (!healthComp || !m_pCachedText) 
+		return;
 
 	m_pCachedText->SetText(m_pTrackedPlayer->GetName() + " HP: " + std::to_string(healthComp->GetCurrentHealth()));
 }

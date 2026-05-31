@@ -37,8 +37,12 @@ void ScoreDisplayComponent::Notify(int eventId, ge::GameObject*)
 
 void ScoreDisplayComponent::RefreshText()
 {
+	if (!m_pTrackedPlayer)
+		return;
+
 	auto* score{ m_pTrackedPlayer->GetComponent<ge::ScoreComponent>() };
-	if (!score || !m_pCachedText) return;
+	if (!score || !m_pCachedText) 
+		return;
 
 	m_pCachedText->SetText("Score: " + std::to_string(score->GetCurrentScore()));
 }

@@ -41,7 +41,7 @@ void bombGame::BombermanGame::Load()
 	ge::CollisionSystem::GetInstance().AddLayerTag("Explosion");
 
 	m_GameStateMachine = std::make_unique<GameStateMachine>();
-	m_GameStateMachine->SetInitialState(std::make_unique<MainMenuGameState>(*this));
+	m_GameStateMachine->SetInitialState(*this);
 }
 
 void bombGame::BombermanGame::Update(float deltaTime)

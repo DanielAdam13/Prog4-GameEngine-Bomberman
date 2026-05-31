@@ -87,7 +87,7 @@ std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointAt(const glm::v
 		m_LevelTopLeftPos.y + row * m_TileSize + m_TileSize * 0.5f };
 }
 
-std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointAt(int col, int row)
+std::optional<glm::vec2> bombGame::LevelGrid::GetMidGridTilePointByCoord(int col, int row) const noexcept
 {
 	if (col >= m_LevelLayout.width || row >= m_LevelLayout.height)
 		return std::nullopt;

@@ -1,10 +1,12 @@
 #include "GameStateMachine.h"
+#include "MainMenuState.h"
 
 #include <utility>
+#include <memory>
 
-void bombGame::GameStateMachine::SetInitialState(std::unique_ptr<GameState> initialState)
+void bombGame::GameStateMachine::SetInitialState(BombermanGame& game)
 {
-	m_CurrentGameState = std::move(initialState);
+	m_CurrentGameState = std::make_unique<MainMenuGameState>(game);
 	if (m_CurrentGameState)
 		m_CurrentGameState->OnEnter();
 }

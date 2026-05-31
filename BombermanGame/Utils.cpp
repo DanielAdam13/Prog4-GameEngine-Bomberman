@@ -75,6 +75,7 @@ void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 				if (auto* brWallComp = breakableWall->GetComponent<BreakableWallComponent>())
 				{
 					brWallComp->Crumble();
+					grid.ClearBreakableAt(currentCol, currentRow);
 				}
 				break;
 			}

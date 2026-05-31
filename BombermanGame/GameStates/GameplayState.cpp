@@ -212,13 +212,13 @@ void bombGame::GameplayGameState::OnEnter()
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
 	// ---- Enemy Initialization ----
-	const auto spawnTileCenter = m_LevelGrid->GetMidGridTilePointAt(7, 5);
+	const auto spawnTileCenter = m_LevelGrid->GetMidGridTilePointByCoord(7, 5);
 
 	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(), 
 		balloonSpriteSheet, {player1GO.get(), player2GO.get()}, 
 		{ spawnTileCenter->x, spawnTileCenter->y, 0.f }, 60.f, 1);
 
-	const auto spawnTileCenter2 = m_LevelGrid->GetMidGridTilePointAt(1, 5);
+	const auto spawnTileCenter2 = m_LevelGrid->GetMidGridTilePointByCoord(1, 5);
 	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(),
 		iceEnemySheet, { player1GO.get(), player2GO.get() },
 		{ spawnTileCenter2->x, spawnTileCenter2->y, 0.f }, 100.f, 1);

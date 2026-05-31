@@ -5,13 +5,14 @@
 
 namespace bombGame
 {
+	class BombermanGame;
 	class GameStateMachine final
 	{
 	public:
 		GameStateMachine() = default;
 		~GameStateMachine() = default;
 
-		void SetInitialState(std::unique_ptr<GameState> initialState);
+		void SetInitialState(BombermanGame& game);
 		void RequestStateTransition(std::unique_ptr<GameState> nextState);
 
 		void Update(float deltaTime);

@@ -66,7 +66,7 @@ namespace bombGame
 		ge::AnimatorComponent* m_CachedAnimator;
 
 		bool m_MovedThisFrame{ false }; // Flag for animation logic
-		glm::vec3 m_LastMoveDir{ 0.f }; // for animation logic
+		glm::vec3 m_LastMoveDir{ 0, 0, 0 }; // for animation logic
 
 		void UpdateAnimationLogic();
 	};
