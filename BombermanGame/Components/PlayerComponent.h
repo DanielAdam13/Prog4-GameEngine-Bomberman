@@ -38,9 +38,10 @@ namespace bombGame
 
 		float GetSpeed() const noexcept;
 		void SetSpeed(float newSpeed) noexcept;
-
-		glm::vec3 GetPlayerMidPoint() const noexcept;
 		bool IsAlive() const noexcept;
+
+		// Used for Bomb-Laying, for more specific drop location
+		glm::vec3 GetPlayerMidPoint() const noexcept;
 
 		ge::Subject& GetDamageEvent() { return m_DamageEvent; }
 		ge::Subject& GetDeadEvent() { return m_DeadEvent; }

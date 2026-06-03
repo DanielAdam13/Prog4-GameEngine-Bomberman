@@ -56,39 +56,24 @@ void bombGame::EnemyComponent::UpdateComponent(float deltaTime)
 		return;
 
 	// 2. Tick current state.
-	// If next does not return nullptr (nullptr means no change):
+	// If next does not return nullptr (nullptr means no change), pedning state is set
 	if (auto next = m_CurrentState->OnUpdate(deltaTime))
 	{
 		m_PendingState = std::move(next);
 		m_TransitionPending = true;
 	}
 
+	// Guard - early out
 	if (!IsAlive())
 		return;
 
 	// ===================================
 	// Apply movement
 	// ===================================
-	
-	// 3. Pick new Tile to move to
-	if (!m_HasTileTarget)
-	{
-		PickNextTileTarget();
-	}
+	// 3,4,5. Tile-based Movement Loigc
+	ApplyMovement(deltaTime);
 
-	// 4. Move toward the tile target
-	const auto pos{ m_OwnerTransformRef->GetWorldPosition() };
-	m_OwnerTransformRef->SetLocalPosition(pos + m_CurrentMoveDirection * m_Speed * deltaTime);
-
-	// 5. Check arrival
-	if (m_HasTileTarget && HasArrivedAtTargetTile())
-	{
-		// Snap position to tile center
-		GetOwnerTransform()->SetLocalPosition({ m_TargetTileCenter->x, m_TargetTileCenter->y, 0.f });
-		m_HasTileTarget = false;
-	}
-
-	// 6. After everything, animate
+	// 6. After state switching AND movement, animate
 	UpdateAnimationLogic();
 }
 
@@ -200,6 +185,27 @@ void bombGame::EnemyComponent::OnCollisionEnter(ge::GameObject*, const ge::Colli
 	{
 		if(m_CachedHealthComp)
 			m_CachedHealthComp->TakeDamage(1);
+	}
+}
+
+void bombGame::EnemyComponent::ApplyMovement(float deltaTime)
+{
+	// 3. Pick new Tile to move to
+	if (!m_HasTileTarget)
+	{
+		PickNextTileTarget();
+	}
+
+	// 4. Move toward the tile target
+	const auto pos{ m_OwnerTransformRef->GetWorldPosition() };
+	m_OwnerTransformRef->SetLocalPosition(pos + m_CurrentMoveDirection * m_Speed * deltaTime);
+
+	// 5. Check arrival
+	if (m_HasTileTarget && HasArrivedAtTargetTile())
+	{
+		// Snap position to tile center
+		GetOwnerTransform()->SetLocalPosition({ m_TargetTileCenter->x, m_TargetTileCenter->y, 0.f });
+		m_HasTileTarget = false;
 	}
 }
 

@@ -15,7 +15,7 @@ namespace bombGame
 {
     class LevelGrid;
 
-    // Keeps track of active bombs, increments when a bomb is Registered, decrements by listening to BOMB_EXPLODE
+    // Keeps track of active bombs, increments when a bomb is Registered, decrements by listening to BOMB_EXPLODE from Bomb GOs.
     class BombLayerComponent final : public ge::Component, public ge::IObserver
     {
     public:
@@ -57,6 +57,8 @@ namespace bombGame
         std::function<float()> m_WindupDurationFn;
         LevelGrid* m_LevelGridRef; // Cached ref
 
+        // If an observer is interested of the action that a bomb has exploded -> subscribe to this bomb exploded event, 
+        // not the Bomb GO specific one
         ge::Subject m_LaidBombEvent;
         ge::Subject m_BombExplodedEvent; // Per Component notify, not per bomb
 

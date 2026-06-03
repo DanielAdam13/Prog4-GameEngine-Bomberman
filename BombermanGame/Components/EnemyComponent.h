@@ -89,6 +89,7 @@ namespace bombGame
 
 		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 
+		void ApplyMovement(float deltaTime);
 		void UpdateAnimationLogic();
 
 	};

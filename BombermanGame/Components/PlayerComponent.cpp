@@ -64,13 +64,14 @@ bombGame::PlayerComponent::~PlayerComponent()
 
 	// ------------------------------------------------------------------------------------------------
 
-	// Old, this WOULD work if the component cleanup order didn't exist
+	// Old, this WOULD work if the component cleanup order ISSUE didn't exist
 	// Sadly, this is not the case
-	// => an IObserver registers its own subjects references and automatically unsubscribes
 
 	/*m_CachedAnimator->GetOnAnimationFinishedEvent().RemoveObserver(this);
 	m_CachedBoxCollider->GetOnCollisionEnterEvent().RemoveObserver(this);
 	m_CachedBoxCollider->GetOnCollisionExitEvent().RemoveObserver(this);*/
+
+	// => an IObserver registers its own subjects references and automatically unsubscribes, that's how it is now
 }
 
 void bombGame::PlayerComponent::UpdateComponent(float)
@@ -181,8 +182,8 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 		const auto& tag{ otherColl->GetLayerTag() };
 
 		OnCollisionEnter(other, tag);
-		break;
 	}
+	break;
 	case ge::EngineEventId::ANIMATION_FINISHED:
 		// This for after death animation finished
 		// do nothing for now
