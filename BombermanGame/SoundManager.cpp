@@ -17,6 +17,7 @@ bombGame::SoundManager::SoundManager()
 	RegisterMapping(GameEventId::EXPLODED_BOMB, SoundIds::ExplosionBomb, 0.3f);
 	RegisterMapping(GameEventId::PLAYER_MOVED_HOR, SoundIds::Step_Horizontal, 0.3f);
 	RegisterMapping(GameEventId::PLAYER_MOVED_VERT, SoundIds::Step_Vertical, 0.3f);
+	RegisterMapping(GameEventId::POWERUP_PICKED_UP, SoundIds::Powerup, 0.2f);
 }
 
 void bombGame::SoundManager::Notify(int eventId, ge::GameObject* sourceObj)

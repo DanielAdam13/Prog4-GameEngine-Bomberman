@@ -14,12 +14,13 @@
 
 bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid* levelGridRef,
 	ge::SpriteSheet* bombSheetRef, std::array<ge::SpriteSheet*, 3> explosionSheetsRef,
-	std::function<float()> windupDurationFn, int maxBombs)
+	float startingWindup, int startingExplArm, int maxBombs)
 	:Component::Component(owner),
 	m_MaxBombs{ maxBombs },
 	m_BombSheetRef{ bombSheetRef },
 	m_ExplosionSheetsRef{ explosionSheetsRef },
-	m_WindupDurationFn{ std::move(windupDurationFn) },
+	m_WindupDuration{ startingWindup },
+	m_ExplosionArmLength{ startingExplArm },
 	m_LevelGridRef{ levelGridRef }
 {
 }
@@ -42,7 +43,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 
 	// Adds BombComponent to the new bomb gameobject
 	auto bomb{ spawnUtils::CreateBomb(m_LevelGridRef, {gridTileMidPos->x, gridTileMidPos->y, 0.f},
-		m_BombSheetRef, m_ExplosionSheetsRef, m_WindupDurationFn()) };
+		m_BombSheetRef, m_ExplosionSheetsRef, m_WindupDuration, m_ExplosionArmLength) };
 	auto* rawBombGO{ bomb.get() };
 	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 
@@ -57,19 +58,14 @@ bool bombGame::BombLayerComponent::CanLayBomb() const noexcept
 	return m_ActiveBombs < m_MaxBombs;
 }
 
-int bombGame::BombLayerComponent::GetActiveBombs() const noexcept
-{
-	return m_ActiveBombs;
-}
-
-int bombGame::BombLayerComponent::GetMaxBombs() const noexcept
-{
-	return m_MaxBombs;
-}
-
 void bombGame::BombLayerComponent::SetMaxBombs(int newMaxBombNr) noexcept
 {
 	m_MaxBombs = newMaxBombNr;
+}
+
+void bombGame::BombLayerComponent::SetExplosionArmLength(int newLength)
+{
+	m_ExplosionArmLength = newLength;
 }
 
 void bombGame::BombLayerComponent::RegisterLaidBomb(ge::GameObject* bomb)

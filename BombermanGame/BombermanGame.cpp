@@ -39,6 +39,7 @@ void bombGame::BombermanGame::Load()
 	ge::CollisionSystem::GetInstance().AddLayerTag("BreakableWall");
 	ge::CollisionSystem::GetInstance().AddLayerTag("Enemy");
 	ge::CollisionSystem::GetInstance().AddLayerTag("Explosion");
+	ge::CollisionSystem::GetInstance().AddLayerTag("Powerup");
 
 	m_GameStateMachine = std::make_unique<GameStateMachine>();
 	m_GameStateMachine->SetInitialState(*this);

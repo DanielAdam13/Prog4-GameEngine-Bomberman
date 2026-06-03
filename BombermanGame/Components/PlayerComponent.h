@@ -10,6 +10,7 @@ namespace ge
 {
 	class Transform;
 	class HealthComponent;
+	class ScoreComponent;
 	class AnimatorComponent;
 }
 
@@ -48,6 +49,7 @@ namespace bombGame
 		ge::Subject& GetScoreChangeEvent() { return m_ScoreChangeEvent; }
 		ge::Subject& GetMovedHorEvent() { return m_MovedHorEvent; }
 		ge::Subject& GetMovedVertEvent() { return m_MovedVertEvent; }
+		ge::Subject& GetPowerupPickedUpEvent() { return m_PowerupPickedUpEvent; }
 
 		virtual void Notify(int eventId, ge::GameObject* other) override;
 
@@ -59,6 +61,7 @@ namespace bombGame
 		ge::Subject m_ScoreChangeEvent;
 		ge::Subject m_MovedHorEvent;
 		ge::Subject m_MovedVertEvent;
+		ge::Subject m_PowerupPickedUpEvent;
 
 		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 
@@ -67,6 +70,7 @@ namespace bombGame
 
 		ge::Transform* m_CachedOwnerTransform;
 		ge::HealthComponent* m_CachedHealthComp;
+		ge::ScoreComponent* m_CachedScoreComp;
 		ge::BoxCollider* m_CachedBoxCollider;
 		ge::AnimatorComponent* m_CachedAnimator;
 

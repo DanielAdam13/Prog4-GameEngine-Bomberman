@@ -7,12 +7,14 @@
 
 #include <utility>
 
-bombGame::BombComponent::BombComponent(ge::GameObject* owner, LevelGrid* grid, float windupDuration, std::array<ge::SpriteSheet*, 3>& explosionSheetRef)
+bombGame::BombComponent::BombComponent(ge::GameObject* owner, LevelGrid* grid, 
+	float windupDuration, int explosionArmLength, std::array<ge::SpriteSheet*, 3>& explosionSheetRef)
 	:Component::Component{ owner },
 	m_WindUpDuration{ windupDuration },
 	m_WindupTimer{ 0.f },
 	m_ExplosionSheetsRef{ explosionSheetRef },
-	m_CachedGrid{ grid }
+	m_CachedGrid{ grid },
+	m_ExplosionArmLength{ explosionArmLength }
 {
 }
 

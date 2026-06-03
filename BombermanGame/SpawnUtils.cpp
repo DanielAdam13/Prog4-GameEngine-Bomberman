@@ -11,6 +11,7 @@
 #include "Components/BreakableWallComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/EnemyComponent.h"
+#include "Components/PowerupComponent.h"
 
 #include "LevelGrid.h"
 #include "LevelLoader.h"
@@ -24,7 +25,8 @@
 #include <memory>
 
 std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid* grid, const glm::vec3& position,
-	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets, float windupDuration)
+	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets, 
+	float windupDuration, int explosionArmLength)
 {
 	auto bomb = std::make_unique<ge::GameObject>("GO_Bomb");
 	auto* bombTr{ bomb->GetComponent<ge::Transform>() };
@@ -36,7 +38,7 @@ std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid* grid
 	animator->AddAnimation({ "wind_up", {0, 1, 2}, 4, true });
 	animator->Play("wind_up");
 
-	bomb->AddComponent<BombComponent>(bomb.get(), grid, windupDuration, explosionSheets);
+	bomb->AddComponent<BombComponent>(bomb.get(), grid, windupDuration, explosionArmLength, explosionSheets);
 
 	return bomb;
 }
@@ -200,9 +202,9 @@ void bombGame::spawnUtils::SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int co
 {
 	auto exitGO = std::make_unique<ge::GameObject>("GO_ExitDoor");
 	const glm::vec3 exitPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f };
-	auto breakTr{ exitGO->GetComponent<ge::Transform>() };
-	breakTr->SetLocalPosition(grid.GetLevelTopLeft() + exitPos);
-	breakTr->SetLocalScale(3.6f, 3.6f, 1.f);
+	auto exitTr{ exitGO->GetComponent<ge::Transform>() };
+	exitTr->SetLocalPosition(grid.GetLevelTopLeft() + exitPos);
+	exitTr->SetLocalScale(3.6f, 3.6f, 1.f);
 
 	auto* exitImage{ exitGO->AddComponent<ge::Image>(exitGO.get()) };
 	exitImage->SetTexture(exitDoorTexture);
@@ -210,4 +212,27 @@ void bombGame::spawnUtils::SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int co
 	scene.Add(std::move(exitGO));
 
 	grid.MarkExitLocationAt(col, row);
+}
+
+void bombGame::spawnUtils::SpawnPowerupAt(ge::Scene& scene, LevelGrid& grid, int col, int row, 
+	PowerupType type, ge::Texture2D* powerupTexture, int score)
+{
+	auto powerupGO = std::make_unique<ge::GameObject>("GO_Powerup");
+	const glm::vec3 powerupPos{ col * grid.GetTileSize(), row * grid.GetTileSize(), 0.f };
+	auto powerTr{ powerupGO->GetComponent<ge::Transform>() };
+	powerTr->SetLocalPosition(grid.GetLevelTopLeft() + powerupPos);
+	powerTr->SetLocalScale(3.6f, 3.6f, 1.f);
+
+	auto* powerupImage{ powerupGO->AddComponent<ge::Image>(powerupGO.get()) };
+	powerupImage->SetTexture(powerupTexture);
+	
+	// TODO: Box Collider
+	auto* collider{ powerupGO->AddComponent<ge::BoxCollider>(powerupGO.get(),
+		glm::vec2{ grid.GetTileSize(), grid.GetTileSize() }, true) };
+	collider->AssignTag("Powerup");
+
+	// TODO: Powerup Component
+	powerupGO->AddComponent<PowerupComponent>(powerupGO.get(), type, score);
+
+	scene.Add(std::move(powerupGO));
 }

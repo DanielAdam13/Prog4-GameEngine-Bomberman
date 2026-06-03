@@ -42,6 +42,7 @@
 #include "LevelBuilder.h"
 
 #include "EnemyArchetypes.h"
+#include "PowerupArchetypes.h"
 
 #include <utility>
 #include <memory>
@@ -71,9 +72,9 @@ void bombGame::GameplayGameState::OnEnter()
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
 	
-	/*const auto powerupBombUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupBombUp.png") };
 	const auto powerupFireUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupFireUp.png") };
-	const auto powerupRemoteDetonateTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupRemoteDetonate.png") };*/
+	const auto powerupBombUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupBombUp.png") };
+	const auto powerupRemoteDetonateTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupRemoteDetonate.png") };
 
 	const auto playerSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Player.png", 7, 3) };
 
@@ -127,9 +128,9 @@ void bombGame::GameplayGameState::OnEnter()
 	GameplayScene.Add(std::move(tutorial1GO));
 	GameplayScene.Add(std::move(tutorial2GO));
 
-	// -----------------------------------------------
-	// --- Level Initialization ---
-	// -----------------------------------------------
+	// =================================================
+	// Level Genertion
+	// =================================================
 	const stageLoader::StageDescriptor& stage{ stageLoader::Load(GetBombermanGame().GetCurrentGameSession().currentStageIndex)};
 
 	levelLoader::LevelLayout layout{ levelLoader::Load(
@@ -138,8 +139,14 @@ void bombGame::GameplayGameState::OnEnter()
 
 	m_LevelGrid = std::make_unique<LevelGrid>(layout, topBgPosition, tileSize);
 
+	powerupArchetypes::InitializeArchetypes(powerupFireUpTexture, powerupBombUpTexture, powerupRemoteDetonateTexture);
+
+	// Generate Static Wall box colliders
 	levelBuilder::BuildStaticGeometry(GameplayScene, *m_LevelGrid.get());
-	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), breakableWallSheet, exitDoorTexture, stage.breakableDensity);
+	// Generate Exit, Powerup, DYNAMIC WALLS
+	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), 
+		breakableWallSheet, exitDoorTexture, 
+		stage.powerupType, stage.breakableDensity);
 
 	// -----------------------------------------------
 	// Players
@@ -175,11 +182,12 @@ void bombGame::GameplayGameState::OnEnter()
 	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetMovedHorEvent().AddObserver(&bombermanSoundManager);
 	player1PlayerComp->GetMovedVertEvent().AddObserver(&bombermanSoundManager);
+	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(&bombermanSoundManager);
 
 	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionVertSpriteSheet, explosionHorSpriteSheet };
 	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
 		bombSpriteSheet, explosions,
-		[]() -> float { return 3.f; }, 1) };
+		3.f, 1, 1) };
 	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
@@ -213,10 +221,11 @@ void bombGame::GameplayGameState::OnEnter()
 	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetMovedHorEvent().AddObserver(&bombermanSoundManager);
 	player2PlayerComp->GetMovedVertEvent().AddObserver(&bombermanSoundManager);
+	player2PlayerComp->GetPowerupPickedUpEvent().AddObserver(&bombermanSoundManager);
 
 	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
 		bombSpriteSheet, explosions,
-		[]() -> float { return 3.f; }, 2) };
+		3.f, 1, 2) };
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 

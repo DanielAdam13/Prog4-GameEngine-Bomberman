@@ -21,7 +21,8 @@ namespace bombGame
 		// Every Bomb Component Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 11 };
 
-		BombComponent(ge::GameObject* owner, LevelGrid* grid, float windupDuration, std::array<ge::SpriteSheet*, 3>& explosionSheetRef);
+		BombComponent(ge::GameObject* owner, LevelGrid* grid, 
+			float windupDuration, int explosionArmLength, std::array<ge::SpriteSheet*, 3>& explosionSheetRef);
 		~BombComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
@@ -41,7 +42,7 @@ namespace bombGame
 		// --- Explosion data ---
 		std::array<ge::SpriteSheet*, 3> m_ExplosionSheetsRef; // Cached references
 		LevelGrid* m_CachedGrid; // Cached ref
-		const float m_ExplosionLifetime{ 0.6f };
-		const int m_ExplosionArmLength{ 1 };
+		static constexpr float m_ExplosionLifetime{ 0.6f };
+		const int m_ExplosionArmLength;
 	};
 }

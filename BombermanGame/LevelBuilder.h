@@ -1,5 +1,6 @@
 #pragma once
 #include "LevelGrid.h"
+#include "PowerupType.h"
 
 #include <vector>
 #include <utility>
@@ -25,7 +26,8 @@ namespace bombGame
 
 		// Generate and push the dynamic walls to the scene and store them in the grid as a reference
 		void GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid,
-			ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture,
+			ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, 
+			PowerupType stagePowerup,
 			int breakableWallRandomnessIndex);
 
 		void GenerateEnemies(ge::Scene& scene, LevelGrid& grid,

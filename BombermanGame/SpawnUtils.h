@@ -1,4 +1,5 @@
 #pragma once
+#include "PowerupType.h"
 
 #include <memory>
 #include <glm/glm.hpp>
@@ -21,7 +22,8 @@ namespace bombGame
 	{
 		// Creates the reusable Bomb Game Object and returns it as a unique_ptr
 		std::unique_ptr<ge::GameObject> CreateBomb(LevelGrid* grid, const glm::vec3& position, 
-			ge::SpriteSheet* bombTexture, std::array<ge::SpriteSheet*, 3> explosionSheets, float windupTimer);
+			ge::SpriteSheet* bombTexture, std::array<ge::SpriteSheet*, 3> explosionSheets, 
+			float windupTimer, int explosionArmLength);
 
 		void DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 			const glm::vec3& bombCenter, int armLength, const std::array<ge::SpriteSheet*, 3>& explosionSheets,
@@ -40,5 +42,7 @@ namespace bombGame
 
 		void SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet);
 		void SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int col, int row, ge::Texture2D* exitdoorTexture);
+		void SpawnPowerupAt(ge::Scene& scene, LevelGrid& grid, int col, int row,
+			 PowerupType type, ge::Texture2D* powerupTexture, int score);
 	}
 }

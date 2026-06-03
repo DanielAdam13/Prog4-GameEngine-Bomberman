@@ -11,6 +11,7 @@
 #include "SpriteSheet.h"
 #include "SpawnUtils.h"
 #include "EnemyArchetypes.h"
+#include "PowerupArchetypes.h"
 
 #include <utility>
 #include <memory>
@@ -44,7 +45,8 @@ void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGr
 }
 
 void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid, 
-	ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, int breakableWallRandomnessIndex)
+	ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, PowerupType stagePowerup,
+	int breakableWallRandomnessIndex)
 {
 	static std::mt19937 gen{ std::random_device{}() };
 
@@ -65,13 +67,22 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 	if (emptyTiles.empty()) // Invalid level
 		return;
 
-	std::uniform_int_distribution<size_t> pick(0, emptyTiles.size() - 1);
-	const auto [exitCol, exitRow] { emptyTiles[pick(gen)]};
+	std::uniform_int_distribution<size_t> pickEx(0, emptyTiles.size() - 1);
+	const auto [exitCol, exitRow] { emptyTiles[pickEx(gen)]};
 
 	spawnUtils::SpawnExitAt(scene, grid, exitCol, exitRow, exitDoorTexture); // Saves exit coordinate to grid internally
 	spawnUtils::SpawnBreakableWallAt(scene, grid, exitCol, exitRow, breakableWallSheet);
 
-	// 2. Spawn random breakable walls
+	// 2. Pick Powerup tile
+	std::uniform_int_distribution<size_t> pickPow(0, emptyTiles.size() - 1);
+	const auto [powerCol, powerRow] { emptyTiles[pickPow(gen)] };
+
+	const auto& arch{ powerupArchetypes::Get(stagePowerup) };
+	spawnUtils::SpawnPowerupAt(scene, grid, powerCol, powerRow, 
+		stagePowerup, arch.texture, arch.scoreValuePicked);
+	spawnUtils::SpawnBreakableWallAt(scene, grid, powerCol, powerRow, breakableWallSheet);
+
+	// 3. Spawn random breakable walls
 	static std::uniform_int_distribution<size_t> dist(0, breakableWallRandomnessIndex);
 	for (int row{ 0 }; row < layout.height; ++row)
 	{
@@ -79,6 +90,10 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 		{
 			// Skip exit
 			if (row == exitRow && col == exitCol)
+				continue;
+
+			// Skip powerup
+			if (row == powerRow && col == powerCol)
 				continue;
 
 			levelLoader::TileType currentTileType{ layout.At(col, row) };

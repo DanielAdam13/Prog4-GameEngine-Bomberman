@@ -5,6 +5,7 @@
 #include "Components/Transform.h"
 #include "GameEvents.h"
 #include "Components/AnimatorComponent.h"
+#include "Components/PowerupComponent.h" // To call ApplyTo
 
 #include "Components/Colliders.h"
 #include "CollisionSystem.h"
@@ -25,6 +26,10 @@ PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
 	assert(m_CachedHealthComp && "PlayerComponent requires a HealthComponent on the same GameObject");
 	m_CachedHealthComp->GetOnTakingDamageEvent().AddObserver(this);
 	m_CachedHealthComp->GetOnDeathEvent().AddObserver(this);
+
+	m_CachedScoreComp = GetOwner()->GetComponent<ge::ScoreComponent>();
+	assert(m_CachedHealthComp && "PlayerComponent requires a ScoreComponent on the same GameObject");
+	m_CachedScoreComp->GetOnScoreChangedEvent().AddObserver(this);
 
 	// Subscribe to Score
 	auto* scoreComp{ GetOwner()->GetComponent<ge::ScoreComponent>() };
@@ -199,7 +204,7 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 	}
 }
 
-void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject*, const ge::CollisionLayerTag& tag)
+void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag)
 {
 	if (tag == "Enemy" || tag == "Explosion")
 	{
@@ -209,7 +214,15 @@ void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject*, const ge::Coll
 	}
 	else if (tag == "Powerup")
 	{
-		// Collect —> call an event or call into the powerup's component.
+		// Powerup is applied on collision
+		if (auto* powerupComp = other->GetComponent<PowerupComponent>())
+		{
+			powerupComp->ApplyTo(GetOwner());
+			m_PowerupPickedUpEvent.NotifyObservers(GameEventId::POWERUP_PICKED_UP, GetOwner());
+
+			if (m_CachedScoreComp)
+				m_CachedScoreComp->ChangeScore(powerupComp->GetPickupScore());
+		}
 	}
 }
 

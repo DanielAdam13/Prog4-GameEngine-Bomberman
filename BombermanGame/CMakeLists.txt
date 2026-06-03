@@ -5,14 +5,15 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Main.cpp"
   "GameEvents.h"
  
-  "Components/PlayerComponent.h"        "Components/PlayerComponent.cpp"
+  "Components/PlayerComponent.h" "Components/PlayerComponent.cpp"
   "Components/HealthDisplayComponent.h" "Components/HealthDisplayComponent.cpp"
-  "Components/ScoreDisplayComponent.h"  "Components/ScoreDisplayComponent.cpp"
+  "Components/ScoreDisplayComponent.h" "Components/ScoreDisplayComponent.cpp"
   "Components/BombComponent.h" "Components/BombComponent.cpp" 
   "Components/BombLayerComponent.h" "Components/BombLayerComponent.cpp"
   "Components/EnemyComponent.h" "Components/EnemyComponent.cpp"
   "Components/ExplosionComponent.h" "Components/ExplosionComponent.cpp"
   "Components/BreakableWallComponent.h" "Components/BreakableWallComponent.cpp"
+  "Components/PowerupComponent.h" "Components/PowerupComponent.cpp"
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
@@ -38,7 +39,10 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/GameState.h" 
   "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
   "GameStates/GameplayState.h" "GameStates/GameplayState.cpp"
-   "EnemyType.h" "PowerupType.h" "EnemyArchetypes.h" "EnemyArchetypes.cpp")
+  "EnemyType.h"  
+  "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
+  "PowerupType.h"
+  "PowerupArchetypes.h" "PowerupArchetypes.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
