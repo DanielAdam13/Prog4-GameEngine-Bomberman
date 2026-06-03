@@ -36,7 +36,7 @@
 #include "Components/ScoreDisplayComponent.h"
 
 #include "Animation.h"
-#include "Utils.h"
+#include "SpawnUtils.h"
 
 #include "LevelLoader.h"
 #include "LevelGrid.h"

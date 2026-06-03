@@ -1,6 +1,6 @@
 #pragma once
 #include "GameState.h"
-#include "LevelBuilder.h"
+#include "LevelGrid.h"
 #include "Camera.h"
 
 #include <memory>
@@ -8,7 +8,6 @@
 namespace bombGame
 {
 	class BombermanGame;
-	class LevelGrid;
 
 	class GameplayGameState final : public GameState
 	{

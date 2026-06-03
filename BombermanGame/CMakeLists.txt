@@ -28,7 +28,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "EnemyStates/ChaseState.h" "EnemyStates/ChaseState.cpp" 
   "EnemyStates/BaseEnemyState.h" "EnemyStates/BaseEnemyState.cpp"
 
-  "Utils.h" "Utils.cpp" 
+  "SpawnUtils.h" "SpawnUtils.cpp" 
   "LevelLoader.h" "LevelLoader.cpp" 
   "LevelGrid.h" "LevelGrid.cpp"
   "LevelBuilder.h" "LevelBuilder.cpp" 

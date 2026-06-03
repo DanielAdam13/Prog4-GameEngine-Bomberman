@@ -6,7 +6,7 @@
 #include "SceneManager.h"
 #include "Components/PlayerComponent.h"
 #include "Texture2D.h"
-#include "Utils.h"
+#include "SpawnUtils.h"
 #include "LevelGrid.h"
 
 #include <utility>

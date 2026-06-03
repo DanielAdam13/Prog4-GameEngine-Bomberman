@@ -12,8 +12,7 @@
 #include "Components/AnimatorComponent.h"
 #include "SpriteSheet.h"
 #include "Animation.h"
-#include "Utils.h"
-
+#include "SpawnUtils.h"
 
 #include <utility>
 #include <memory>
