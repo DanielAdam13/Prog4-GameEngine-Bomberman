@@ -7,19 +7,18 @@
 #include "Components/Colliders.h"
 #include "Scene.h"
 #include "Structs.h"
-#include "Components/BreakableWallComponent.h"
 
-#include "Components/AnimatorComponent.h"
 #include "SpriteSheet.h"
-#include "Animation.h"
 #include "SpawnUtils.h"
+#include "EnemyArchetypes.h"
 
 #include <utility>
 #include <memory>
 #include <random>
 #include <glm/glm.hpp>
-#include <optional>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGrid& grid)
 {
@@ -94,4 +93,75 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 			}
 		}
 	}
+}
+
+void bombGame::levelBuilder::GenerateEnemies(ge::Scene& scene, LevelGrid& grid, 
+	const std::vector<stageLoader::EnemyEntry>& enemyEntries, 
+	const std::vector<ge::GameObject*>& players)
+{
+	auto eligibleTiles{ CollectEnemySpawnableTiles(grid) };
+
+	static std::mt19937 gen{ std::random_device{}() };
+	std::shuffle(eligibleTiles.begin(), eligibleTiles.end(), gen);
+
+	size_t tileIdx{ 0 };
+	for (auto& enemyEntry : enemyEntries)
+	{
+		for (int i{}; i < enemyEntry.count; ++i)
+		{
+			if (tileIdx >= eligibleTiles.size()) // Out of room for spawning, unlikely
+				return;
+			const auto [col, row] = eligibleTiles[tileIdx++];
+
+			const auto& arch{ enemyArchetypes::Get(enemyEntry.type) };
+			
+			spawnUtils::SpawnEnemy(scene, &grid, arch.sheet, players, col, row, arch.speed, arch.health);
+		}
+	}
+}
+
+std::vector<std::pair<int, int>> bombGame::levelBuilder::CollectEnemySpawnableTiles(const LevelGrid& grid, int minDistanceFromPlayers)
+{
+	std::vector<std::pair<int, int>> eligible;
+	const auto& layout{ grid.GetLevelLayout() };
+
+	const std::pair<int, int> playerCoords[2] = {
+		{ layout.player1SpawnPoint.first, layout.player1SpawnPoint.second },
+		{ layout.player2SpawnPoint.first, layout.player2SpawnPoint.second },
+	};
+
+	for (int row{}; row < layout.height; ++row) 
+	{
+		for (int col{}; col < layout.width; ++col) 
+		{
+			// 1. No wall or player spawn tile
+			if (layout.At(col, row) != levelLoader::TileType::Empty) 
+				continue;
+			// 2. No Breakable Wall at tile
+			if (grid.GetBreakableWallAt(col, row)) 
+				continue;
+
+			// 3. Far enough from players
+			bool tooClose = false;
+			for (const auto& [pc, pr] : playerCoords) 
+			{
+				if (pc < 0 || pr < 0) // Skip invalid players - for single mode vs coop
+					continue;
+
+				const int manhattan{ std::abs(col - pc) + std::abs(row - pr) };
+
+				if (manhattan < minDistanceFromPlayers) 
+				{
+					tooClose = true;
+					break;
+				}
+			}
+			if (tooClose) 
+				continue;
+
+			eligible.emplace_back(col, row);
+		}
+	}
+
+	return eligible;
 }

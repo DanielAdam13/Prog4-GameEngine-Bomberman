@@ -38,7 +38,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/GameState.h" 
   "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
   "GameStates/GameplayState.h" "GameStates/GameplayState.cpp"
-   "EnemyType.h" "PowerupType.h")
+   "EnemyType.h" "PowerupType.h" "EnemyArchetypes.h" "EnemyArchetypes.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

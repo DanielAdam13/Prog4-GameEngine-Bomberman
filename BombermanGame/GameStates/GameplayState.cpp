@@ -31,7 +31,6 @@
 
 #include "Components/PlayerComponent.h"
 #include "Components/BombLayerComponent.h"
-#include "Components/EnemyComponent.h"
 #include "Components/HealthDisplayComponent.h"
 #include "Components/ScoreDisplayComponent.h"
 
@@ -41,6 +40,8 @@
 #include "LevelLoader.h"
 #include "LevelGrid.h"
 #include "LevelBuilder.h"
+
+#include "EnemyArchetypes.h"
 
 #include <utility>
 #include <memory>
@@ -69,19 +70,21 @@ void bombGame::GameplayGameState::OnEnter()
 	tutFont->SetBold(true);
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
-	const auto exitDoorTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_DoorExit.png") };
+	
 	/*const auto powerupBombUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupBombUp.png") };
 	const auto powerupFireUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupFireUp.png") };
 	const auto powerupRemoteDetonateTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupRemoteDetonate.png") };*/
 
-	const auto iceEnemySheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_IceEnemy.png", 11, 1) };
-	const auto breakableWallSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_BreakableWall.png", 7, 1) };
-
 	const auto playerSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Player.png", 7, 3) };
-	const auto balloonSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Balloon.png", 11, 1) };
 
+	const auto balloomSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Balloom.png", 11, 1) };
+	const auto onilEnemySheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Onil.png", 11, 1) };
+	const auto dahlSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Dahl.png", 11, 1) };
+	const auto minvoSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Minvo.png", 11, 1) };
+
+	const auto exitDoorTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_DoorExit.png") };
+	const auto breakableWallSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_BreakableWall.png", 7, 1) };
 	const auto bombSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_Bomb.png", 3, 1) };
-
 	const auto explosionCenterSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_CenterExplosion.png", 4, 1) };
 	const auto explosionHorSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_HorExplosion.png", 4, 2) };
 	const auto explosionVertSpriteSheet{ ge::ResourceManager::GetInstance().LoadSpriteSheet("sprites/I_SpriteSheet_VertExplosion.png", 4, 2) };
@@ -154,8 +157,8 @@ void bombGame::GameplayGameState::OnEnter()
 
 	auto player1Tr{ player1GO->GetComponent<ge::Transform>() };
 	const glm::vec3 player1Pos{
-		topBgPosition.x + layout.player1SpawnPoint.x * tileSize,
-		topBgPosition.y + layout.player1SpawnPoint.y * tileSize, 0.f };
+		topBgPosition.x + layout.player1SpawnPoint.first * tileSize,
+		topBgPosition.y + layout.player1SpawnPoint.second * tileSize, 0.f };
 	player1Tr->SetLocalPosition(player1Pos);
 	const float playerScale{ m_LevelGrid->GetTileSize() / (playerSpriteSheet->GetFrameWidth() + 1) };
 	player1Tr->SetLocalScale({ playerScale, playerScale, 1.f });
@@ -181,7 +184,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// Player 2
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
 	
-	auto player2Animator{ player2GO->AddComponent<ge::AnimatorComponent>(player2GO.get(), balloonSpriteSheet) };
+	auto player2Animator{ player2GO->AddComponent<ge::AnimatorComponent>(player2GO.get(), balloomSpriteSheet) };
 	player2Animator->AddAnimation({ "idle", {0}, 1, false });
 	player2Animator->AddAnimation({ "walk_left", {3, 4, 5}, 4, true });
 	player2Animator->AddAnimation({ "walk_down", {3, 4, 5}, 4, true });
@@ -191,8 +194,8 @@ void bombGame::GameplayGameState::OnEnter()
 
 	auto player2Tr{ player2GO->GetComponent<ge::Transform>() };
 	const glm::vec3 player2Pos{
-		topBgPosition.x + layout.player2SpawnPoint.x * tileSize,
-		topBgPosition.y + layout.player2SpawnPoint.y * tileSize, 0.f };
+		topBgPosition.x + layout.player2SpawnPoint.first * tileSize,
+		topBgPosition.y + layout.player2SpawnPoint.second * tileSize, 0.f };
 	player2Tr->SetLocalPosition(player2Pos);
 	player2Tr->SetLocalScale({ 2.f, 2.f, 2.f });
 
@@ -213,14 +216,14 @@ void bombGame::GameplayGameState::OnEnter()
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
-	// ---- Enemy Initialization ----
-	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(), 
-		balloonSpriteSheet, {player1GO.get(), player2GO.get()}, 
-		7, 5, 60.f, 2);
+	// =================================================
+	// Enemy Generation
+	// =================================================
+	enemyArchetypes::InitializeArchetypes(balloomSpriteSheet, onilEnemySheet, dahlSpriteSheet, minvoSpriteSheet);
 
-	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(),
-		iceEnemySheet, { player1GO.get(), player2GO.get() },
-		1, 5, 100.f, 1);
+	levelBuilder::GenerateEnemies(GameplayScene, *m_LevelGrid,
+		stage.enemies,
+		{ player1GO.get(), player2GO.get() });
 
 	// ---- Health Displays ----
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");

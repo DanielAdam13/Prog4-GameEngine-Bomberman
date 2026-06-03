@@ -3,8 +3,8 @@
 #include "PowerupType.h"
 
 #include <vector>
-#include <glm/glm.hpp>
 #include <string>
+#include <utility>
 
 namespace bombGame
 {
@@ -23,8 +23,8 @@ namespace bombGame
 			int width;
 			int height;
 			std::vector<TileType> tilesContainer;
-			glm::vec2 player1SpawnPoint;
-			glm::vec2 player2SpawnPoint;
+			std::pair<int, int> player1SpawnPoint;
+			std::pair<int, int> player2SpawnPoint;
 
 			// Helper that returns TileType by row/col
 			TileType At(int col, int row) const
