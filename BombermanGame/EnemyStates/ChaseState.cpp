@@ -4,7 +4,7 @@
 #include "Components/Transform.h"
 #include "Components/EnemyComponent.h"
 #include "WanderState.h"
-#include "LevelBuilder.h"
+#include "LevelGrid.h"
 #include <cmath>
 
 bombGame::ChaseState::ChaseState(ge::GameObject* pSourcePtr)

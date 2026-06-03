@@ -39,6 +39,7 @@
 #include "Utils.h"
 
 #include "LevelLoader.h"
+#include "LevelGrid.h"
 #include "LevelBuilder.h"
 
 #include <utility>
@@ -213,16 +214,13 @@ void bombGame::GameplayGameState::OnEnter()
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
 	// ---- Enemy Initialization ----
-	const auto spawnTileCenter = m_LevelGrid->GetMidGridTilePointByCoord(7, 5);
-
 	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(), 
 		balloonSpriteSheet, {player1GO.get(), player2GO.get()}, 
-		{ spawnTileCenter->x, spawnTileCenter->y, 0.f }, 60.f, 1);
+		7, 5, 60.f, 2);
 
-	const auto spawnTileCenter2 = m_LevelGrid->GetMidGridTilePointByCoord(1, 5);
 	spawnUtils::SpawnEnemy(GameplayScene, m_LevelGrid.get(),
 		iceEnemySheet, { player1GO.get(), player2GO.get() },
-		{ spawnTileCenter2->x, spawnTileCenter2->y, 0.f }, 100.f, 1);
+		1, 5, 100.f, 1);
 
 	// ---- Health Displays ----
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");

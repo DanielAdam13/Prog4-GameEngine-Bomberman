@@ -12,7 +12,7 @@
 #include "Components/HealthComponent.h"
 #include "Components/EnemyComponent.h"
 
-#include "LevelBuilder.h"
+#include "LevelGrid.h"
 #include "LevelLoader.h"
 #include "Animation.h"
 #include "SpriteSheet.h"
@@ -160,6 +160,15 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 	scene.Add(std::move(enemyGO));
 
 	return enemyRaw;
+}
+
+ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
+	ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets, 
+	int gridCol, int gridRow, float speed, int health)
+{
+	const auto gridTileMid{ grid->GetMidGridTilePointByCoord(gridCol, gridRow) };
+	const glm::vec3 spawnPos{ gridTileMid->x, gridTileMid->y, 0.f };
+	return SpawnEnemy(scene, grid, enemySpriteSheet, targets, spawnPos, speed, health);
 }
 
 void bombGame::spawnUtils::SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet)

@@ -54,7 +54,5 @@ namespace bombGame
 
 		const StageDescriptor& Load(size_t stageIndex);
 		StageDescriptor Load(const std::string& filePath);
-
-		
 	}
 }

@@ -7,7 +7,7 @@
 #include "Components/PlayerComponent.h"
 #include "Texture2D.h"
 #include "Utils.h"
-#include "LevelBuilder.h"
+#include "LevelGrid.h"
 
 #include <utility>
 #include <optional>

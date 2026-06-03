@@ -5,7 +5,7 @@
 #include "Components/Transform.h"
 #include "EnemyStates/ChaseState.h"
 #include "EnemyStates/WanderState.h"
-#include "LevelBuilder.h"
+#include "LevelGrid.h"
 
 #include "Components/Colliders.h"
 #include "EngineEvents.h"
@@ -199,7 +199,7 @@ void bombGame::EnemyComponent::OnCollisionEnter(ge::GameObject*, const ge::Colli
 	if (tag == "Explosion")
 	{
 		if(m_CachedHealthComp)
-			m_CachedHealthComp->Die();
+			m_CachedHealthComp->TakeDamage(1);
 	}
 }
 

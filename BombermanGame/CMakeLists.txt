@@ -30,6 +30,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
 
   "Utils.h" "Utils.cpp" 
   "LevelLoader.h" "LevelLoader.cpp" 
+  "LevelGrid.h" "LevelGrid.cpp"
   "LevelBuilder.h" "LevelBuilder.cpp" 
   "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
   

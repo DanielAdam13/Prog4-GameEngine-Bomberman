@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "Components/EnemyComponent.h"
 #include "Components/PlayerComponent.h"
-#include "LevelBuilder.h"
+#include "LevelGrid.h"
 
 #include <cassert>
 #include <limits>
