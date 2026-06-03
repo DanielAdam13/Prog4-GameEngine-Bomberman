@@ -117,10 +117,10 @@ void bombGame::GameplayGameState::OnEnter()
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
-		"D-Pad to move the Balloon | X damage | A score | B bomb", tutFont, colorRed);
+		"D-Pad to move the Balloon | B bomb", tutFont, colorRed);
 	auto tutorial2GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
-		"WASD to move the BomberMan | X damage | E score | SPACE bomb", tutFont, colorBlue);
+		"WASD to move the BomberMan | SPACE bomb", tutFont, colorBlue);
 
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
@@ -323,13 +323,6 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
-	// Damage and score
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<DamageCommand>(player2GO.get(), 1),
-			deathConditionLambda1));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ScoreCommand>(player1GO.get(), 10),
-			deathConditionLambda1));
 
 	// ---------------------
 	// Second player
@@ -345,13 +338,6 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
-	// Damage and score
-	inputManager.BindControllerCommand(ge::ControllerButton::X, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<DamageCommand>(player1GO.get(), 1),
-			deathConditionLambda2));
-	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ConditionalCommand>(std::make_unique<ScoreCommand>(player2GO.get(), 10),
-			deathConditionLambda2));
 #pragma endregion
 
 	GameplayScene.Add(std::move(player1GO));
