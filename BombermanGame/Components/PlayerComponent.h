@@ -46,6 +46,8 @@ namespace bombGame
 		ge::Subject& GetDamageEvent() { return m_DamageEvent; }
 		ge::Subject& GetDeadEvent() { return m_DeadEvent; }
 		ge::Subject& GetScoreChangeEvent() { return m_ScoreChangeEvent; }
+		ge::Subject& GetMovedHorEvent() { return m_MovedHorEvent; }
+		ge::Subject& GetMovedVertEvent() { return m_MovedVertEvent; }
 
 		virtual void Notify(int eventId, ge::GameObject* other) override;
 
@@ -55,6 +57,8 @@ namespace bombGame
 		ge::Subject m_DamageEvent;
 		ge::Subject m_DeadEvent;
 		ge::Subject m_ScoreChangeEvent;
+		ge::Subject m_MovedHorEvent;
+		ge::Subject m_MovedVertEvent;
 
 		void OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag);
 
@@ -70,5 +74,9 @@ namespace bombGame
 		glm::vec3 m_LastMoveDir{ 0, 0, 0 }; // for animation logic
 
 		void UpdateAnimationLogic();
+
+		float m_StepTimer{ 0.f };
+		static constexpr float m_StepInterval{ 0.28f };
+		void UpdateMovementSound(float deltaTime);
 	};
 }

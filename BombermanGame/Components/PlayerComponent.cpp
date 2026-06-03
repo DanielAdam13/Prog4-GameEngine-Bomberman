@@ -74,9 +74,11 @@ bombGame::PlayerComponent::~PlayerComponent()
 	// => an IObserver registers its own subjects references and automatically unsubscribes, that's how it is now
 }
 
-void bombGame::PlayerComponent::UpdateComponent(float)
+void bombGame::PlayerComponent::UpdateComponent(float delatTime)
 {
 	UpdateAnimationLogic();
+	UpdateMovementSound(delatTime);
+	m_MovedThisFrame = false;
 }
 
 void bombGame::PlayerComponent::TryMove(const glm::vec3& direction, float deltaTime)
@@ -248,6 +250,29 @@ void bombGame::PlayerComponent::UpdateAnimationLogic()
 	{
 		m_CachedAnimator->Play("idle");
 	}
+}
 
-	m_MovedThisFrame = false;
+void bombGame::PlayerComponent::UpdateMovementSound(float deltaTime)
+{
+	if (!m_MovedThisFrame)
+	{
+		m_StepTimer = m_StepInterval;
+		return;
+	}
+
+	m_StepTimer += deltaTime;
+	if (m_StepTimer >= m_StepInterval)
+	{
+		m_StepTimer = 0.f;
+
+		/*if (std::abs(m_LastMoveDir.y) > std::abs(m_LastMoveDir.x))
+			m_MovedVertEvent.NotifyObservers(GameEventId::PLAYER_MOVED_VERT, GetOwner());
+		else
+			m_MovedHorEvent.NotifyObservers(GameEventId::PLAYER_MOVED_HOR, GetOwner());*/
+
+		if (m_LastMoveDir.y != 0.f)
+			m_MovedVertEvent.NotifyObservers(GameEventId::PLAYER_MOVED_VERT, GetOwner());
+		if (m_LastMoveDir.x != 0.f)
+			m_MovedHorEvent.NotifyObservers(GameEventId::PLAYER_MOVED_HOR, GetOwner());
+	}
 }
