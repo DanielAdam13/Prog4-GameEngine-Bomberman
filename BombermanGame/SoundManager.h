@@ -14,7 +14,7 @@ namespace ge
 
 namespace bombGame
 {
-	// A fully static singleton OBSERVER class playing sounds via an EventQueue 
+	// A static singleton OBSERVER class playing sounds via an internal EventQueue in the Sound System
 	class SoundManager final : public ge::IObserver
 	{
 	public:
@@ -34,10 +34,10 @@ namespace bombGame
 		};
 
 		// Simply maps an event id to a sound id, taking volume
-		void RegisterMapping(GameEventId eventId, ge::Sound_Id soundId, float volume);
+		static void RegisterMapping(GameEventId eventId, ge::Sound_Id soundId, float volume);
 
 	private:
-		std::unordered_map<GameEventId, SoundManager::SoundMapping> m_SoundMappings{};
+		static inline std::unordered_map<GameEventId, SoundManager::SoundMapping> m_SoundMappings{};
 
 	};
 }

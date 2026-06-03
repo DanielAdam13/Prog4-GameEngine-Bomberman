@@ -167,7 +167,7 @@ void bombGame::GameplayGameState::OnEnter()
 		player1Animator->GetSingleFrameRectSize()) };
 	player1BoxColl->AssignTag("Player");
 
-	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 3);
+	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 1);
 	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), 0);
 	auto player1PlayerComp{ player1GO->AddComponent<PlayerComponent>(player1GO.get(), 150.f) };
 	player1PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);
@@ -205,7 +205,7 @@ void bombGame::GameplayGameState::OnEnter()
 		player2Animator->GetSingleFrameRectSize()) };
 	player2BoxColl->AssignTag("Player");
 
-	player2GO->AddComponent<ge::HealthComponent>(player2GO.get(), 3);
+	player2GO->AddComponent<ge::HealthComponent>(player2GO.get(), 1);
 	player2GO->AddComponent<ge::ScoreComponent>(player2GO.get(), 0);
 	auto player2PlayerComp{ player2GO->AddComponent<PlayerComponent>(player2GO.get(), 120.f) };
 	player2PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);

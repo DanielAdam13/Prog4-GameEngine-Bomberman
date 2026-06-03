@@ -26,6 +26,7 @@ namespace bombGame
 	class LevelGrid;
 
 	// Game-specific Component
+	// TYPED Object - Type Object is the Enemy Archetype, used in enemy creation in Spawn Utils
 	class EnemyComponent final : public ge::Component, public ge::IObserver
 	{
 	public:

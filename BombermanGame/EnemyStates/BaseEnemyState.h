@@ -47,11 +47,13 @@ namespace bombGame
 		virtual glm::vec3 ChooseDirectionAtIntersection(const GridTile& currentTile) = 0;
 
 	protected:
+		// Subclass Sandbox pattern kinda
 		ge::GameObject* FindClosestPlayerInRange() const;
 
 		EnemyComponent* GetSourceEnemyComponent() const noexcept;
 		ge::Transform* GetSourceTransform() const noexcept;
 
+		// Subclass Sandbox pattern kinda
 		std::vector<glm::vec3> CollectWalkableNeighbors(const LevelGrid& grid, const GridTile& currentTile, const glm::vec3& currentDir) const;
 
 		static constexpr inline std::array<std::pair<int, int>, 4> m_PossibleDirections{

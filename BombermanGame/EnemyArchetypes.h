@@ -8,6 +8,7 @@ namespace ge
 
 namespace bombGame
 {
+	// Type Object - TYPED Object is EnemyComponent
 	struct EnemyArchetype
 	{
 		ge::SpriteSheet* sheet{ nullptr };

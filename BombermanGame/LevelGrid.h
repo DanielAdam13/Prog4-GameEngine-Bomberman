@@ -24,8 +24,8 @@ namespace bombGame
 		int row;
 	};
 
-	// Generated the Dynamic parts of the level - breakable walls, exit, powerups
-	// and STORES reference to their Game Objects and/or cooridnates
+	// Plays the role of "Grid Tile Manager". Specifies HOW the layout is displayed.
+	// Also stores pointers/references to dynamically created grid objects such as Breakable Walls or the Exit.
 	class LevelGrid final
 	{
 	public:

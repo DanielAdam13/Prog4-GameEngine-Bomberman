@@ -7,7 +7,7 @@ ge::IObserver::~IObserver()
     auto subjects = m_ObservedSubjects;
     for (auto* s : subjects)
     {
-        s->RemoveObserver(this);
+        s->RemoveObserver(this); // !! Subjects are auto-removed from an Observer !!
     }
 }
 

@@ -23,7 +23,7 @@ namespace ge
 	protected:
 
 	private:
-		friend class Subject;
+		friend class Subject; // Subject calls RegisterSubject and Unregister internally
 
 		void RegisterSubject(Subject* s);
 		void UnregisterSubject(Subject* s);
