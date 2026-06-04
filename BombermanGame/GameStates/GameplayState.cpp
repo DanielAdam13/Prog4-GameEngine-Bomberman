@@ -299,17 +299,6 @@ void bombGame::GameplayGameState::OnEnter()
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_R, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
 
-	auto* p1GORaw{ player1GO.get() };
-	auto* p2GORaw{ player2GO.get() };
-
-	// Player speeds
-	auto deathConditionLambda1{ [p1GORaw]() -> bool {
-		auto* pc{p1GORaw->GetComponent<PlayerComponent>()};
-		return pc && pc->IsAlive(); } };
-	auto deathConditionLambda2{ [p2GORaw]() -> bool {
-		auto* pc{p2GORaw->GetComponent<PlayerComponent>()};
-		return pc && pc->IsAlive(); } };
-
 	// --------------------
 	// First player 
 	// --------------------
