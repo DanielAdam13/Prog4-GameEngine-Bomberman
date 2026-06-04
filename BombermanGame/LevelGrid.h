@@ -69,6 +69,7 @@ namespace bombGame
 		int ToIndex(int col, int row) const noexcept;
 
 		// Returns true if the tile is of type Wall or if a Breakable wall exists on this tile
+		// + Or if a bomb is at the tile
 		bool IsBlocked(const GridTile& tile) const noexcept;
 
 	private:

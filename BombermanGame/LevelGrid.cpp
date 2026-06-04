@@ -159,5 +159,7 @@ bool bombGame::LevelGrid::IsBlocked(const GridTile& tile) const noexcept
 		return true;
 	if (this->GetBreakableWallAt(tile.col, tile.row))
 		return true;
+	if (this->GetBombAt(tile.col, tile.row))
+		return true;
 	return false;
 }
