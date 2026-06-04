@@ -53,8 +53,10 @@ void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 	const int bombDroppedTileCol{ bombTile->col };
 	const int bombDroppedTileRow{ bombTile->row };
 
-	CreateExplosion(scene, grid, bombDropCenter, explosionSheets[0], lifetime, { 0,1,2,3 });
+	// Middle part
+	CreateExplosionPart(scene, grid, bombDropCenter, explosionSheets[0], lifetime, { 0,1,2,3 });
 
+	// Explosion arms creation logic
 	constexpr std::pair<int, int> directions[4]{ {-1, 0}, {1, 0}, {0, -1}, {0, 1} };
 	for (auto [dx, dy] : directions)
 	{
@@ -70,6 +72,16 @@ void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 			// If Static wall - arm is not spawned
 			if (tile->gridTileType == levelLoader::TileType::Wall)
 				break;
+
+			// Chain detonation: if there's a bomb here, detonate and stop it
+			if (auto* bombGO = grid.GetBombAt(currentCol, currentRow)) 
+			{
+				if (auto* bc = bombGO->GetComponent<BombComponent>()) 
+				{
+					bc->ForceDetonate();
+				}
+				break;   // arm stops at the chained bomb
+			}
 
 			// If Breakable Wall is not nullptr - CRUMBLE wall and arm is not spawned
 			if (auto* breakableWall = grid.GetBreakableWallAt(currentCol, currentRow))
@@ -91,12 +103,12 @@ void bombGame::spawnUtils::DetonateBombAt(LevelGrid& grid, ge::Scene& scene,
 
 			const auto gridRectSize{ tile->gridRect.size };
 			const auto gridRectPos{ tile->gridRect.position + gridRectSize / 2.f };
-			CreateExplosion(scene, grid, {gridRectPos.x, gridRectPos.y, 0.f}, sheet, lifetime, animationFrames);
+			CreateExplosionPart(scene, grid, {gridRectPos.x, gridRectPos.y, 0.f}, sheet, lifetime, animationFrames);
 		}
 	}
 }
 
-void bombGame::spawnUtils::CreateExplosion(ge::Scene& scene, const LevelGrid&,
+void bombGame::spawnUtils::CreateExplosionPart(ge::Scene& scene, const LevelGrid&,
 	const glm::vec3& fixedPosition, ge::SpriteSheet* explosionSheet, float activeTimer, const std::vector<int>& animationFrames)
 {
 	auto explosion = std::make_unique<ge::GameObject>("GO_ExplosionArm");

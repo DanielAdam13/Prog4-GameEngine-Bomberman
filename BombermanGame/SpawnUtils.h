@@ -30,7 +30,7 @@ namespace bombGame
 			float lifetime);
 
 		// Creates the Explosion Game Object on the correct collision Layer
-		void CreateExplosion(ge::Scene& scene, const LevelGrid& grid,
+		void CreateExplosionPart(ge::Scene& scene, const LevelGrid& grid,
 			const glm::vec3& fixedPosition,	ge::SpriteSheet* texture, float lifetime, const std::vector<int>& animationFrames);
 
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
