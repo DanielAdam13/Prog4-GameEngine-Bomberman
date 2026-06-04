@@ -117,7 +117,7 @@ void bombGame::GameplayGameState::OnEnter()
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
-		"D-Pad to move the Balloon | B bomb", tutFont, colorRed);
+		"D-Pad to move the Balloon | A bomb", tutFont, colorRed);
 	auto tutorial2GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
 		"WASD to move the BomberMan | SPACE bomb", tutFont, colorBlue);
@@ -327,7 +327,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// ---------------------
 	// Second player
 	// ---------------------
-	inputManager.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
+	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
 		std::make_unique<LayBombCommand>(player2GO.get()));
 	// Movement
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,

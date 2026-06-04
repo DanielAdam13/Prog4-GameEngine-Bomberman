@@ -4,7 +4,8 @@ bombGame::LevelGrid::LevelGrid(const levelLoader::LevelLayout& layout, const glm
 	:m_LevelLayout{ layout },
 	m_LevelTopLeftPos{ buildTopLeftPos },
 	m_TileSize{ tileSize },
-	m_DynamicWalls(layout.width* layout.height, nullptr)
+	m_DynamicWalls(layout.width * layout.height, nullptr), // Container size is known during runtime
+	m_CurrentlyActiveBombs(layout.width * layout.height, nullptr) // Container size is known during runtime
 {
 }
 
@@ -130,6 +131,21 @@ void bombGame::LevelGrid::RegisterExit(ge::GameObject* go)
 ge::GameObject* bombGame::LevelGrid::GetExitObject() const noexcept
 {
 	return m_ExitGO;
+}
+
+void bombGame::LevelGrid::RegisterBombAt(int col, int row, ge::GameObject* go)
+{
+	m_CurrentlyActiveBombs[ToIndex(col, row)] = go;
+}
+
+ge::GameObject* bombGame::LevelGrid::GetBombAt(int col, int row) const noexcept
+{
+	return m_CurrentlyActiveBombs[ToIndex(col, row)];
+}
+
+void bombGame::LevelGrid::ClearBombAt(int col, int row)
+{
+	m_CurrentlyActiveBombs[ToIndex(col, row)] = nullptr;
 }
 
 int bombGame::LevelGrid::ToIndex(int col, int row) const noexcept

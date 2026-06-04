@@ -27,8 +27,9 @@ bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGri
 
 bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 {
-	glm::vec3 midReceivedPosition{ position };
-	// Optional: Check if owner has PlayerComponent and if is alive
+	glm::vec3 midReceivedPosition{ position }; // position parameter is a fallback
+
+	// Check if owner has PlayerComponent and if is alive to get its mid point
 	if (auto* pc = GetOwner()->GetComponent<PlayerComponent>())
 	{
 		midReceivedPosition = pc->GetPlayerMidPoint();
@@ -36,7 +37,11 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 			return false;
 	}
 
-	if (!CanLayBomb())
+	const auto bombTile{ m_LevelGridRef->GetGridTileAt(midReceivedPosition) };
+	if (!bombTile)
+		return false;
+
+	if (!CanLayBomb(bombTile->col, bombTile->row))
 		return false;
 
 	const auto gridTileMidPos{ m_LevelGridRef->GetMidGridTilePointAt(midReceivedPosition) };
@@ -47,15 +52,24 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	auto* rawBombGO{ bomb.get() };
 	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 
+	// Register bomb to Grid AND this Layer Component
+	m_LevelGridRef->RegisterBombAt(bombTile->col, bombTile->row, rawBombGO);
 	RegisterLaidBomb(rawBombGO);
 
 	m_LaidBombEvent.NotifyObservers(GameEventId::LAY_BOMB, GetOwner());
 	return true;
 }
 
-bool bombGame::BombLayerComponent::CanLayBomb() const noexcept
+bool bombGame::BombLayerComponent::CanLayBomb(int tileCol, int tileRow) const noexcept
 {
-	return m_ActiveBombs < m_MaxBombs;
+	// Can't lay on top of another bomb
+	if (m_LevelGridRef->GetBombAt(tileCol, tileRow))
+		return false;
+
+	if (m_ActiveBombs >= m_MaxBombs)
+		return false;
+
+	return true;
 }
 
 void bombGame::BombLayerComponent::SetMaxBombs(int newMaxBombNr) noexcept

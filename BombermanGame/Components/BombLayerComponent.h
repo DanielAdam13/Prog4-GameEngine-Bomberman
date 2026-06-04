@@ -67,7 +67,7 @@ namespace bombGame
         ge::Subject m_BombExplodedEvent; // Per Component notify, not per bomb
 
         // Private helper
-        bool CanLayBomb() const noexcept;
+        bool CanLayBomb(int tileCol, int tileRow) const noexcept;
 
         // Subscribes to the bomb's explosion event
         void RegisterLaidBomb(ge::GameObject* bomb);

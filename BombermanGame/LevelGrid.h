@@ -45,11 +45,11 @@ namespace bombGame
 		levelLoader::LevelLayout GetLevelLayout() const noexcept;
 		float GetTileSize() const noexcept;
 
-		// Pushes a GO to the dynamic wall container
+		// Asigns a GO* to an index in the dynamic wall container
 		void RegisterBreakableAt(int col, int row, ge::GameObject* go);
 		// Simply returns nullptr if no dynamic wall exists here
 		ge::GameObject* GetBreakableWallAt(int col, int row) const noexcept;
-		// Sets the dynamic wall from the container to nullptr
+		// Sets the dynamic wall* from the container to nullptr
 		void ClearBreakableAt(int col, int row);
 
 		void MarkExitLocationAt(int col, int row);
@@ -57,6 +57,13 @@ namespace bombGame
 		bool IsExitTile(int col, int row) const noexcept;
 		void RegisterExit(ge::GameObject* go);
 		ge::GameObject* GetExitObject() const noexcept;
+
+		// Asigns a GO* to an index in the bomb container
+		void RegisterBombAt(int col, int row, ge::GameObject* go);
+		// Simply returns nullptr if no bomb exists here
+		ge::GameObject* GetBombAt(int col, int row) const noexcept;
+		// Sets the bomb* from the container to nullptr
+		void ClearBombAt(int col, int row);
 
 		// Small index helper
 		int ToIndex(int col, int row) const noexcept;
@@ -72,5 +79,6 @@ namespace bombGame
 		std::vector<ge::GameObject*> m_DynamicWalls;
 		ge::GameObject* m_ExitGO;
 		std::pair<int, int> m_ExitCoords{ -1, -1 };
+		std::vector<ge::GameObject*> m_CurrentlyActiveBombs;
 	};
 }
