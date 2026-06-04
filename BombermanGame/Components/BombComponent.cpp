@@ -41,3 +41,8 @@ void bombGame::BombComponent::UpdateComponent(float deltaTime)
 		GetOwner()->MarkForDeletion();
 	}
 }
+
+void bombGame::BombComponent::ForceDetonate() noexcept
+{
+	m_WindupTimer = m_WindUpDuration;
+}

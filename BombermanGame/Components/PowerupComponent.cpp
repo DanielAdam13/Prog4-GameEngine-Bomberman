@@ -13,21 +13,20 @@ bombGame::PowerupComponent::PowerupComponent(ge::GameObject* owner, PowerupType 
 
 void bombGame::PowerupComponent::ApplyTo(ge::GameObject* player)
 {
+	auto* layerComp{ player->GetComponent<BombLayerComponent>() };
+	if (!layerComp)
+		return;
+
 	switch (m_Type)
 	{
 	case bombGame::BombUp:
-		if (auto* layerComp = player->GetComponent<BombLayerComponent>())
-		{
-			layerComp->SetMaxBombs(layerComp->GetMaxBombs() + 1);
-		}
+		layerComp->SetMaxBombs(layerComp->GetMaxBombs() + 1);
 		break;
 	case bombGame::FireUp:
-		if (auto* layerComp = player->GetComponent<BombLayerComponent>())
-		{
-			layerComp->SetExplosionArmLength(layerComp->GetExplosionArmLength() + 1);
-		}
+		layerComp->SetExplosionArmLength(layerComp->GetExplosionArmLength() + 1);
 		break;
 	case bombGame::RemoteDetonate:
+		layerComp->EnableRemoteDetonation();
 		break;
 	}
 

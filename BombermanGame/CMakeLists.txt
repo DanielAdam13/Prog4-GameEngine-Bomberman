@@ -19,6 +19,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
   "Commands/LayBombCommand.h" "Commands/LayBombCommand.cpp"
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
+  "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
+  "Commands/RemoteBombDetonateCommand.h" "Commands/RemoteBombDetonateCommand.cpp"
 
   "SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
@@ -33,7 +35,6 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "LevelLoader.h" "LevelLoader.cpp" 
   "LevelGrid.h" "LevelGrid.cpp"
   "LevelBuilder.h" "LevelBuilder.cpp" 
-  "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
   
   "GameStates/GameStateMachine.h" "GameStates/GameStateMachine.cpp" 
   "GameStates/GameState.h" 
@@ -42,7 +43,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "EnemyType.h"  
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
-  "PowerupArchetypes.h" "PowerupArchetypes.cpp")
+  "PowerupArchetypes.h" "PowerupArchetypes.cpp" )
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

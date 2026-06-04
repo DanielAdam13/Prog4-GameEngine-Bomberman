@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <array>
+#include <vector>
 
 namespace ge
 {
@@ -39,11 +40,14 @@ namespace bombGame
 
         bool TryLayBomb(const glm::vec3& position);
 
-        int GetActiveBombs() const noexcept { return m_ActiveBombs; }
+        size_t GetActiveBombsCount() const noexcept { return m_ActiveBombs.size(); }
         int GetMaxBombs() const noexcept { return m_MaxBombs; }
         void SetMaxBombs(int newMaxBombNr) noexcept;
         int GetExplosionArmLength() const noexcept { return m_ExplosionArmLength; }
         void SetExplosionArmLength(int newLength);
+
+        void EnableRemoteDetonation() noexcept;
+        void DetonateAllBombsIfPossible();
 
         // Called when one of the bombs explode
         void Notify(int eventId, ge::GameObject* source) override;
@@ -53,11 +57,12 @@ namespace bombGame
 
     private:
         int m_MaxBombs;
-        int m_ActiveBombs{ 0 };
+        std::vector<ge::GameObject*> m_ActiveBombs{};// Cached ref
         ge::SpriteSheet* m_BombSheetRef;
-        std::array<ge::SpriteSheet*, 3> m_ExplosionSheetsRef;
+        std::array<ge::SpriteSheet*, 3> m_ExplosionSheetsRef; // Cached ref
         float m_WindupDuration;
         int m_ExplosionArmLength;
+        bool m_CanRemoteDetonate{ false };
 
         LevelGrid* m_LevelGridRef; // Cached ref
 
@@ -67,7 +72,7 @@ namespace bombGame
         ge::Subject m_BombExplodedEvent; // Per Component notify, not per bomb
 
         // Private helper
-        bool CanLayBomb(int tileCol, int tileRow) const noexcept;
+        bool CanLayBombAt(int tileCol, int tileRow) const noexcept;
 
         // Subscribes to the bomb's explosion event
         void RegisterLaidBomb(ge::GameObject* bomb);

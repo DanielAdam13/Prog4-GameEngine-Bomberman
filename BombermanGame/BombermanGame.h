@@ -38,7 +38,7 @@ namespace bombGame
 
 		struct GameSession
 		{
-			int currentStageIndex{ 1 };
+			int currentStageIndex{ 2 };
 			int playerLives{ 2 };
 			int totalScore{ 0 };
 			std::vector<PowerupType> storedPowerups;

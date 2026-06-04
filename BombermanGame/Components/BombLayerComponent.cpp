@@ -11,6 +11,7 @@
 
 #include <utility>
 #include <optional>
+#include <vector>
 
 bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid* levelGridRef,
 	ge::SpriteSheet* bombSheetRef, std::array<ge::SpriteSheet*, 3> explosionSheetsRef,
@@ -41,7 +42,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	if (!bombTile)
 		return false;
 
-	if (!CanLayBomb(bombTile->col, bombTile->row))
+	if (!CanLayBombAt(bombTile->col, bombTile->row))
 		return false;
 
 	const auto gridTileMidPos{ m_LevelGridRef->GetMidGridTilePointAt(midReceivedPosition) };
@@ -60,13 +61,13 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	return true;
 }
 
-bool bombGame::BombLayerComponent::CanLayBomb(int tileCol, int tileRow) const noexcept
+bool bombGame::BombLayerComponent::CanLayBombAt(int tileCol, int tileRow) const noexcept
 {
 	// Can't lay on top of another bomb
 	if (m_LevelGridRef->GetBombAt(tileCol, tileRow))
 		return false;
 
-	if (m_ActiveBombs >= m_MaxBombs)
+	if (static_cast<int>(m_ActiveBombs.size()) >= m_MaxBombs)
 		return false;
 
 	return true;
@@ -82,23 +83,41 @@ void bombGame::BombLayerComponent::SetExplosionArmLength(int newLength)
 	m_ExplosionArmLength = newLength;
 }
 
+void bombGame::BombLayerComponent::EnableRemoteDetonation() noexcept
+{
+	m_CanRemoteDetonate = true;
+}
+
+void bombGame::BombLayerComponent::DetonateAllBombsIfPossible()
+{
+	if (m_CanRemoteDetonate)
+	{
+		for (auto* bomb : m_ActiveBombs)
+		{
+			if (auto* bComp = bomb->GetComponent<BombComponent>())
+			{
+				bComp->ForceDetonate();
+			}
+		}
+	}
+}
+
 void bombGame::BombLayerComponent::RegisterLaidBomb(ge::GameObject* bomb)
 {
 	if (!bomb)
 		return;
 
 	auto bombComp{ bomb->GetComponent<BombComponent>() };
-
 	bombComp->GetExplodedBombEvent().AddObserver(this);
-	++m_ActiveBombs;
+
+	m_ActiveBombs.push_back(bomb); // Add cached ref to Layer
 }
 
 void bombGame::BombLayerComponent::Notify(int eventId, ge::GameObject* sourceObj)
 {
 	if (static_cast<GameEventId>(eventId) == GameEventId::EXPLODED_BOMB)
 	{
-		if (m_ActiveBombs > 0)
-			--m_ActiveBombs;
+		std::erase(m_ActiveBombs, sourceObj); // Remove cached ref from Layer
 
 		// Per Component notify, not per bomb
 		m_BombExplodedEvent.NotifyObservers(eventId, sourceObj);

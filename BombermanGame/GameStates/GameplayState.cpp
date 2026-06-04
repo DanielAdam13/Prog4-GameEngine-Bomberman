@@ -17,6 +17,7 @@
 #include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
 #include "Commands/SwitchToGameplayStateCommand.h"
+#include "Commands/RemoteBombDetonateCommand.h"
 
 #include "GameObject.h"
 #include "Components/Image.h"
@@ -117,10 +118,10 @@ void bombGame::GameplayGameState::OnEnter()
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
-		"D-Pad to move the Balloon | A bomb", tutFont, colorRed);
+		"D-Pad to move the Balloon | A bomb | B detonate(if)", tutFont, colorRed);
 	auto tutorial2GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
-		"WASD to move the BomberMan | SPACE bomb", tutFont, colorBlue);
+		"WASD to move the BomberMan | SPACE bomb | X detonate(if) ", tutFont, colorBlue);
 
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
@@ -314,6 +315,8 @@ void bombGame::GameplayGameState::OnEnter()
 	// --------------------
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
 		std::make_unique<LayBombCommand>(player1GO.get()));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
+		std::make_unique<RemoteBombDetonateCommand>(player1GO.get()));
 	// Movement
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }));
@@ -329,6 +332,8 @@ void bombGame::GameplayGameState::OnEnter()
 	// ---------------------
 	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
 		std::make_unique<LayBombCommand>(player2GO.get()));
+	inputManager.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
+		std::make_unique<RemoteBombDetonateCommand>(player2GO.get()));
 	// Movement
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }));

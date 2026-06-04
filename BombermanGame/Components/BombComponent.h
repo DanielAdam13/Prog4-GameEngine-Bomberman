@@ -13,7 +13,8 @@ namespace bombGame
 {
 	class LevelGrid;
 
-	// Bomb Component has an Explosion event which is used ONLY from Bomb Layer on the player GO.
+	// Bomb Component.
+	// Has an Explosion Subject event which is used ONLY from Bomb Layer on the player GO.
 	class BombComponent final : public ge::Component
 	{
 	public:
@@ -31,6 +32,8 @@ namespace bombGame
 
 		float GetWindupDuration() const noexcept { return m_WindUpDuration; };
 		ge::Subject& GetExplodedBombEvent() { return m_ExplodedBombEvent; }
+
+		void ForceDetonate() noexcept;
 
 	private:
 		float m_WindUpDuration;
