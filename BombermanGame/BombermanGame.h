@@ -40,7 +40,7 @@ namespace bombGame
 		{
 			int currentStageIndex{ 0 };
 			int playerLives{ 2 };
-			int totalScore{ 0 };
+			int totalScore{ 0 }; // (it's shared for both players)
 			std::vector<PowerupType> storedPowerups;
 		};
 

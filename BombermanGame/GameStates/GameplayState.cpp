@@ -374,7 +374,7 @@ void bombGame::GameplayGameState::OnEnter()
 	GameplayScene.Add(std::move(p1ScoreDisplayGO));
 	GameplayScene.Add(std::move(p2ScoreDisplayGO));
 
-	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayOST, 0.3f, ge::SoundCategory::Music);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayOST, 0.2f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Gameplay);
 }
 
@@ -426,14 +426,39 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 	}
 }
 
-void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject*)
+void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 {
 	if (eventId == GameEventId::ENEMY_DIED)
 	{
+		// --- Stage Cleared logic ---
 		--m_RemainingEnemyCount;
 		if (m_RemainingEnemyCount == 0)
 		{
 			m_StageCleared = true;
+		}
+
+		// --- Awarding Player score logic ---
+		if (!sourceObj)
+			return;
+
+		const auto enemyComp{ sourceObj->GetComponent<EnemyComponent>() };
+		if (!enemyComp)
+			return;
+
+		const int scorePerEnemy{ enemyComp->GetScoreValue() };
+		for (auto* player : m_TrackedPlayers)
+		{
+			if (!player)
+				continue;
+
+			auto* playerComp{ player->GetComponent<PlayerComponent>() };
+			if (!playerComp || !playerComp->IsAlive())
+				continue;
+
+			if (auto* scoreComp = player->GetComponent<ge::ScoreComponent>())
+			{
+				scoreComp->ChangeScore(scorePerEnemy);
+			}
 		}
 	}
 }

@@ -20,10 +20,10 @@ namespace bombGame
 		virtual void Play(const ge::Sound_Id soundId, const float volume, ge::SoundCategory category = ge::SoundCategory::SFX) override;
 		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;
 
-		virtual void Stop(ge::Sound_Id) {} // Empty, I don't need it
-		virtual void StopAll();
-		virtual void SetMuted(bool muted);
-		virtual bool IsMuted() const;
+		virtual void Stop(ge::Sound_Id) override {} // Empty, I don't need it
+		virtual void StopAll() override;
+		virtual void SetMuted(bool muted) override;
+		virtual bool IsMuted() const override;
 
 	private:
 		std::unique_ptr<SDLSoundSysImpl> m_Impl{};

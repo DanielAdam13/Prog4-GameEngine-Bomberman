@@ -160,7 +160,8 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 
 	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), archetype.health);
 
-	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), grid, archetype.speed, archetype.detectionRadius) };
+	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), grid, 
+		archetype.speed, archetype.detectionRadius, archetype.scoreValue) };
 
 	for (auto t : targets)
 	{

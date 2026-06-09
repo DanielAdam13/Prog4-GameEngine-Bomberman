@@ -19,10 +19,10 @@ namespace ge
 
 		virtual void Play(const Sound_Id soundId, const float volume, SoundCategory category = SoundCategory::SFX) override;
 		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;
-		virtual void Stop(Sound_Id id);
-		virtual void StopAll();
-		virtual void SetMuted(bool muted);
-		virtual bool IsMuted() const;
+		virtual void Stop(Sound_Id id) override;
+		virtual void StopAll() override;
+		virtual void SetMuted(bool muted) override;
+		virtual bool IsMuted() const override;
 
 	private:
 		std::unique_ptr<SoundSystem> m_RealSoundSystem{};

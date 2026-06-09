@@ -13,10 +13,10 @@ namespace ge
 		virtual void Play(Sound_Id, float, SoundCategory) override {};
 		virtual void RegisterSound(ge::Sound_Id, const std::string&) override {};
 
-		virtual void Stop(Sound_Id) {}
-		virtual void StopAll() {}
-		virtual void SetMuted(bool) {}
-		virtual bool IsMuted() const { return false; }
+		virtual void Stop(Sound_Id) override {}
+		virtual void StopAll() override {}
+		virtual void SetMuted(bool) override {}
+		virtual bool IsMuted() const override { return false; }
 
 	private:
 

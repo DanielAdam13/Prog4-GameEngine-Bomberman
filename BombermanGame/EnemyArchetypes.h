@@ -15,7 +15,7 @@ namespace bombGame
 		float speed{ 60.f };
 		int health{ 1 };
 		float detectionRadius{ 200.f };
-		float smartness{ 0.f };
+		int scoreValue{ 100 };
 	};
 
 	namespace enemyArchetypes

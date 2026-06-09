@@ -34,7 +34,7 @@ namespace bombGame
 		// Every PlayerComponent Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 13 };
 
-		explicit EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, float speed = 60.f, float detectionRadius = 200.f);
+		explicit EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, float speed, float detectionRadius, int scoreValue);
 		~EnemyComponent() override = default;
 
 		void FixedUpdateComponent(float) override {}
@@ -51,6 +51,7 @@ namespace bombGame
 		glm::vec3 GetMoveDirection() const noexcept { return m_CurrentMoveDirection; }
 		float GetSpeed() const noexcept { return m_Speed; }
 		float GetDetectionRadius() const noexcept { return m_DetectionRadius; }
+		int GetScoreValue() const noexcept { return m_ScoreValue; }
 		LevelGrid* GetLevelGrid() const noexcept { return m_LevelGrid; } // For states
 
 		bool IsAlive() const noexcept;
@@ -72,8 +73,9 @@ namespace bombGame
 		LevelGrid* m_LevelGrid{ nullptr }; // Ref
 
 		// Movement related data:
-		const float m_Speed{ 60.f };
-		const float m_DetectionRadius{ 200.f };
+		const float m_Speed;
+		const float m_DetectionRadius;
+		const int m_ScoreValue;
 		glm::vec3 m_CurrentMoveDirection{};
 
 		void PickNextTileTarget();

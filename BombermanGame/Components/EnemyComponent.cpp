@@ -15,7 +15,8 @@
 #include <utility>
 #include <memory>
 
-bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, float speed, float detectionRadius)
+bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, 
+	float speed, float detectionRadius, int scoreValue)
 	:Component::Component(owner),
 	m_OwnerTransformRef{ owner->GetComponent<ge::Transform>() },
 	m_CachedHealthComp{ owner->GetComponent<ge::HealthComponent>() },
@@ -23,7 +24,8 @@ bombGame::EnemyComponent::EnemyComponent(ge::GameObject* owner, LevelGrid* level
 	m_CachedAnimator{ owner->GetComponent<ge::AnimatorComponent>() },
 	m_LevelGrid{ levelGrid },
 	m_Speed{ speed },
-	m_DetectionRadius{ detectionRadius }
+	m_DetectionRadius{ detectionRadius },
+	m_ScoreValue{ scoreValue }
 {
 	assert(m_CachedHealthComp && "EnemyComponent requires a HealthComponent on the same GameObject");
 	m_CachedHealthComp->GetOnTakingDamageEvent().AddObserver(this);
