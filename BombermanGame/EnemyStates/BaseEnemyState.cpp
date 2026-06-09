@@ -76,6 +76,8 @@ std::vector<glm::vec3> bombGame::EnemyState::CollectWalkableNeighbors(const Leve
 			continue;
 		if (grid.GetBreakableWallAt(currentTile.col + dx, currentTile.row + dy))
 			continue;
+		if (grid.GetBombAt(currentTile.col + dx, currentTile.row + dy))
+			continue;
 
 		const glm::vec3 dir{ dx, dy, 0 };
 
