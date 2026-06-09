@@ -44,10 +44,14 @@ namespace bombGame
 			std::vector<PowerupType> storedPowerups;
 		};
 
-		GameSession GetCurrentGameSession() const noexcept;
+		const GameSession& GetCurrentGameSession() const noexcept;
+		// Progress gameplay stage
+		void AdvanceGameplayStageIndex();
+		// Go back to first gameplay stage
+		void ResetGameplayStageIndex();
 
 	private:
-		std::unique_ptr<GameStateMachine> m_GameStateMachine{};
+		GameStateMachine m_GameStateMachine{};
 
 		ge::SoundSystem* m_StoredSoundSystem{ nullptr };
 		SoundManager m_BombermanSoundManager{};

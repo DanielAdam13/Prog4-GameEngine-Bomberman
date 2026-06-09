@@ -17,6 +17,7 @@
 #include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
 #include "Commands/SwitchToGameplayStateCommand.h"
+#include "Commands/SkipGameplayStageCommand.h"
 #include "Commands/RemoteBombDetonateCommand.h"
 
 #include "GameObject.h"
@@ -39,6 +40,7 @@
 #include "SpawnUtils.h"
 
 #include "LevelLoader.h"
+#include "StageLoader.h"
 #include "LevelGrid.h"
 #include "LevelBuilder.h"
 
@@ -297,7 +299,9 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_R, ge::InputManager::InputTrigger::Up,
-		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
+		std::make_unique<SwitchToGameplayCommand>(GetBombermanGame()));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
+		std::make_unique<SkipGameplayStageCommand>(GetBombermanGame()));
 
 	// --------------------
 	// First player 

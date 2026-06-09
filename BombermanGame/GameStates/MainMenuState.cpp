@@ -58,9 +58,9 @@ void bombGame::MainMenuGameState::OnEnter()
 	//	std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
-		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
+		std::make_unique<SwitchToGameplayCommand>(GetBombermanGame()));
 	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<SwitchToGameplayCommand>(sceneNames::Gameplay, GetBombermanGame()));
+		std::make_unique<SwitchToGameplayCommand>(GetBombermanGame()));
 }
 
 void bombGame::MainMenuGameState::OnExit()

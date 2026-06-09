@@ -7,9 +7,8 @@
 #include <utility>
 #include <memory>
 
-bombGame::SwitchToGameplayCommand::SwitchToGameplayCommand(const std::string& gameplaySceneName, BombermanGame& game)
+bombGame::SwitchToGameplayCommand::SwitchToGameplayCommand(BombermanGame& game)
 	:Command::Command(),
-	m_GameplaySceneName{ gameplaySceneName },
 	m_BomberGame{ game }
 {
 }

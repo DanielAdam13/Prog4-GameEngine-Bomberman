@@ -21,6 +21,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
   "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
   "Commands/RemoteBombDetonateCommand.h" "Commands/RemoteBombDetonateCommand.cpp"
+  "Commands/SkipGameplayStageCommand.h" "Commands/SkipGameplayStageCommand.cpp"
 
   "SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
@@ -40,10 +41,12 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/GameState.h" 
   "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
   "GameStates/GameplayState.h" "GameStates/GameplayState.cpp"
+  "GameStates/VictoryState.h" "GameStates/VictoryState.cpp"
   "EnemyType.h"  
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
-  "PowerupArchetypes.h" "PowerupArchetypes.cpp" )
+  "PowerupArchetypes.h" "PowerupArchetypes.cpp"    
+   "StageLoader.h" "StageLoader.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

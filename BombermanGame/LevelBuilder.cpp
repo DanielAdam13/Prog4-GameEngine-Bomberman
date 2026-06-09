@@ -1,6 +1,7 @@
 #include "LevelBuilder.h"
 
 #include "LevelGrid.h"
+#include "StageLoader.h"
 
 #include "GameObject.h"
 #include "Components/Transform.h"

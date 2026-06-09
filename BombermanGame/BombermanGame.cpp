@@ -41,18 +41,18 @@ void bombGame::BombermanGame::Load()
 	ge::CollisionSystem::GetInstance().AddLayerTag("Explosion");
 	ge::CollisionSystem::GetInstance().AddLayerTag("Powerup");
 
-	m_GameStateMachine = std::make_unique<GameStateMachine>();
-	m_GameStateMachine->SetInitialState(*this);
+	//m_GameStateMachine = std::make_unique<GameStateMachine>();
+	m_GameStateMachine.SetInitialState(*this);
 }
 
 void bombGame::BombermanGame::Update(float deltaTime)
 {
-	m_GameStateMachine->Update(deltaTime);
+	m_GameStateMachine.Update(deltaTime);
 }
 
 void bombGame::BombermanGame::FixedUpdate(float fixedDeltaSec)
 {
-	m_GameStateMachine->FixedUpdate(fixedDeltaSec);
+	m_GameStateMachine.FixedUpdate(fixedDeltaSec);
 }
 
 bombGame::SoundManager& bombGame::BombermanGame::GetSoundManager() noexcept
@@ -67,10 +67,10 @@ ge::SoundSystem* bombGame::BombermanGame::GetStoredSoundSystem() noexcept
 
 bombGame::GameStateMachine& bombGame::BombermanGame::GetStateMachine() noexcept
 {
-	return *m_GameStateMachine;
+	return m_GameStateMachine;
 }
 
-bombGame::BombermanGame::GameSession bombGame::BombermanGame::GetCurrentGameSession() const noexcept
+const bombGame::BombermanGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() const noexcept
 {
 	return m_CurrentGameSession;
 }
@@ -84,4 +84,14 @@ void bombGame::BombermanGame::LoadSound()
 	m_StoredSoundSystem->RegisterSound(SoundIds::Powerup, ge::ResourceManager::GetInstance().GetFullPath("sounds/powerup.wav"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::Step_Horizontal, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_horizontal.wav"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::Step_Vertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
+}
+
+void bombGame::BombermanGame::AdvanceGameplayStageIndex()
+{
+	++m_CurrentGameSession.currentStageIndex; // Progress gameplay stage
+}
+
+void bombGame::BombermanGame::ResetGameplayStageIndex()
+{
+	m_CurrentGameSession.currentStageIndex = 0; // Go back to first stage
 }
