@@ -36,6 +36,10 @@ namespace bombGame
 		// Simply maps an event id to a sound id, taking volume
 		void RegisterMapping(GameEventId eventId, ge::Sound_Id soundId, float volume);
 
+		void StopAllSounds();
+		void SetMuted(bool muted);
+		bool IsMuted() const;
+
 	private:
 		std::unordered_map<GameEventId, SoundManager::SoundMapping> m_SoundMappings{};
 

@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "BombermanGame.h"
 #include "Services/ServiceLocator.h"
+#include "Services/SoundSystem.h" // for sound channels enum class
 #include "Renderer.h"
 #include "ResourceManager.h"
 
@@ -11,12 +12,11 @@
 #include "Commands/ChangeWindowSizeCommand.h"
 
 #include "Commands/MoveCommand.h"
-#include "Commands/DamageCommand.h"
-#include "Commands/ScoreCommand.h"
 #include "Commands/LayBombCommand.h"
 #include "Commands/SwitchToGameplayStateCommand.h"
 #include "Commands/SkipGameplayStageCommand.h"
 #include "Commands/RemoteBombDetonateCommand.h"
+#include "Commands/ToggleMuteCommand.h"
 
 #include "GameObject.h"
 #include "Components/Image.h"
@@ -45,6 +45,7 @@
 #include "EnemyArchetypes.h"
 #include "PowerupArchetypes.h"
 #include "GameEvents.h"
+#include "SoundIds.h"
 
 #include "VictoryState.h"
 #include "StageTransitionState.h"
@@ -324,8 +325,10 @@ void bombGame::GameplayGameState::OnEnter()
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_R, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F1, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SkipGameplayStageCommand>(GetBombermanGame()));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 
 	// --------------------
 	// First player 
@@ -371,6 +374,7 @@ void bombGame::GameplayGameState::OnEnter()
 	GameplayScene.Add(std::move(p1ScoreDisplayGO));
 	GameplayScene.Add(std::move(p2ScoreDisplayGO));
 
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayOST, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Gameplay);
 }
 
@@ -380,6 +384,7 @@ void bombGame::GameplayGameState::OnExit()
 	inputManager.UnbindAllController();
 	inputManager.UnbindAllKeyboard();
 
+	GetBombermanGame().GetSoundManager().StopAllSounds();
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Gameplay);
 }
 

@@ -4,12 +4,14 @@
 #include "Scene.h"
 #include "BombermanGame.h"
 #include "Services/ServiceLocator.h"
+#include "Services/SoundSystem.h" // for sound channels enum class
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "SoundManager.h"
 #include "SoundIds.h"
 
-#include "Commands/ChangeWindowSizeCommand.h"
+//#include "Commands/ChangeWindowSizeCommand.h"
+#include "Commands/ToggleMuteCommand.h"
 
 #include "GameObject.h"
 #include "Components/Image.h"
@@ -49,15 +51,17 @@ void bombGame::MainMenuGameState::OnEnter()
 
 	MainMenuScene.Add(std::move(backgroundGO));
 
-	ge::ServiceLocator::GetSoundSystem().Play(SoundIds::MainMenuOST, 0.3f);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
 
 	// ---------------------
 	// Specify Game State Input Bindings
 	// ---------------------
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
-	//inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
-	//	std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
+	/*inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
@@ -71,6 +75,7 @@ void bombGame::MainMenuGameState::OnExit()
 	inputManager.UnbindAllController();
 	inputManager.UnbindAllKeyboard();
 
+	GetBombermanGame().GetSoundManager().StopAllSounds();
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::MainMenu);
 }
 

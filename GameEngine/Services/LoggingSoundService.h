@@ -2,6 +2,7 @@
 #include "Services/SoundSystem.h"
 
 #include <memory>
+#include <string>
 
 namespace ge
 {
@@ -16,8 +17,12 @@ namespace ge
 		LoggingSoundSystem& operator=(const LoggingSoundSystem& other) = delete;
 		LoggingSoundSystem& operator=(LoggingSoundSystem&& other) = delete;
 
-		virtual void Play(const Sound_Id soundId, const float volume) override;
+		virtual void Play(const Sound_Id soundId, const float volume, SoundCategory category = SoundCategory::SFX) override;
 		virtual void RegisterSound(ge::Sound_Id id, const std::string& fileName) override;
+		virtual void Stop(Sound_Id id);
+		virtual void StopAll();
+		virtual void SetMuted(bool muted);
+		virtual bool IsMuted() const;
 
 	private:
 		std::unique_ptr<SoundSystem> m_RealSoundSystem{};

@@ -4,12 +4,11 @@
 #include "GameplayState.h"
 
 #include "SceneManager.h"
+#include "Services/SoundSystem.h" // for sound channels enum class
 #include "GameObject.h"
 #include "Components/TextComponent.h"
-#include "Components/Transform.h"
 #include "ResourceManager.h"
 #include "Font.h"
-#include "Services/ServiceLocator.h"
 
 #include <string>
 #include <utility>
@@ -38,11 +37,12 @@ void bombGame::StageTransitionState::OnEnter()
 
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Transition);
 	
-	ge::ServiceLocator::GetSoundSystem().Play(SoundIds::StageEnter, 0.3f);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StageEnter, 0.3f, ge::SoundCategory::Music);
 }
 
 void bombGame::StageTransitionState::OnExit()
 {
+	GetBombermanGame().GetSoundManager().StopAllSounds();
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Transition);
 }
 

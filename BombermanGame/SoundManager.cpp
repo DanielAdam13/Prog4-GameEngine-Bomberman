@@ -33,3 +33,18 @@ void bombGame::SoundManager::RegisterMapping(GameEventId eventId, ge::Sound_Id s
 {
 	m_SoundMappings.insert_or_assign(eventId, SoundMapping{ soundId, volume });
 }
+
+void bombGame::SoundManager::StopAllSounds()
+{
+	ge::ServiceLocator::GetSoundSystem().StopAll();
+}
+
+void bombGame::SoundManager::SetMuted(bool muted)
+{
+	ge::ServiceLocator::GetSoundSystem().SetMuted(muted);
+}
+
+bool bombGame::SoundManager::IsMuted() const
+{
+	return ge::ServiceLocator::GetSoundSystem().IsMuted();
+}

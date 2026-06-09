@@ -23,6 +23,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
   "Commands/RemoteBombDetonateCommand.h" "Commands/RemoteBombDetonateCommand.cpp"
   "Commands/SkipGameplayStageCommand.h" "Commands/SkipGameplayStageCommand.cpp"
+  "Commands/ToggleMuteCommand.h" "Commands/ToggleMuteCommand.cpp"
 
   "SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
