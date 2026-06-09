@@ -43,6 +43,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
   "GameStates/GameplayState.h" "GameStates/GameplayState.cpp"
   "GameStates/VictoryState.h" "GameStates/VictoryState.cpp"
+  "GameStates/StageTransitionState.h" "GameStates/StageTransitionState.cpp"
   "EnemyType.h"  
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"

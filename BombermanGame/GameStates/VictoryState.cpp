@@ -2,8 +2,9 @@
 #include "MainMenuState.h"
 #include "BombermanGame.h"
 
-bombGame::VictoryState::VictoryState(BombermanGame& game)
-	:GameState::GameState(game)
+bombGame::VictoryState::VictoryState(BombermanGame& game, float duration)
+	:GameState::GameState(game),
+	m_VictoryScreenDuration{ duration }
 {
 }
 

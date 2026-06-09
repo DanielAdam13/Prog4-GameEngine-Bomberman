@@ -49,6 +49,8 @@ void bombGame::MainMenuGameState::OnEnter()
 
 	MainMenuScene.Add(std::move(backgroundGO));
 
+	ge::ServiceLocator::GetSoundSystem().Play(SoundIds::MainMenuOST, 0.3f);
+
 	// ---------------------
 	// Specify Game State Input Bindings
 	// ---------------------
@@ -58,9 +60,9 @@ void bombGame::MainMenuGameState::OnEnter()
 	//	std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
-		std::make_unique<SwitchToGameplayCommand>(GetBombermanGame()));
+		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
 	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<SwitchToGameplayCommand>(GetBombermanGame()));
+		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
 }
 
 void bombGame::MainMenuGameState::OnExit()
@@ -74,5 +76,5 @@ void bombGame::MainMenuGameState::OnExit()
 
 std::unique_ptr<bombGame::GameState> bombGame::MainMenuGameState::Update(float)
 {
-	return std::unique_ptr<GameState>();
+	return nullptr;
 }

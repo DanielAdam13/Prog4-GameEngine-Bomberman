@@ -1,7 +1,7 @@
 #include "SkipGameplayStageCommand.h"
 #include "BombermanGame.h"
 #include "GameStates/GameStateMachine.h"
-#include "GameStates/GameplayState.h"
+#include "GameStates/StageTransitionState.h"
 #include "GameStates/VictoryState.h"
 #include "StageLoader.h"
 
@@ -23,6 +23,6 @@ void bombGame::SkipGameplayStageCommand::Execute(float)
 	}
 	else
 	{
-		m_BomberGame.GetStateMachine().RequestStateTransition(std::make_unique<GameplayGameState>(m_BomberGame));
+		m_BomberGame.GetStateMachine().RequestStateTransition(std::make_unique<StageTransitionState>(m_BomberGame));
 	}
 }

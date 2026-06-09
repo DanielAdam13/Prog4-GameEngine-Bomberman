@@ -19,8 +19,8 @@
 #include <utility>
 
 bombGame::BombermanGame::BombermanGame()
+	:m_StoredSoundSystem{ &ge::ServiceLocator::GetSoundSystem() }
 {
-	m_StoredSoundSystem = &ge::ServiceLocator::GetSoundSystem();
 	ge::Renderer::GetInstance().SetWindowSize({ 800, 800 });
 }
 
@@ -41,7 +41,6 @@ void bombGame::BombermanGame::Load()
 	ge::CollisionSystem::GetInstance().AddLayerTag("Explosion");
 	ge::CollisionSystem::GetInstance().AddLayerTag("Powerup");
 
-	//m_GameStateMachine = std::make_unique<GameStateMachine>();
 	m_GameStateMachine.SetInitialState(*this);
 }
 
@@ -82,8 +81,13 @@ void bombGame::BombermanGame::LoadSound()
 	m_StoredSoundSystem->RegisterSound(SoundIds::LayBomb, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomb_lay.wav"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::Pause, ge::ResourceManager::GetInstance().GetFullPath("sounds/pause.wav"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::Powerup, ge::ResourceManager::GetInstance().GetFullPath("sounds/powerup.wav"));
-	m_StoredSoundSystem->RegisterSound(SoundIds::Step_Horizontal, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_horizontal.wav"));
-	m_StoredSoundSystem->RegisterSound(SoundIds::Step_Vertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::StepHorizontal, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_horizontal.wav"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::StepVertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::MainMenuOST, ge::ResourceManager::GetInstance().GetFullPath("sounds/main_menu.mp3"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::GameplayOST, ge::ResourceManager::GetInstance().GetFullPath("sounds/gameplay_ost.mp3"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::StageEnter, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_enter.mp3"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::StageWon, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_won.mp3"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::StageLost, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_lost.mp3"));
 }
 
 void bombGame::BombermanGame::IncrementGameplayStageIndex()

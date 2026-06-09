@@ -2,18 +2,19 @@
 
 #include "BombermanGame.h"
 #include "GameStates/GameStateMachine.h"
-#include "GameStates/GameplayState.h"
+#include "GameStates/StageTransitionState.h"
 
 #include <utility>
 #include <memory>
 
-bombGame::SwitchToGameplayCommand::SwitchToGameplayCommand(BombermanGame& game)
+bombGame::SwitchToTransitionCommand::SwitchToTransitionCommand(BombermanGame& game)
 	:Command::Command(),
 	m_BomberGame{ game }
 {
 }
 
-void bombGame::SwitchToGameplayCommand::Execute(float)
+void bombGame::SwitchToTransitionCommand::Execute(float)
 {
-	m_BomberGame.GetStateMachine().RequestStateTransition(std::make_unique<GameplayGameState>(m_BomberGame));
+	m_BomberGame.GetStateMachine().RequestStateTransition(
+		std::make_unique<StageTransitionState>(m_BomberGame));
 }

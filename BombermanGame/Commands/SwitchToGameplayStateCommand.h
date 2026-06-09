@@ -8,10 +8,10 @@ namespace bombGame
 	class BombermanGame;
 
 	// Game-specific Command, calls RequestStateChange from the Game State Machine
-	class SwitchToGameplayCommand final : public ge::Command
+	class SwitchToTransitionCommand final : public ge::Command
 	{
 	public:
-		SwitchToGameplayCommand(BombermanGame& game);
+		SwitchToTransitionCommand(BombermanGame& game);
 
 		virtual void Execute(float) override;
 

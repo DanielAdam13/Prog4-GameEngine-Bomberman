@@ -47,10 +47,12 @@
 #include "GameEvents.h"
 
 #include "VictoryState.h"
+#include "StageTransitionState.h"
 
 #include <utility>
 #include <memory>
 #include <array>
+#include <algorithm>
 
 bombGame::GameplayGameState::GameplayGameState(BombermanGame& game)
 	:GameState::GameState(game)
@@ -321,7 +323,7 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_R, ge::InputManager::InputTrigger::Up,
-		std::make_unique<SwitchToGameplayCommand>(GetBombermanGame()));
+		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SkipGameplayStageCommand>(GetBombermanGame()));
 
@@ -383,12 +385,31 @@ void bombGame::GameplayGameState::OnExit()
 
 std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 {
+	// If there are still alive enemies
 	if (!m_StageCleared)
-		return nullptr;
+	{
+		// Reset GameplayOST State + stage if both players are dead
+		if (std::all_of(m_TrackedPlayers.begin(), m_TrackedPlayers.end(), [](ge::GameObject* player)->bool
+			{
+				auto* playerComp{ player->GetComponent<PlayerComponent>() };
+				if (playerComp && !playerComp->IsAlive())
+					return true;
 
+				return false;
+			}))
+		{
+			return std::make_unique<StageTransitionState>(GetBombermanGame());
+		}
+
+		// Else, stay in this state
+		return nullptr;
+	}
+
+	// If stage is clear but no player is on the exit, stay in this state
 	if (!IsAnyPlayerOnExit())
 		return nullptr;
 
+	// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
 	GetBombermanGame().IncrementGameplayStageIndex();
 	if (GetBombermanGame().GetCurrentGameSession().currentStageIndex >= stageLoader::GetStageCount())
 	{
@@ -396,7 +417,7 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 	}
 	else
 	{
-		return std::make_unique<GameplayGameState>(GetBombermanGame());
+		return std::make_unique<StageTransitionState>(GetBombermanGame());
 	}
 }
 

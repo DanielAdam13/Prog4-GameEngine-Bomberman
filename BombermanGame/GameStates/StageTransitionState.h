@@ -7,10 +7,10 @@ namespace bombGame
 {
 	class BombermanGame;
 
-	class VictoryState final : public GameState
+	class StageTransitionState final : public GameState
 	{
 	public:
-		VictoryState(BombermanGame& game, float duration = 3.f);
+		StageTransitionState(BombermanGame& game, float duration = 2.7f);
 
 		virtual void OnEnter() override;
 		virtual void OnExit() override;
@@ -19,8 +19,10 @@ namespace bombGame
 		virtual void FixedUpdate(float) override {}
 
 	private:
-		float m_VictoryTimer{ 0.f };
-		float m_VictoryScreenDuration;
+		int m_StageIndex;
+
+		float m_Timer{ 0.f };
+		float m_TransitionDuration;
 
 	};
 }

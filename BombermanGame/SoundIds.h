@@ -10,7 +10,12 @@ namespace bombGame
 		constexpr ge::Sound_Id BombermanDied{ 2 };
 		constexpr ge::Sound_Id Pause{ 3 };
 		constexpr ge::Sound_Id Powerup{ 4 };
-		constexpr ge::Sound_Id Step_Horizontal{ 5 };
-		constexpr ge::Sound_Id Step_Vertical{ 6 };
+		constexpr ge::Sound_Id StepHorizontal{ 5 };
+		constexpr ge::Sound_Id StepVertical{ 6 };
+		constexpr ge::Sound_Id MainMenuOST{ 7 };
+		constexpr ge::Sound_Id GameplayOST{ 8 };
+		constexpr ge::Sound_Id StageEnter{ 9 };
+		constexpr ge::Sound_Id StageWon{ 10 };
+		constexpr ge::Sound_Id StageLost{ 11 };
 	}
 }
