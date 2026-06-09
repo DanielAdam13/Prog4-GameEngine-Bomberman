@@ -15,7 +15,7 @@ bombGame::SkipGameplayStageCommand::SkipGameplayStageCommand(BombermanGame& game
 
 void bombGame::SkipGameplayStageCommand::Execute(float)
 {
-	m_BomberGame.AdvanceGameplayStageIndex();
+	m_BomberGame.IncrementGameplayStageIndex();
 	
 	if (m_BomberGame.GetCurrentGameSession().currentStageIndex >= stageLoader::GetStageCount())
 	{

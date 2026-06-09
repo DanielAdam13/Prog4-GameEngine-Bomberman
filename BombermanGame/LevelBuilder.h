@@ -30,7 +30,7 @@ namespace bombGame
 			PowerupType stagePowerup,
 			int breakableWallRandomnessIndex);
 
-		void GenerateEnemies(ge::Scene& scene, LevelGrid& grid,
+		std::vector<ge::GameObject*> GenerateEnemies(ge::Scene& scene, LevelGrid& grid,
 			const std::vector<stageLoader::EnemyEntry>& enemyEntries,
 			const std::vector<ge::GameObject*>& players);
 

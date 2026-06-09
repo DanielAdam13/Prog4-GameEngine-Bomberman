@@ -45,9 +45,9 @@ namespace bombGame
 		};
 
 		const GameSession& GetCurrentGameSession() const noexcept;
-		// Progress gameplay stage
-		void AdvanceGameplayStageIndex();
-		// Go back to first gameplay stage
+		// ++currentStageIndex
+		void IncrementGameplayStageIndex();
+		// currentStageIndex = 0
 		void ResetGameplayStageIndex();
 
 	private:

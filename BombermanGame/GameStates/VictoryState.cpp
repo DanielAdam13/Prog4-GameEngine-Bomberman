@@ -17,8 +17,8 @@ void bombGame::VictoryState::OnExit()
 
 std::unique_ptr<bombGame::GameState> bombGame::VictoryState::Update(float deltaTime)
 {
-	victoryTimer += deltaTime;
-	if (victoryTimer >= victoryScreenDuration)
+	m_VictoryTimer += deltaTime;
+	if (m_VictoryTimer >= m_VictoryScreenDuration)
 	{
 		GetBombermanGame().ResetGameplayStageIndex();
 		return std::make_unique<MainMenuGameState>(GetBombermanGame());

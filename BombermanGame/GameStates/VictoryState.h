@@ -19,8 +19,8 @@ namespace bombGame
 		virtual void FixedUpdate(float) override {}
 
 	private:
-		static inline float victoryTimer{ 0.f };
-		static inline constexpr float victoryScreenDuration{ 3.f };
+		static inline float m_VictoryTimer{ 0.f };
+		static inline constexpr float m_VictoryScreenDuration{ 3.f };
 
 	};
 }

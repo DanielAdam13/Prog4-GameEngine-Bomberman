@@ -17,6 +17,7 @@ namespace ge
 namespace bombGame
 {
 	class LevelGrid;
+	struct EnemyArchetype;
 
 	namespace spawnUtils
 	{
@@ -34,11 +35,11 @@ namespace bombGame
 			const glm::vec3& fixedPosition,	ge::SpriteSheet* texture, float lifetime, const std::vector<int>& animationFrames);
 
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
-			ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets, 
-			const glm::vec3& spawnPos, float speed, int health);
+			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
+			const glm::vec3& spawnPos);
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
-			ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets,
-			int gridCol, int gridRow, float speed, int health);
+			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
+			int gridCol, int gridRow);
 
 		void SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet);
 		void SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int col, int row, ge::Texture2D* exitdoorTexture);

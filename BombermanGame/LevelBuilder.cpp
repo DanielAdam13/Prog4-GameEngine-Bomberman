@@ -111,10 +111,12 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 	}
 }
 
-void bombGame::levelBuilder::GenerateEnemies(ge::Scene& scene, LevelGrid& grid, 
+std::vector<ge::GameObject*> bombGame::levelBuilder::GenerateEnemies(ge::Scene& scene, LevelGrid& grid,
 	const std::vector<stageLoader::EnemyEntry>& enemyEntries, 
 	const std::vector<ge::GameObject*>& players)
 {
+	std::vector<ge::GameObject*> spawnedEnemies;
+
 	auto eligibleTiles{ CollectEnemySpawnableTiles(grid) };
 
 	static std::mt19937 gen{ std::random_device{}() };
@@ -125,15 +127,19 @@ void bombGame::levelBuilder::GenerateEnemies(ge::Scene& scene, LevelGrid& grid,
 	{
 		for (int i{}; i < enemyEntry.count; ++i)
 		{
-			if (tileIdx >= eligibleTiles.size()) // Out of room for spawning, unlikely
-				return;
+			if (tileIdx >= eligibleTiles.size()) // Out of room for spawning(unlikely)
+				return spawnedEnemies; // return spawned enemies so far
+
 			const auto [col, row] = eligibleTiles[tileIdx++];
 
 			const auto& arch{ enemyArchetypes::Get(enemyEntry.type) };
 			
-			spawnUtils::SpawnEnemy(scene, &grid, arch.sheet, players, col, row, arch.speed, arch.health);
+			auto enemyGo{ spawnUtils::SpawnEnemy(scene, &grid, arch, players, col, row) };
+			spawnedEnemies.push_back(enemyGo);
 		}
 	}
+
+	return spawnedEnemies;
 }
 
 std::vector<std::pair<int, int>> bombGame::levelBuilder::CollectEnemySpawnableTiles(const LevelGrid& grid, int minDistanceFromPlayers)

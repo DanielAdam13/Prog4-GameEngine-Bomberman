@@ -86,7 +86,7 @@ void bombGame::BombermanGame::LoadSound()
 	m_StoredSoundSystem->RegisterSound(SoundIds::Step_Vertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
 }
 
-void bombGame::BombermanGame::AdvanceGameplayStageIndex()
+void bombGame::BombermanGame::IncrementGameplayStageIndex()
 {
 	++m_CurrentGameSession.currentStageIndex; // Progress gameplay stage
 }

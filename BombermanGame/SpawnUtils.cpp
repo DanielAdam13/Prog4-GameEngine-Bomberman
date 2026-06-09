@@ -15,6 +15,7 @@
 
 #include "LevelGrid.h"
 #include "LevelLoader.h"
+#include "EnemyArchetypes.h"
 #include "Animation.h"
 #include "SpriteSheet.h"
 
@@ -135,12 +136,12 @@ void bombGame::spawnUtils::CreateExplosionPart(ge::Scene& scene, const LevelGrid
 }
 
 ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
-	ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets,
-	const glm::vec3& spawnPos, float speed, int health)
+	const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
+	const glm::vec3& spawnPos)
 {
 	auto enemyGO = std::make_unique<ge::GameObject>("GO_IceEnemy1");
 
-	auto* enemy1Animator{ enemyGO->AddComponent<ge::AnimatorComponent>(enemyGO.get(), enemySpriteSheet) };
+	auto* enemy1Animator{ enemyGO->AddComponent<ge::AnimatorComponent>(enemyGO.get(), archetype.sheet) };
 	enemy1Animator->AddAnimation({ "walk_right", {0, 1, 2}, 4, true });
 	enemy1Animator->AddAnimation({ "walk_left", {3, 4, 5}, 4, true });
 	enemy1Animator->AddAnimation({ "death", {6, 7, 8, 9, 10}, 3, false });
@@ -157,9 +158,9 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 		glm::vec2{-gridTileSize * 0.5f , -gridTileSize * 0.5f})};
 	enemy1BoxColl->AssignTag("Enemy");
 
-	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), health);
+	enemyGO->AddComponent<ge::HealthComponent>(enemyGO.get(), archetype.health);
 
-	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), grid, speed) };
+	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), grid, archetype.speed, archetype.detectionRadius) };
 
 	for (auto t : targets)
 	{
@@ -177,12 +178,12 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 }
 
 ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
-	ge::SpriteSheet* enemySpriteSheet, const std::vector<ge::GameObject*>& targets, 
-	int gridCol, int gridRow, float speed, int health)
+	const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
+	int gridCol, int gridRow)
 {
 	const auto gridTileMid{ grid->GetMidGridTilePointByCoord(gridCol, gridRow) };
 	const glm::vec3 spawnPos{ gridTileMid->x, gridTileMid->y, 0.f };
-	return SpawnEnemy(scene, grid, enemySpriteSheet, targets, spawnPos, speed, health);
+	return SpawnEnemy(scene, grid, archetype, targets, spawnPos);
 }
 
 void bombGame::spawnUtils::SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet)

@@ -14,6 +14,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Components/ExplosionComponent.h" "Components/ExplosionComponent.cpp"
   "Components/BreakableWallComponent.h" "Components/BreakableWallComponent.cpp"
   "Components/PowerupComponent.h" "Components/PowerupComponent.cpp"
+  "Components/CameraPlayerFollowComponent.h" "Components/CameraPlayerFollowComponent.cpp"
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
@@ -46,7 +47,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
   "PowerupArchetypes.h" "PowerupArchetypes.cpp"    
-   "StageLoader.h" "StageLoader.cpp")
+   "StageLoader.h" "StageLoader.cpp" )
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

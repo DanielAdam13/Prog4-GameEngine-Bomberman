@@ -27,7 +27,7 @@ bombGame::MainMenuGameState::MainMenuGameState(BombermanGame& game)
 void bombGame::MainMenuGameState::OnEnter()
 {
 	// ---------------------
-	// Load Sound specifi sound
+	// Load Sound specific sound
 	// ---------------------
 
 	// ---------------------

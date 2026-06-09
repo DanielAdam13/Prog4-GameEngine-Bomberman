@@ -7,8 +7,6 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 
-#include "SoundManager.h"
-
 #include "Commands/ConditionalCommand.h"
 #include "Commands/ChangeWindowSizeCommand.h"
 
@@ -29,7 +27,8 @@
 #include "Components/ScoreComponent.h"
 #include "Components/AnimatorComponent.h"
 #include "Components/Colliders.h"
-#include "Components/CameraFollowComponent.h"
+#include "Components/CameraPlayerFollowComponent.h"
+#include "Components/EnemyComponent.h" // only to subscibe to dead event
 
 #include "Components/PlayerComponent.h"
 #include "Components/BombLayerComponent.h"
@@ -38,14 +37,16 @@
 
 #include "Animation.h"
 #include "SpawnUtils.h"
-
+#include "SoundManager.h"
 #include "LevelLoader.h"
 #include "StageLoader.h"
 #include "LevelGrid.h"
 #include "LevelBuilder.h"
-
 #include "EnemyArchetypes.h"
 #include "PowerupArchetypes.h"
+#include "GameEvents.h"
+
+#include "VictoryState.h"
 
 #include <utility>
 #include <memory>
@@ -194,6 +195,9 @@ void bombGame::GameplayGameState::OnEnter()
 	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
+	//!!
+	m_TrackedPlayers.push_back(player1GO.get());
+
 	// Player 2
 	auto player2GO = std::make_unique<ge::GameObject>("GO_Player2");
 	
@@ -232,14 +236,31 @@ void bombGame::GameplayGameState::OnEnter()
 	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
 	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
+	//!!
+	m_TrackedPlayers.push_back(player2GO.get());
+
 	// =================================================
 	// Enemy Generation
 	// =================================================
 	enemyArchetypes::InitializeArchetypes(balloomSpriteSheet, onilEnemySheet, dahlSpriteSheet, minvoSpriteSheet);
 
-	levelBuilder::GenerateEnemies(GameplayScene, *m_LevelGrid,
+	auto spawnedEnemies{ levelBuilder::GenerateEnemies(GameplayScene, *m_LevelGrid,
 		stage.enemies,
-		{ player1GO.get(), player2GO.get() });
+		{ player1GO.get(), player2GO.get() }) };
+
+	// Listen to ENEMY_DIED event so we can check if stage is cleared
+	for (auto* enemy : spawnedEnemies)
+	{
+		if (auto* enemyComp = enemy->GetComponent<EnemyComponent>())
+		{
+			enemyComp->GetDeadEvent().AddObserver(this);
+		}
+	}
+
+	// !!!
+	m_RemainingEnemyCount = static_cast<int>(spawnedEnemies.size());
+	if (m_RemainingEnemyCount > 0)
+		m_StageCleared = false;
 
 	// ---- Health Displays ----
 	auto p1HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P1HealthDisplay");
@@ -284,7 +305,8 @@ void bombGame::GameplayGameState::OnEnter()
 	ge::Renderer::GetInstance().SetActiveCamera(m_GameplayCamera.get());
 
 	auto cameraGO = std::make_unique<ge::GameObject>("GO_Camera");
-	auto* followCam{ cameraGO->AddComponent<ge::CameraFollowComponent>(cameraGO.get(), m_GameplayCamera.get(), 3.f) };
+	auto* followCam{ cameraGO->AddComponent<CameraPlayerFollowComponent>(
+		cameraGO.get(), m_GameplayCamera.get(), 3.f) };
 	followCam->AddTarget(player1GO.get());
 	followCam->AddTarget(player2GO.get());
 	GameplayScene.Add(std::move(cameraGO));
@@ -361,5 +383,49 @@ void bombGame::GameplayGameState::OnExit()
 
 std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 {
-	return std::unique_ptr<GameState>();
+	if (!m_StageCleared)
+		return nullptr;
+
+	if (!IsAnyPlayerOnExit())
+		return nullptr;
+
+	GetBombermanGame().IncrementGameplayStageIndex();
+	if (GetBombermanGame().GetCurrentGameSession().currentStageIndex >= stageLoader::GetStageCount())
+	{
+		return std::make_unique<VictoryState>(GetBombermanGame());
+	}
+	else
+	{
+		return std::make_unique<GameplayGameState>(GetBombermanGame());
+	}
+}
+
+void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject*)
+{
+	if (eventId == GameEventId::ENEMY_DIED)
+	{
+		--m_RemainingEnemyCount;
+		if (m_RemainingEnemyCount == 0)
+		{
+			m_StageCleared = true;
+		}
+	}
+}
+
+bool bombGame::GameplayGameState::IsAnyPlayerOnExit() const noexcept
+{
+	const auto exitCoord{ m_LevelGrid->GetExitLocation() };
+	for (auto* player : m_TrackedPlayers)
+	{
+		if (!player)
+			continue;
+		const auto pos{ player->GetComponent<ge::Transform>()->GetWorldPosition() };
+		const auto playerTile{ m_LevelGrid->GetGridTileAt(pos) };
+		if (playerTile && playerTile->col == exitCoord.first && playerTile->row == exitCoord.second)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
