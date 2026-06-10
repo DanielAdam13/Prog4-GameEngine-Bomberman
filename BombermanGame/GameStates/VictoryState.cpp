@@ -7,7 +7,6 @@
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "Services/SoundSystem.h"
-#include "Renderer.h"
 #include "Components/Image.h"
 #include "Components/Transform.h"
 
@@ -36,6 +35,7 @@ void bombGame::VictoryState::OnEnter()
 	victoryScene.Add(std::move(victoryScreenGO));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StageWon, 0.3f, ge::SoundCategory::Music);
+	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Victory);
 }
 
 void bombGame::VictoryState::OnExit()
@@ -49,7 +49,7 @@ std::unique_ptr<bombGame::GameState> bombGame::VictoryState::Update(float deltaT
 	m_VictoryTimer += deltaTime;
 	if (m_VictoryTimer >= m_VictoryScreenDuration)
 	{
-		GetBombermanGame().ResetGameplayStageIndex();
+		GetBombermanGame().GetCurrentGameSession().currentStageIndex = 0;
 		return std::make_unique<MainMenuGameState>(GetBombermanGame());
 	}
 

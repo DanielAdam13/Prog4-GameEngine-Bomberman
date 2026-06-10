@@ -44,5 +44,6 @@ void ScoreDisplayComponent::RefreshText()
 	if (!score || !m_pCachedText) 
 		return;
 
-	m_pCachedText->SetText("Score: " + std::to_string(score->GetCurrentScore()));
+	//m_pCachedText->SetText(m_pTrackedPlayer->GetName() + " " + std::to_string(score->GetCurrentScore()));
+	m_pCachedText->SetText(std::to_string(score->GetCurrentScore()));
 }

@@ -69,7 +69,7 @@ bombGame::GameStateMachine& bombGame::BombermanGame::GetStateMachine() noexcept
 	return m_GameStateMachine;
 }
 
-const bombGame::BombermanGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() const noexcept
+bombGame::BombermanGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() noexcept
 {
 	return m_CurrentGameSession;
 }
@@ -88,14 +88,4 @@ void bombGame::BombermanGame::LoadSound()
 	m_StoredSoundSystem->RegisterSound(SoundIds::StageEnter, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_enter.mp3"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::StageWon, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_won.mp3"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::StageLost, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_lost.mp3"));
-}
-
-void bombGame::BombermanGame::IncrementGameplayStageIndex()
-{
-	++m_CurrentGameSession.currentStageIndex; // Progress gameplay stage
-}
-
-void bombGame::BombermanGame::ResetGameplayStageIndex()
-{
-	m_CurrentGameSession.currentStageIndex = 0; // Go back to first stage
 }

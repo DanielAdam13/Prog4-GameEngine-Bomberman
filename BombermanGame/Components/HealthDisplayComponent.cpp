@@ -51,5 +51,5 @@ void HealthDisplayComponent::RefreshText()
 	if (!healthComp || !m_pCachedText) 
 		return;
 
-	m_pCachedText->SetText(m_pTrackedPlayer->GetName() + " HP: " + std::to_string(healthComp->GetCurrentHealth()));
+	m_pCachedText->SetText("LEFT " + std::to_string(healthComp->GetCurrentHealth()));
 }

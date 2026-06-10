@@ -39,16 +39,12 @@ namespace bombGame
 		struct GameSession
 		{
 			int currentStageIndex{ 0 };
-			int playerLives{ 2 };
-			int totalScore{ 0 }; // (it's shared for both players)
+			int playerLives{ 4 }; // (shared for both players)
+			int totalScore{ 0 }; // (shared for both players)
 			std::vector<PowerupType> storedPowerups;
 		};
 
-		const GameSession& GetCurrentGameSession() const noexcept;
-		// ++currentStageIndex
-		void IncrementGameplayStageIndex();
-		// currentStageIndex = 0
-		void ResetGameplayStageIndex();
+		GameSession& GetCurrentGameSession() noexcept;
 
 	private:
 		GameStateMachine m_GameStateMachine{};
@@ -63,10 +59,11 @@ namespace bombGame
 
 	namespace sceneNames
 	{
-		inline constexpr auto MainMenu{ "MainMenu" };
-		inline constexpr auto Gameplay{ "Gameplay" };
-		inline constexpr auto GameOver{ "GameOver" };
-		inline constexpr auto Transition{ "Transition" };
-		inline constexpr auto Victory{ "Victory" };
+		inline constexpr auto MainMenu{ "S_MainMenu" };
+		inline constexpr auto Gameplay{ "S_Gameplay" };
+		inline constexpr auto GameOver{ "S_GameOver" };
+		inline constexpr auto Transition{ "S_Transition" };
+		inline constexpr auto Victory{ "S_Victory" };
+		inline constexpr auto Loss{ "S_Loss" };
 	}
 }

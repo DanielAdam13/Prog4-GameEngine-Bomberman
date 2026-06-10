@@ -42,13 +42,8 @@ void bombGame::MainMenuGameState::OnEnter()
 	// Static object initalization:
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_MainMenuBG");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(mainMenuTexture);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.f,
-		windowSize.second / 800.f * 3.3f, 1.f);
-
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.f, 3.3f, 1.f);
 	mainMenuScene.Add(std::move(backgroundGO));
-
-	// Play Sound
-	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
 
 	// ---------------------
 	// Specify Game State Input Bindings
@@ -64,6 +59,11 @@ void bombGame::MainMenuGameState::OnEnter()
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
 	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
+
+	// Play Sound
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
+
+	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::MainMenu);
 }
 
 void bombGame::MainMenuGameState::OnExit()
