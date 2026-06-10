@@ -33,7 +33,7 @@ namespace ge
 		int m_MaxHealth{};
 		int m_CurrentHealth{};
 
-		Subject m_OnTakingDamageEvent;
-		Subject m_OnDeathEvent;
+		Subject m_OnTakingDamageEvent{};
+		Subject m_OnDeathEvent{};
 	};
 }

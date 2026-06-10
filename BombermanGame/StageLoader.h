@@ -7,6 +7,7 @@
 
 namespace bombGame
 {
+	// Describes the information of dynamicallly spawned objects for the Level
 	namespace stageLoader
 	{
 		struct EnemyEntry

@@ -1,5 +1,6 @@
 #pragma once
 #include "PowerupType.h"
+#include "StageLoader.h"
 
 #include <memory>
 #include <glm/glm.hpp>
@@ -40,6 +41,10 @@ namespace bombGame
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
 			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
 			int gridCol, int gridRow);
+
+		std::vector<ge::GameObject*> SpawnEnemiesAtExit(ge::Scene& scene, LevelGrid* grid,
+			const std::vector<stageLoader::EnemyEntry>& enemyEntries,
+			const std::vector<ge::GameObject*>& players);
 
 		void SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet);
 		void SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int col, int row, ge::Texture2D* exitdoorTexture);

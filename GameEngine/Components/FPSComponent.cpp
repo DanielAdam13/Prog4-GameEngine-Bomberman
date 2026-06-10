@@ -30,8 +30,7 @@ void FPSComponent::UpdateComponent(float deltaTime)
 			std::ostringstream ss;
 			ss << std::fixed << std::setprecision(2) << m_CurrentFPS << " FPS";
 			m_pTextComponent->SetText(ss.str());
-		}
-			
+		}	
 	}
 }
 

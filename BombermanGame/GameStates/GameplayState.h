@@ -33,7 +33,8 @@ namespace bombGame
 		std::unique_ptr<LevelGrid> m_LevelGrid; // Owned, exists for the whole gameplay state
 		std::unique_ptr<ge::Camera> m_GameplayCamera; // Owned
 
-		std::vector<ge::GameObject*> m_TrackedPlayers; // Cached Ref
+		std::vector<ge::GameObject*> m_TrackedPlayers; // Ref
+		ge::GameObject* m_TrackedTimer{ nullptr }; // Ref
 
 		int m_RemainingEnemyCount{ 0 };
 		bool m_StageCleared{ true };
@@ -41,7 +42,6 @@ namespace bombGame
 		// Private Helper
 		bool IsAnyPlayerOnExit() const noexcept;
 
-		static inline constexpr float GameplayTime{ 180.f };
-		float m_GameplayTimer{ GameplayTime };
+		static inline constexpr float GameplayTime{ 5.f };
 	};
 }

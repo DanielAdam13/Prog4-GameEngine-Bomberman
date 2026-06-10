@@ -17,11 +17,11 @@ void bombGame::enemyArchetypes::InitializeArchetypes(ge::SpriteSheet* balloomShe
     ge::SpriteSheet* dallSheet, ge::SpriteSheet* minvoSheet)
 {
     g_EnemyArchetypes[static_cast<size_t>(EnemyType::Balloom)] =
-        { balloomSheet, 60.f, 1, 130.f, 100 };
+        { balloomSheet, 60.f, 1, 150.f, 100 };
     g_EnemyArchetypes[static_cast<size_t>(EnemyType::Onil)] =
-        { onilSheet, 120.f, 1, 180.f, 200 };
+        { onilSheet, 100.f, 1, 200.f, 200 };
     g_EnemyArchetypes[static_cast<size_t>(EnemyType::Dall)] =
-        { dallSheet, 60.f, 1, 180.f, 400 };
+        { dallSheet, 100.f, 1, 150.f, 400 };
     g_EnemyArchetypes[static_cast<size_t>(EnemyType::Minvo)] =
-        { minvoSheet, 120.f, 1, 230.f, 800 };
+        { minvoSheet, 140.f, 1, 200.f, 800 };
 }

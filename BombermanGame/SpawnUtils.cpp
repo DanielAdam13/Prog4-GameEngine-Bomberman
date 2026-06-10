@@ -187,6 +187,27 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 	return SpawnEnemy(scene, grid, archetype, targets, spawnPos);
 }
 
+std::vector<ge::GameObject*> bombGame::spawnUtils::SpawnEnemiesAtExit(ge::Scene& scene, LevelGrid* grid, 
+	const std::vector<stageLoader::EnemyEntry>& enemyEntries, const std::vector<ge::GameObject*>& players)
+{
+	std::vector<ge::GameObject*> spawnedEnemies;
+
+	const auto [col, row] = grid->GetExitLocation();
+
+	for (auto& enemyEntry : enemyEntries)
+	{
+		for (int i{}; i < enemyEntry.count; ++i)
+		{
+			const auto& arch{ enemyArchetypes::Get(enemyEntry.type) };
+
+			auto enemyGo{ SpawnEnemy(scene, grid, arch, players, col, row) };
+			spawnedEnemies.push_back(enemyGo);
+		}
+	}
+
+	return spawnedEnemies;
+}
+
 void bombGame::spawnUtils::SpawnBreakableWallAt(ge::Scene& scene, LevelGrid& grid, int col, int row, const ge::SpriteSheet* brWallSheet)
 {
 	const int currentIndex{ grid.ToIndex(col, row) };

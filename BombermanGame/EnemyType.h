@@ -2,7 +2,7 @@
 
 namespace bombGame
 {
-	enum EnemyType
+	enum class EnemyType
 	{
 		Balloom,
 		Onil,

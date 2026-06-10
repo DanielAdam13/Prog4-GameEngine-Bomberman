@@ -27,9 +27,10 @@
 #include "Components/ScoreComponent.h"
 #include "Components/AnimatorComponent.h"
 #include "Components/Colliders.h"
+#include "Components/TimerDisplayComponent.h"
+
 #include "Components/CameraPlayerFollowComponent.h"
 #include "Components/EnemyComponent.h" // only to subscibe to dead event
-
 #include "Components/PlayerComponent.h"
 #include "Components/BombLayerComponent.h"
 #include "Components/HealthDisplayComponent.h"
@@ -43,9 +44,11 @@
 #include "LevelGrid.h"
 #include "LevelBuilder.h"
 #include "EnemyArchetypes.h"
+#include "EnemyType.h" // for spawning enemies when timer is over
 #include "PowerupArchetypes.h"
 #include "GameEvents.h"
 #include "SoundIds.h"
+#include "EngineEvents.h" // for TIMER_REACHED_GOAL event
 
 #include "VictoryState.h"
 #include "LossState.h"
@@ -93,7 +96,6 @@ void bombGame::GameplayGameState::OnEnter()
 	const auto displaysFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 35) };
 	displaysFont->SetBold(true);
 
-	//constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
 	constexpr SDL_Color colorWhite{ SDL_Color{255, 255, 255, 255} };
 
 	// =================================================
@@ -116,15 +118,6 @@ void bombGame::GameplayGameState::OnEnter()
 	topBarGO->AddComponent<ge::Image>(topBarGO.get())->SetTexture(topGrayTexture);
 	topBarGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f, 2.f, 1.f);
 	gameplayScene.Add(std::move(topBarGO));
-
-#if _DEBUG
-	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
-	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", displaysFont, colorWhite);
-	textGO->AddComponent<ge::FPSComponent>(textGO.get());
-	textGO->SetIgnoreCamera(true);
-
-	gameplayScene.Add(std::move(textGO));
-#endif
 
 	// =================================================
 	// Level Genertion
@@ -254,7 +247,7 @@ void bombGame::GameplayGameState::OnEnter()
 	}
 
 	// !!!
-	m_RemainingEnemyCount = static_cast<int>(spawnedEnemies.size());
+	m_RemainingEnemyCount += static_cast<int>(spawnedEnemies.size());
 	if (m_RemainingEnemyCount > 0)
 		m_StageCleared = false;
 
@@ -280,13 +273,32 @@ void bombGame::GameplayGameState::OnEnter()
 	scoreDisplayGO->SetIgnoreCamera(true);
 	gameplayScene.Add(std::move(scoreDisplayGO));
 
-	/*auto p2ScoreDisplayGO = std::make_unique<ge::GameObject>("GO_SecondPlayerScore");
-	p2ScoreDisplayGO->AddComponent<ge::TextComponent>(p2ScoreDisplayGO.get(), "00", displaysFont, colorWhite);
-	p2ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p2ScoreDisplayGO.get(), player2GO.get());
-	p2ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.65f, windowSize.second * 0.02f, 0.f });
-	p2ScoreDisplayGO->SetIgnoreCamera(true);
-	gameplayScene.Add(std::move(p2ScoreDisplayGO));*/
+	// --- Timer ---
+	auto timerGO = std::make_unique<ge::GameObject>("GO_Timer");
+	timerGO->AddComponent<ge::TextComponent>(timerGO.get(), "", displaysFont, colorWhite);
+	timerGO->GetComponent<ge::Transform>()->SetLocalPosition({ 10.f, 10.f, 0.f });
+	auto* timerComp{ timerGO->AddComponent<ge::TimerDisplayComponent>(timerGO.get(), GameplayTime,
+		0.f, ge::TimerDisplayComponent::TimerType::Decrementing, 1.f) };
+	timerGO->SetIgnoreCamera(true);
+	timerComp->GetReachedGoalEvent().AddObserver(this);
+	m_TrackedTimer = timerGO.get();
+	gameplayScene.Add(std::move(timerGO));
+
+	// -- FPS Debug Text ---
+#if _DEBUG
+	constexpr SDL_Color colorRed{ SDL_Color{255, 0, 0, 255} };
+	const auto debugFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 30) };
+	debugFont->SetBold(true);
+
+	auto fpsGO = std::make_unique<ge::GameObject>("GO_FPSTextObject");
+	fpsGO->AddComponent<ge::TextComponent>(fpsGO.get(), "", debugFont, colorRed);
+	fpsGO->AddComponent<ge::FPSComponent>(fpsGO.get());
+	fpsGO->GetComponent<ge::Transform>()->
+		SetLocalPosition({ 10.f, windowSize.second * 0.9f, 0.f });
+	fpsGO->SetIgnoreCamera(true);
+
+	gameplayScene.Add(std::move(fpsGO));
+#endif
 
 	// =================================================
 	// Camera + Folow
@@ -379,18 +391,12 @@ void bombGame::GameplayGameState::OnExit()
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Gameplay);
 }
 
-std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float deltaTime)
+std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 {
-	m_GameplayTimer -= deltaTime;
-	if (m_GameplayTimer <= 0.f)
-	{
-		m_GameplayTimer = 0.f;
-	}
-
 	// If there are still alive enemies
 	if (!m_StageCleared)
 	{
-		// Reset GameplayOST State + stage if both players are dead
+		// Reset GameplayOST State + stage if all(1 or 2) players are dead
 		if (std::all_of(m_TrackedPlayers.begin(), m_TrackedPlayers.end(), [](ge::GameObject* player)->bool
 			{
 				auto* playerComp{ player->GetComponent<PlayerComponent>() };
@@ -467,6 +473,23 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 				scoreComp->ChangeScore(scorePerEnemy);
 			}
 		}
+	}
+	else if (eventId == ge::EngineEventId::TIMER_REACHED_GOAL && sourceObj == m_TrackedTimer)
+	{
+		auto spawnedEnemies{ spawnUtils::SpawnEnemiesAtExit(*ge::SceneManager::GetInstance().GetCurrentActiveScene(),
+			m_LevelGrid.get(), { {EnemyType::Dall, 5} }, m_TrackedPlayers) };
+
+		// Listen to ENEMY_DIED event so we can check if stage is cleared
+		for (auto* enemy : spawnedEnemies)
+		{
+			if (auto* enemyComp = enemy->GetComponent<EnemyComponent>())
+			{
+				enemyComp->GetDeadEvent().AddObserver(this);
+			}
+		}
+
+		// !!!
+		m_RemainingEnemyCount += static_cast<int>(spawnedEnemies.size());
 	}
 }
 
