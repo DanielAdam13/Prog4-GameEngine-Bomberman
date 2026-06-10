@@ -173,3 +173,15 @@ void ge::Renderer::SetActiveCamera(Camera* camera)
 {
 	m_ActiveCamera = camera;
 }
+
+void ge::Renderer::SuspendCamera()
+{
+	m_SuspendedCamera = m_ActiveCamera;
+	m_ActiveCamera = nullptr;
+}
+
+void ge::Renderer::RestoreCamera()
+{
+	m_ActiveCamera = m_SuspendedCamera;
+	m_SuspendedCamera = nullptr;
+}

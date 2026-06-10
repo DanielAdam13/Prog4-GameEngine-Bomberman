@@ -87,6 +87,8 @@ namespace ge
 		GameObject* GetChildByName(const std::string& childName) const; // Slow - O(n)
 		int GetChildrenCount() const;
 
+		void SetIgnoreCamera(bool ignoreFlag);
+
 	private:
 		Transform* m_pTransform; // Reference to the transform component
 
@@ -106,6 +108,8 @@ namespace ge
 		void AddChild(GameObject* child);
 		void RemoveChild(GameObject* child);
 		bool IsAncestor(const GameObject* obj) const;
+
+		bool m_IgnoresCamera{ false }; // Flag to separate UI from World GOs, world by default
 
 	};
 }

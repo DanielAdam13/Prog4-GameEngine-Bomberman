@@ -78,6 +78,7 @@ void bombGame::GameplayGameState::OnEnter()
 	tutFont->SetBold(true);
 
 	const auto backgroundTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PlayField.png") };
+	const auto topGrayTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_GrayTopBar.png") };
 	
 	const auto powerupFireUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupFireUp.png") };
 	const auto powerupBombUpTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_PowerupBombUp.png") };
@@ -101,7 +102,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// Scene Initialization:
 	// =================================================
 	
-	// --- Static objects in scene initialization ---
+	// --- Static objects initialization ---
 	ge::Scene& GameplayScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Gameplay) };
 
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
@@ -109,15 +110,21 @@ void bombGame::GameplayGameState::OnEnter()
 	const glm::vec3 topBgPosition{ 0.f, windowSize.second / 10.7f, 0.f };
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / rendWindowDesignSize.first * 3.5f,
-		windowSize.second / rendWindowDesignSize.second * 3.5f, 1.f);
-
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f,
+		3.5f, 1.f);
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(topBgPosition);
 	GameplayScene.Add(std::move(backgroundGO));
+
+	auto topBarGO = std::make_unique<ge::GameObject>("GO_GrayTopBar");
+	topBarGO->AddComponent<ge::Image>(topBarGO.get())->SetTexture(topGrayTexture);
+	topBarGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f,
+		2.f, 1.f);
+	GameplayScene.Add(std::move(topBarGO));
 #if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
 	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", font, colorRed);
 	textGO->AddComponent<ge::FPSComponent>(textGO.get());
+	textGO->SetIgnoreCamera(true);
 
 	GameplayScene.Add(std::move(textGO));
 #endif
@@ -125,9 +132,11 @@ void bombGame::GameplayGameState::OnEnter()
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
 		"D-Pad to move the Balloon | A bomb | B detonate(if)", tutFont, colorRed);
+	tutorial1GO->SetIgnoreCamera(true);
 	auto tutorial2GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
 		"WASD to move the BomberMan | SPACE bomb | X detonate(if) ", tutFont, colorBlue);
+	tutorial2GO->SetIgnoreCamera(true);
 
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
@@ -271,12 +280,14 @@ void bombGame::GameplayGameState::OnEnter()
 	p1HealthDisplayGO->AddComponent<HealthDisplayComponent>(p1HealthDisplayGO.get(), player1GO.get());
 	p1HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.9f, 0.f });
+	p1HealthDisplayGO->SetIgnoreCamera(true);
 
 	auto p2HealthDisplayGO = std::make_unique<ge::GameObject>("GO_P2HealthDisplay");
 	p2HealthDisplayGO->AddComponent<ge::TextComponent>(p2HealthDisplayGO.get(), "", font, colorRed);
 	p2HealthDisplayGO->AddComponent<HealthDisplayComponent>(p2HealthDisplayGO.get(), player2GO.get());
 	p2HealthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.65f, windowSize.second * 0.9f, 0.f });
+	p2HealthDisplayGO->SetIgnoreCamera(true);
 
 	// ---- Score Displays ----
 	auto p1ScoreDisplayGO = std::make_unique<ge::GameObject>("GO_FirstPlayerScore");
@@ -284,12 +295,14 @@ void bombGame::GameplayGameState::OnEnter()
 	p1ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p1ScoreDisplayGO.get(), player1GO.get());
 	p1ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.05f, windowSize.second * 0.8f, 0.f });
+	p1ScoreDisplayGO->SetIgnoreCamera(true);
 
 	auto p2ScoreDisplayGO = std::make_unique<ge::GameObject>("GO_SecondPlayerScore");
 	p2ScoreDisplayGO->AddComponent<ge::TextComponent>(p2ScoreDisplayGO.get(), "Score: 0", font, colorRed);
 	p2ScoreDisplayGO->AddComponent<ScoreDisplayComponent>(p2ScoreDisplayGO.get(), player2GO.get());
 	p2ScoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.65f, windowSize.second * 0.8f, 0.f });
+	p2ScoreDisplayGO->SetIgnoreCamera(true);
 
 	// =================================================
 	// Camera + Folow
@@ -388,8 +401,14 @@ void bombGame::GameplayGameState::OnExit()
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Gameplay);
 }
 
-std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
+std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float deltaTime)
 {
+	m_GameplayTimer -= deltaTime;
+	if (m_GameplayTimer <= 0.f)
+	{
+		m_GameplayTimer = 0.f;
+	}
+
 	// If there are still alive enemies
 	if (!m_StageCleared)
 	{

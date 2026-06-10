@@ -40,6 +40,9 @@ namespace ge
 
 		void SetActiveCamera(Camera* camera);
 
+		void SuspendCamera();
+		void RestoreCamera();
+
 	private:
 		SDL_Renderer* m_Renderer{};
 		SDL_Window* m_Window{}; // Doesn't own
@@ -52,6 +55,7 @@ namespace ge
 		Subject m_OnScreenResizeEvent;
 
 		Camera* m_ActiveCamera;
+		Camera* m_SuspendedCamera; // for the Suspend and Restore methods
 	};
 }
 

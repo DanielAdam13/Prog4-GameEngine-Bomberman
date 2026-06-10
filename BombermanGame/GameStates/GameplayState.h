@@ -40,5 +40,8 @@ namespace bombGame
 
 		// Private Helper
 		bool IsAnyPlayerOnExit() const noexcept;
+
+		static inline constexpr float GameplayTime{ 180.f };
+		float m_GameplayTimer{ GameplayTime };
 	};
 }
