@@ -374,7 +374,7 @@ void bombGame::GameplayGameState::OnEnter()
 	gameplayScene.Add(std::move(player1GO));
 	gameplayScene.Add(std::move(player2GO));
 
-	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayOST, 0.2f, ge::SoundCategory::Music);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayNormalOST, 0.2f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Gameplay);
 }
 
@@ -389,6 +389,11 @@ void bombGame::GameplayGameState::OnExit()
 
 	GetBombermanGame().GetSoundManager().StopAllSounds();
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Gameplay);
+
+	// Just to be safe -> clear tracked data
+	m_TrackedPlayers.clear();
+	m_TrackedTimer = nullptr;
+	m_RemainingEnemyCount = 0;
 }
 
 std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
@@ -396,7 +401,7 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 	// If there are still alive enemies
 	if (!m_StageCleared)
 	{
-		// Reset GameplayOST State + stage if all(1 or 2) players are dead
+		// Reset GameplayNormalOST State + stage if all(1 or 2) players are dead
 		if (std::all_of(m_TrackedPlayers.begin(), m_TrackedPlayers.end(), [](ge::GameObject* player)->bool
 			{
 				auto* playerComp{ player->GetComponent<PlayerComponent>() };
@@ -411,6 +416,7 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 			// Check Defeat - go into Loss State, else go into StageTransitionState -> GameplayState
 			if (GetBombermanGame().GetCurrentGameSession().playerLives == 0)
 			{
+				GetBombermanGame().SaveScore(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
 				return std::make_unique<LossState>(GetBombermanGame());
 			}
 			else
@@ -429,6 +435,9 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 
 	// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
 	++GetBombermanGame().GetCurrentGameSession().currentStageIndex;
+
+	GetBombermanGame().SaveScore(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
+
 	if (GetBombermanGame().GetCurrentGameSession().currentStageIndex >= stageLoader::GetStageCount())
 	{
 		return std::make_unique<VictoryState>(GetBombermanGame());
@@ -441,7 +450,9 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 
 void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 {
-	if (eventId == GameEventId::ENEMY_DIED)
+	switch (eventId)
+	{
+	case GameEventId::ENEMY_DIED:
 	{
 		// --- Stage Cleared logic ---
 		--m_RemainingEnemyCount;
@@ -474,22 +485,28 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 			}
 		}
 	}
-	else if (eventId == ge::EngineEventId::TIMER_REACHED_GOAL && sourceObj == m_TrackedTimer)
-	{
-		auto spawnedEnemies{ spawnUtils::SpawnEnemiesAtExit(*ge::SceneManager::GetInstance().GetCurrentActiveScene(),
+		break;
+	case ge::EngineEventId::TIMER_REACHED_GOAL:
+		if (sourceObj == m_TrackedTimer)
+		{
+			auto spawnedEnemies{ spawnUtils::SpawnEnemiesAtExit(*ge::SceneManager::GetInstance().GetCurrentActiveScene(),
 			m_LevelGrid.get(), { {EnemyType::Dall, 5} }, m_TrackedPlayers) };
 
-		// Listen to ENEMY_DIED event so we can check if stage is cleared
-		for (auto* enemy : spawnedEnemies)
-		{
-			if (auto* enemyComp = enemy->GetComponent<EnemyComponent>())
+			// Listen to ENEMY_DIED event so we can check if stage is cleared
+			for (auto* enemy : spawnedEnemies)
 			{
-				enemyComp->GetDeadEvent().AddObserver(this);
+				if (auto* enemyComp = enemy->GetComponent<EnemyComponent>())
+				{
+					enemyComp->GetDeadEvent().AddObserver(this);
+				}
 			}
-		}
 
-		// !!!
-		m_RemainingEnemyCount += static_cast<int>(spawnedEnemies.size());
+			// !!!
+			m_RemainingEnemyCount += static_cast<int>(spawnedEnemies.size());
+		}
+		break;
+	default:
+		break;
 	}
 }
 

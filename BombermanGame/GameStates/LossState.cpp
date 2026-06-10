@@ -41,7 +41,7 @@ void bombGame::LossState::OnEnter()
 	lossTextGO->GetComponent<ge::Transform>()->SetLocalPosition({300.f, 400.f, 0.f});
 	victoryScene.Add(std::move(lossTextGO));
 
-	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StageWon, 0.3f, ge::SoundCategory::Music);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameLost, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Loss);
 }
 

@@ -10,7 +10,7 @@ namespace bombGame
 	class VictoryState final : public GameState
 	{
 	public:
-		VictoryState(BombermanGame& game, float duration = 3.f);
+		VictoryState(BombermanGame& game, float duration = 6.f);
 
 		virtual void OnEnter() override;
 		virtual void OnExit() override;

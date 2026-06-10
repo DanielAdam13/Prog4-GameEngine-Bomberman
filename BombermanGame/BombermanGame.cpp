@@ -74,6 +74,11 @@ bombGame::BombermanGame::GameSession& bombGame::BombermanGame::GetCurrentGameSes
 	return m_CurrentGameSession;
 }
 
+void bombGame::BombermanGame::SaveScore(int finalScore)
+{
+	m_CurrentGameSession.totalScore = finalScore;
+}
+
 void bombGame::BombermanGame::LoadSound()
 {
 	m_StoredSoundSystem->RegisterSound(SoundIds::ExplosionBomb, ge::ResourceManager::GetInstance().GetFullPath("sounds/bomb_explosion.wav"));
@@ -84,8 +89,9 @@ void bombGame::BombermanGame::LoadSound()
 	m_StoredSoundSystem->RegisterSound(SoundIds::StepHorizontal, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_horizontal.wav"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::StepVertical, ge::ResourceManager::GetInstance().GetFullPath("sounds/step_vertical.wav"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::MainMenuOST, ge::ResourceManager::GetInstance().GetFullPath("sounds/main_menu.mp3"));
-	m_StoredSoundSystem->RegisterSound(SoundIds::GameplayOST, ge::ResourceManager::GetInstance().GetFullPath("sounds/gameplay_ost.mp3"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::GameplayNormalOST, ge::ResourceManager::GetInstance().GetFullPath("sounds/gameplay_normal.mp3"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::StageEnter, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_enter.mp3"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::StageWon, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_won.mp3"));
 	m_StoredSoundSystem->RegisterSound(SoundIds::StageLost, ge::ResourceManager::GetInstance().GetFullPath("sounds/stage_lost.mp3"));
+	m_StoredSoundSystem->RegisterSound(SoundIds::GameLost, ge::ResourceManager::GetInstance().GetFullPath("sounds/game_lost.mp3"));
 }

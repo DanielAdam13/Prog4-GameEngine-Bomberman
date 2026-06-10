@@ -45,6 +45,7 @@ namespace bombGame
 		};
 
 		GameSession& GetCurrentGameSession() noexcept;
+		void SaveScore(int finalScore);
 
 	private:
 		GameStateMachine m_GameStateMachine{};
