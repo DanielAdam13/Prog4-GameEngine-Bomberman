@@ -9,7 +9,7 @@ namespace ge
 	{
 	public:
 		Camera(const glm::vec2& viewportSize);
-		~Camera() = default;
+		~Camera(); // Clears itself from the Renderer if this == activeCamera
 		Camera(const Camera&) = delete;
 		Camera(Camera&&) = delete;
 		Camera& operator=(const Camera&) = delete;

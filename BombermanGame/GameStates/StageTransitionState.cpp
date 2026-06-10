@@ -34,8 +34,6 @@ void bombGame::StageTransitionState::OnEnter()
 	textGO->AddComponent<ge::TextComponent>(textGO.get(),
 		"STAGE " + std::to_string(m_StageIndex + 1), font, colorBlue);
 	scene.Add(std::move(textGO));
-
-	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Transition);
 	
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StageEnter, 0.3f, ge::SoundCategory::Music);
 }

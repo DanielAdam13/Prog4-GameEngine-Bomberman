@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Renderer.h"
 
 #include <algorithm>
 
@@ -6,6 +7,15 @@ ge::Camera::Camera(const glm::vec2& viewportSize)
 	:m_ViewportSize{ viewportSize },
 	m_ViewportCenter{ viewportSize * 0.5f }
 {
+}
+
+ge::Camera::~Camera()
+{
+	// Clear self from Renderer
+	if (ge::Renderer::GetInstance().GetActiveCamera() == this)
+	{
+		Renderer::GetInstance().SetActiveCamera(nullptr);
+	}
 }
 
 void ge::Camera::SetPosition(const glm::vec2& worldPos)

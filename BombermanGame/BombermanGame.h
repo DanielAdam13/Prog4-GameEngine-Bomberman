@@ -67,5 +67,6 @@ namespace bombGame
 		inline constexpr auto Gameplay{ "Gameplay" };
 		inline constexpr auto GameOver{ "GameOver" };
 		inline constexpr auto Transition{ "Transition" };
+		inline constexpr auto Victory{ "Victory" };
 	}
 }

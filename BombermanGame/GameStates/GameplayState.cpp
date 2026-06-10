@@ -103,7 +103,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// =================================================
 	
 	// --- Static objects initialization ---
-	ge::Scene& GameplayScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Gameplay) };
+	ge::Scene& gameplayScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Gameplay) };
 
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
 
@@ -113,20 +113,20 @@ void bombGame::GameplayGameState::OnEnter()
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f,
 		3.5f, 1.f);
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalPosition(topBgPosition);
-	GameplayScene.Add(std::move(backgroundGO));
+	gameplayScene.Add(std::move(backgroundGO));
 
 	auto topBarGO = std::make_unique<ge::GameObject>("GO_GrayTopBar");
 	topBarGO->AddComponent<ge::Image>(topBarGO.get())->SetTexture(topGrayTexture);
 	topBarGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f,
 		2.f, 1.f);
-	GameplayScene.Add(std::move(topBarGO));
+	gameplayScene.Add(std::move(topBarGO));
 #if _DEBUG
 	auto textGO = std::make_unique<ge::GameObject>("GO_TextObject");
 	textGO->AddComponent<ge::TextComponent>(textGO.get(), "0.00 FPS", font, colorRed);
 	textGO->AddComponent<ge::FPSComponent>(textGO.get());
 	textGO->SetIgnoreCamera(true);
 
-	GameplayScene.Add(std::move(textGO));
+	gameplayScene.Add(std::move(textGO));
 #endif
 
 	auto tutorial1GO = std::make_unique<ge::GameObject>("GO_TutorialText1");
@@ -141,8 +141,8 @@ void bombGame::GameplayGameState::OnEnter()
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 10, 0.f });
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(glm::vec3{ 0.f, windowSize.second / 6, 0.f });
 
-	GameplayScene.Add(std::move(tutorial1GO));
-	GameplayScene.Add(std::move(tutorial2GO));
+	gameplayScene.Add(std::move(tutorial1GO));
+	gameplayScene.Add(std::move(tutorial2GO));
 
 	// =================================================
 	// Level Genertion
@@ -158,9 +158,9 @@ void bombGame::GameplayGameState::OnEnter()
 	powerupArchetypes::InitializeArchetypes(powerupFireUpTexture, powerupBombUpTexture, powerupRemoteDetonateTexture);
 
 	// Generate Static Wall box colliders
-	levelBuilder::BuildStaticGeometry(GameplayScene, *m_LevelGrid.get());
+	levelBuilder::BuildStaticGeometry(gameplayScene, *m_LevelGrid.get());
 	// Generate Exit, Powerup, DYNAMIC WALLS
-	levelBuilder::GenerateDynamicObjects(GameplayScene, *m_LevelGrid.get(), 
+	levelBuilder::GenerateDynamicObjects(gameplayScene, *m_LevelGrid.get(), 
 		breakableWallSheet, exitDoorTexture, 
 		stage.powerupType, stage.breakableDensity);
 
@@ -256,7 +256,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// =================================================
 	enemyArchetypes::InitializeArchetypes(balloomSpriteSheet, onilEnemySheet, dahlSpriteSheet, minvoSpriteSheet);
 
-	auto spawnedEnemies{ levelBuilder::GenerateEnemies(GameplayScene, *m_LevelGrid,
+	auto spawnedEnemies{ levelBuilder::GenerateEnemies(gameplayScene, *m_LevelGrid,
 		stage.enemies,
 		{ player1GO.get(), player2GO.get() }) };
 
@@ -325,7 +325,7 @@ void bombGame::GameplayGameState::OnEnter()
 		cameraGO.get(), m_GameplayCamera.get(), 3.f) };
 	followCam->AddTarget(player1GO.get());
 	followCam->AddTarget(player2GO.get());
-	GameplayScene.Add(std::move(cameraGO));
+	gameplayScene.Add(std::move(cameraGO));
 
 	// =================================================
 	// Specify Game State Input Bindings
@@ -378,14 +378,14 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
 #pragma endregion
 
-	GameplayScene.Add(std::move(player1GO));
-	GameplayScene.Add(std::move(player2GO));
+	gameplayScene.Add(std::move(player1GO));
+	gameplayScene.Add(std::move(player2GO));
 
-	GameplayScene.Add(std::move(p1HealthDisplayGO));
-	GameplayScene.Add(std::move(p2HealthDisplayGO));
+	gameplayScene.Add(std::move(p1HealthDisplayGO));
+	gameplayScene.Add(std::move(p2HealthDisplayGO));
 
-	GameplayScene.Add(std::move(p1ScoreDisplayGO));
-	GameplayScene.Add(std::move(p2ScoreDisplayGO));
+	gameplayScene.Add(std::move(p1ScoreDisplayGO));
+	gameplayScene.Add(std::move(p2ScoreDisplayGO));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayOST, 0.2f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Gameplay);
@@ -396,6 +396,9 @@ void bombGame::GameplayGameState::OnExit()
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 	inputManager.UnbindAllController();
 	inputManager.UnbindAllKeyboard();
+
+	// ~Camera already does this, this is defensive
+	ge::Renderer::GetInstance().SetActiveCamera(nullptr); // clear the camera
 
 	GetBombermanGame().GetSoundManager().StopAllSounds();
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::Gameplay);

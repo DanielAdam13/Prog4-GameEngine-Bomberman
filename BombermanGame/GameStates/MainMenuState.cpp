@@ -29,10 +29,6 @@ bombGame::MainMenuGameState::MainMenuGameState(BombermanGame& game)
 void bombGame::MainMenuGameState::OnEnter()
 {
 	// ---------------------
-	// Load Sound specific sound
-	// ---------------------
-
-	// ---------------------
 	// Load Resources
 	// ---------------------
 	const auto mainMenuTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_MainMenu1.png") };
@@ -40,7 +36,7 @@ void bombGame::MainMenuGameState::OnEnter()
 	// ---------------------
 	// Initialize Scene
 	// ---------------------
-	ge::Scene& MainMenuScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::MainMenu) };
+	ge::Scene& mainMenuScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::MainMenu) };
 
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
 	// Static object initalization:
@@ -49,8 +45,9 @@ void bombGame::MainMenuGameState::OnEnter()
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(windowSize.first / 800.f * 3.f,
 		windowSize.second / 800.f * 3.3f, 1.f);
 
-	MainMenuScene.Add(std::move(backgroundGO));
+	mainMenuScene.Add(std::move(backgroundGO));
 
+	// Play Sound
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
 
 	// ---------------------
