@@ -15,7 +15,6 @@
 #include "Components/ScoreComponent.h" // player
 #include "Components/PlayerComponent.h" // player
 #include "Components/BombLayerComponent.h" // player
-#include "SoundManager.h" // for player subjects
 
 #include "LevelGrid.h"
 #include "LevelLoader.h"
@@ -36,12 +35,11 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	int startingScore)
 {
 	auto tileSize{ grid.GetTileSize() };
-	auto topBgPosition{ grid.GetLevelTopLeft() };
 
 	auto playerGO = std::make_unique<ge::GameObject>("GO_Player");
 
 	auto playerAnimator{ playerGO->AddComponent<ge::AnimatorComponent>(playerGO.get(), playerSheet) };
-	playerAnimator->AddAnimation({ "idle", {3}, 1, false });
+	playerAnimator->AddAnimation(ge::Animation{ "idle", {3}, 1, false });
 	playerAnimator->AddAnimation({ "walk_left", {0, 1, 2}, 10, true });
 	playerAnimator->AddAnimation({ "walk_down", {3, 4, 5}, 10, true });
 	playerAnimator->AddAnimation({ "walk_right", {7, 8, 9}, 10, true });
@@ -88,7 +86,6 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemyPlayerAt(ge::Scene& scene, Level
 	ge::IObserver* soundObserver, ge::IObserver* powerupObserver)
 {
 	auto tileSize{ grid.GetTileSize() };
-	auto topBgPosition{ grid.GetLevelTopLeft() };
 
 	auto enemyPlayerGO = std::make_unique<ge::GameObject>("GO_EnemyPlayer");
 

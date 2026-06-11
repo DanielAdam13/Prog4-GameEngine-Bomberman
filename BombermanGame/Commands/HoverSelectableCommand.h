@@ -1,25 +1,21 @@
 #pragma once
 #include "Commands/Command.h"
-
-namespace ge
-{
-	class GameObject;
-}
+#include <utility>
 
 namespace bombGame
 {
-	class PlayerModeState;
+	class GameState;
 
 	// Game-specific Command, hover left command
 	class HoverSelectableCommand final : public ge::Command
 	{
 	public:
-		HoverSelectableCommand(PlayerModeState& state, int delta);
+		HoverSelectableCommand(GameState* state, std::pair<int,int> delta);
 
 		virtual void Execute(float) override;
 
 	private:
-		PlayerModeState& m_GameState;
-		const int m_Delta;
+		GameState* m_GameState;
+		const std::pair<int, int> m_Delta;
 	};
 }

@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace ge
 {
@@ -30,6 +31,7 @@ namespace bombGame
 		int currentStageIndex{ 0 };
 		// Set by playermode state, used by gameplay state
 		PlayerMode currentPlayerMode{ PlayerMode::SinglePlayer };
+		std::string name{ "AAAA" };
 		int playerLives{ 4 };
 		int totalScore{ 0 };
 		std::vector<PowerupType> storedPowerups;
@@ -62,6 +64,7 @@ namespace bombGame
 		void FailStage(int lossScore = 0); // Leave 0 if game is not lost
 		void CompleteStage(int score, std::vector<PowerupType> pickedPowerups);
 		void SetPlayerMode(PlayerMode mode);
+		void SetPlayerName(const std::string& newName);
 
 	private:
 		GameStateMachine m_GameStateMachine{};
@@ -77,6 +80,7 @@ namespace bombGame
 	namespace sceneNames
 	{
 		inline constexpr auto PlayerModeSelection{ "S_PlayerModeSelection" };
+		inline constexpr auto NameSelection{ "S_NameSelection" };
 		inline constexpr auto MainMenu{ "S_MainMenu" };
 		inline constexpr auto Gameplay{ "S_Gameplay" };
 		inline constexpr auto GameOver{ "S_GameOver" };

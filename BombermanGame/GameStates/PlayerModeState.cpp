@@ -3,7 +3,7 @@
 #include "Components/SelectableTextComponent.h"
 #include "Commands/HoverSelectableCommand.h"
 #include "Commands/ConfirmSelectionCommand.h"
-#include "MainMenuState.h"
+#include "TypeNameState.h"
 
 #include "ResourceManager.h"
 #include "Renderer.h"
@@ -17,9 +17,7 @@
 #include "Services/ServiceLocator.h"
 #include "Services/InputManager.h"
 
-#include <utility>
 #include <SDL3/SDL_pixels.h>
-#include <vector>
 #include <SDL3/SDL_scancode.h>
 
 bombGame::PlayerModeState::PlayerModeState(BombermanGame& game)
@@ -105,22 +103,18 @@ void bombGame::PlayerModeState::OnEnter()
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<HoverSelectableCommand>(*this, -1));
+		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(- 1, 0 )));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Up,
-		std::make_unique<HoverSelectableCommand>(*this, 1));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_LEFT, ge::InputManager::InputTrigger::Up,
-		std::make_unique<HoverSelectableCommand>(*this, -1));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_RIGHT, ge::InputManager::InputTrigger::Up,
-		std::make_unique<HoverSelectableCommand>(*this, 1));
+		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(1, 0)));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ConfirmSelectionCommand>(*this));
+		std::make_unique<ConfirmSelectionCommand>(this));
 
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Up,
-		std::make_unique<HoverSelectableCommand>(*this, -1));
+		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(-1, 0)));
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Up,
-		std::make_unique<HoverSelectableCommand>(*this, 1));
+		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(1, 0)));
 	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ConfirmSelectionCommand>(*this));
+		std::make_unique<ConfirmSelectionCommand>(this));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::PlayerModeSelection);
@@ -135,12 +129,12 @@ void bombGame::PlayerModeState::OnExit()
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::PlayerModeSelection);
 }
 
-void bombGame::PlayerModeState::MoveHover(int delta)
+void bombGame::PlayerModeState::MoveHover(std::pair<int, int> delta)
 {
 	if (m_Selectables.empty())
 		return;
 
-	const int newIndex{ static_cast<int>(m_CurrentHoverIndex) + delta };
+	const int newIndex{ static_cast<int>(m_CurrentHoverIndex) + delta.first };
 	if(newIndex < 0 || newIndex > static_cast<int>(m_Selectables.size() - 1))
 		return;
 
@@ -158,5 +152,5 @@ void bombGame::PlayerModeState::ConfirmCurrentSelection()
 
 	// Transition to MainMenu
 	GetBombermanGame().GetStateMachine().RequestStateTransition(
-		std::make_unique<MainMenuGameState>(GetBombermanGame()));
+		std::make_unique<TypeNameState>(GetBombermanGame()));
 }

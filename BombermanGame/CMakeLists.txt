@@ -51,11 +51,12 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/LossState.h" "GameStates/LossState.cpp"
   "GameStates/StageTransitionState.h" "GameStates/StageTransitionState.cpp"
   "GameStates/PlayerModeState.h" "GameStates/PlayerModeState.cpp"
+  "GameStates/TypeNameState.h" "GameStates/TypeNameState.cpp"
   "EnemyType.h"  
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
   "PowerupArchetypes.h" "PowerupArchetypes.cpp"
-  "PowerupEffects.h" "PowerupEffects.cpp")
+  "PowerupEffects.h" "PowerupEffects.cpp"  )
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

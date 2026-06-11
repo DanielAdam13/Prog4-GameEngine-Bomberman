@@ -1,24 +1,19 @@
 #pragma once
 #include "Commands/Command.h"
 
-namespace ge
-{
-	class GameObject;
-}
-
 namespace bombGame
 {
-	class PlayerModeState;
+	class GameState;
 
 	// Game-specific Command, select currently hovered selectable
 	class ConfirmSelectionCommand final : public ge::Command
 	{
 	public:
-		ConfirmSelectionCommand(PlayerModeState& state);
+		ConfirmSelectionCommand(GameState* state);
 
 		virtual void Execute(float) override;
 
 	private:
-		PlayerModeState& m_GameState;
+		GameState* m_GameState;
 	};
 }

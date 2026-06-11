@@ -1,7 +1,7 @@
 #include "HoverSelectableCommand.h"
-#include "GameStates/PlayerModeState.h"
+#include "GameStates/GameState.h"
 
-bombGame::HoverSelectableCommand::HoverSelectableCommand(PlayerModeState& state, int delta)
+bombGame::HoverSelectableCommand::HoverSelectableCommand(GameState* state, std::pair<int, int> delta)
 	:m_GameState{ state },
 	m_Delta{ delta }
 {
@@ -9,5 +9,5 @@ bombGame::HoverSelectableCommand::HoverSelectableCommand(PlayerModeState& state,
 
 void bombGame::HoverSelectableCommand::Execute(float)
 {
-	m_GameState.MoveHover(m_Delta);
+	m_GameState->MoveHover(m_Delta);
 }

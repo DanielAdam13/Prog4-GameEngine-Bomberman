@@ -6,8 +6,8 @@
 #include "Services/ServiceLocator.h"
 #include "ResourceManager.h"
 #include "SoundManager.h"
-//#include "Services/SoundSystem.h" // for sound channels enum class
-//#include "SoundIds.h"
+#include "Services/SoundSystem.h" // for sound channels enum class
+#include "SoundIds.h"
 
 #include "Commands/ToggleMuteCommand.h"
 
@@ -58,7 +58,7 @@ void bombGame::MainMenuGameState::OnEnter()
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
 
 	// Play Sound
-	//GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
 
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::MainMenu);
 }

@@ -69,7 +69,7 @@ const bombGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() co
 
 void bombGame::BombermanGame::ClearGameSession()
 {
-	// Saves only player mode
+	// Doesn't clear only player mode and name
 	m_CurrentGameSession.currentStageIndex = 0;
 	m_CurrentGameSession.playerLives = 4;
 	m_CurrentGameSession.storedPowerups = {};
@@ -98,6 +98,11 @@ void bombGame::BombermanGame::CompleteStage(int score, std::vector<PowerupType> 
 void bombGame::BombermanGame::SetPlayerMode(PlayerMode mode)
 {
 	m_CurrentGameSession.currentPlayerMode = mode;
+}
+
+void bombGame::BombermanGame::SetPlayerName(const std::string& newName)
+{
+	m_CurrentGameSession.name = newName;
 }
 
 void bombGame::BombermanGame::LoadSound()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
 namespace bombGame
 {
@@ -23,6 +24,11 @@ namespace bombGame
 
 		virtual std::unique_ptr<GameState> Update(float) = 0; // Returns potential new state
 		virtual void FixedUpdate(float) = 0;
+
+		// For UI Selection logic. Used only two times.
+		// Kind of a bad abstraction but I don't have enough use cases...
+		virtual void MoveHover(std::pair<int, int>) {}
+		virtual void ConfirmCurrentSelection() {}
 
 	protected:
 		BombermanGame& GetBombermanGame() noexcept;

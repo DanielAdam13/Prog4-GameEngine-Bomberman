@@ -1,7 +1,7 @@
 #include "ConfirmSelectionCommand.h"
-#include "GameStates/PlayerModeState.h"
+#include "GameStates/GameState.h"
 
-bombGame::ConfirmSelectionCommand::ConfirmSelectionCommand(PlayerModeState& state)
+bombGame::ConfirmSelectionCommand::ConfirmSelectionCommand(GameState* state)
 	:Command::Command(),
 	m_GameState{ state }
 {
@@ -9,5 +9,5 @@ bombGame::ConfirmSelectionCommand::ConfirmSelectionCommand(PlayerModeState& stat
 
 void bombGame::ConfirmSelectionCommand::Execute(float)
 {
-	m_GameState.ConfirmCurrentSelection();
+	m_GameState->ConfirmCurrentSelection();
 }

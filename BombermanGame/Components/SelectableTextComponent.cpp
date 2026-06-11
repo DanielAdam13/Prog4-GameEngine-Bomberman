@@ -33,3 +33,8 @@ void bombGame::SelectableTextComponent::OnExit()
 {
 	m_CachedText->SetColor(m_NormalTextColor);
 }
+
+void bombGame::SelectableTextComponent::SetText(const std::string& text)
+{
+	m_CachedText->SetText(text);
+}

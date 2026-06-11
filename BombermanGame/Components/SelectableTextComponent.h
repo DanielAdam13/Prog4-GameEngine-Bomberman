@@ -4,6 +4,7 @@
 
 #include <SDL3/SDL_pixels.h>
 #include <functional>
+#include <string>
 
 namespace ge
 {
@@ -35,6 +36,8 @@ namespace bombGame
 		virtual void OnSelected() override;
 		virtual void OnHover() override;
 		virtual void OnExit() override;
+
+		void SetText(const std::string& text);
 
 	private:
 		ge::TextComponent* m_CachedText{ nullptr }; // Cached ref from owner
