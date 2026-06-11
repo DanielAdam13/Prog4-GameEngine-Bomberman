@@ -25,7 +25,7 @@ namespace bombGame
 		// Every PlayerComponent Instance shares the same component type ID
 		static constexpr ge::ComponentTypeID StaticTypeID{ 7 };
 
-		explicit PlayerComponent(ge::GameObject* owner, float speed = 120.f);
+		explicit PlayerComponent(ge::GameObject* owner, float speed = 120.f, bool takesContactDamage = true);
 		~PlayerComponent() override; // does nothing, look at implementation for details
 		PlayerComponent(const PlayerComponent&) = delete;
 		PlayerComponent(PlayerComponent&&) = delete;
@@ -86,5 +86,6 @@ namespace bombGame
 		void UpdateMovementSound(float deltaTime);
 
 		PowerupType m_LastPickedPowerupType{};
+		const bool m_TakedContactDamage;
 	};
 }

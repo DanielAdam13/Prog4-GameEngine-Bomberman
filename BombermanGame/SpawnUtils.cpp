@@ -38,49 +38,96 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	auto tileSize{ grid.GetTileSize() };
 	auto topBgPosition{ grid.GetLevelTopLeft() };
 
-	auto player1GO = std::make_unique<ge::GameObject>("GO_Player");
+	auto playerGO = std::make_unique<ge::GameObject>("GO_Player");
 
-	auto player1Animator{ player1GO->AddComponent<ge::AnimatorComponent>(player1GO.get(), playerSheet) };
-	player1Animator->AddAnimation({ "idle", {3}, 1, false });
-	player1Animator->AddAnimation({ "walk_left", {0, 1, 2}, 10, true });
-	player1Animator->AddAnimation({ "walk_down", {3, 4, 5}, 10, true });
-	player1Animator->AddAnimation({ "walk_right", {7, 8, 9}, 10, true });
-	player1Animator->AddAnimation({ "walk_up", {10, 11, 12}, 10, true });
-	player1Animator->AddAnimation({ "death", { 14, 15, 16, 17, 18, 19, 20}, 3, false });
+	auto playerAnimator{ playerGO->AddComponent<ge::AnimatorComponent>(playerGO.get(), playerSheet) };
+	playerAnimator->AddAnimation({ "idle", {3}, 1, false });
+	playerAnimator->AddAnimation({ "walk_left", {0, 1, 2}, 10, true });
+	playerAnimator->AddAnimation({ "walk_down", {3, 4, 5}, 10, true });
+	playerAnimator->AddAnimation({ "walk_right", {7, 8, 9}, 10, true });
+	playerAnimator->AddAnimation({ "walk_up", {10, 11, 12}, 10, true });
+	playerAnimator->AddAnimation({ "death", { 14, 15, 16, 17, 18, 19, 20}, 3, false });
 
-	auto player1Tr{ player1GO->GetComponent<ge::Transform>() };
-	const glm::vec3 player1Pos{
+	auto playerTr{ playerGO->GetComponent<ge::Transform>() };
+	const glm::vec3 playerPos{
 		topBgPosition.x + spawnLoc.first * tileSize,
 		topBgPosition.y + spawnLoc.second * tileSize, 0.f };
-	player1Tr->SetLocalPosition(player1Pos);
+	playerTr->SetLocalPosition(playerPos);
 	const float playerScale{ tileSize / (playerSheet->GetFrameWidth() + 1) };
-	player1Tr->SetLocalScale({ playerScale, playerScale, 1.f });
+	playerTr->SetLocalScale({ playerScale, playerScale, 1.f });
 
-	auto player1BoxColl{ player1GO->AddComponent<ge::BoxCollider>(player1GO.get(),
-		player1Animator->GetSingleFrameRectSize()) };
-	player1BoxColl->AssignTag("Player");
+	auto playerBoxColl{ playerGO->AddComponent<ge::BoxCollider>(playerGO.get(),
+		playerAnimator->GetSingleFrameRectSize()) };
+	playerBoxColl->AssignTag("Player");
 
-	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 1);
-	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), startingScore);
-	auto player1PlayerComp{ player1GO->AddComponent<bombGame::PlayerComponent>(player1GO.get(), 150.f) };
-	player1PlayerComp->GetDamageEvent().AddObserver(soundObserver);
-	player1PlayerComp->GetDeadEvent().AddObserver(soundObserver);
-	player1PlayerComp->GetScoreChangeEvent().AddObserver(soundObserver);
-	player1PlayerComp->GetMovedHorEvent().AddObserver(soundObserver);
-	player1PlayerComp->GetMovedVertEvent().AddObserver(soundObserver);
+	playerGO->AddComponent<ge::HealthComponent>(playerGO.get(), 1);
+	playerGO->AddComponent<ge::ScoreComponent>(playerGO.get(), startingScore);
+	auto playerPlayerComp{ playerGO->AddComponent<bombGame::PlayerComponent>(playerGO.get(), 150.f, true) };
+	playerPlayerComp->GetDamageEvent().AddObserver(soundObserver);
+	playerPlayerComp->GetDeadEvent().AddObserver(soundObserver);
+	playerPlayerComp->GetScoreChangeEvent().AddObserver(soundObserver);
+	playerPlayerComp->GetMovedHorEvent().AddObserver(soundObserver);
+	playerPlayerComp->GetMovedVertEvent().AddObserver(soundObserver);
 	// Two observers for powerup pickup event
-	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(soundObserver);
-	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(powerupObserver);
+	playerPlayerComp->GetPowerupPickedUpEvent().AddObserver(soundObserver);
+	playerPlayerComp->GetPowerupPickedUpEvent().AddObserver(powerupObserver);
 
-	auto player1BombLayer{ player1GO->AddComponent<bombGame::BombLayerComponent>(player1GO.get(), grid,
+	auto playerBombLayer{ playerGO->AddComponent<bombGame::BombLayerComponent>(playerGO.get(), grid,
 		bombSheet, explosionSheets,
 		3.f, 1, 1) };
-	player1BombLayer->GetLaidBombEvent().AddObserver(soundObserver);
-	player1BombLayer->GetBombExplodedEvent().AddObserver(soundObserver);
+	playerBombLayer->GetLaidBombEvent().AddObserver(soundObserver);
+	playerBombLayer->GetBombExplodedEvent().AddObserver(soundObserver);
 
-	auto* playerGORaw{ player1GO.get() };
-	scene.Add(std::move(player1GO));
+	auto* playerGORaw{ playerGO.get() };
+	scene.Add(std::move(playerGO));
 	return playerGORaw;
+}
+
+ge::GameObject* bombGame::spawnUtils::SpawnEnemyPlayerAt(ge::Scene& scene, LevelGrid& grid, 
+	std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
+	ge::IObserver* soundObserver, ge::IObserver* powerupObserver)
+{
+	auto tileSize{ grid.GetTileSize() };
+	auto topBgPosition{ grid.GetLevelTopLeft() };
+
+	auto enemyPlayerGO = std::make_unique<ge::GameObject>("GO_EnemyPlayer");
+
+	auto anim{ enemyPlayerGO->AddComponent<ge::AnimatorComponent>(enemyPlayerGO.get(), playerSheet) };
+	anim->AddAnimation({ "idle", {0}, 1, false });
+	anim->AddAnimation({ "walk_left", {3, 4, 5}, 4, true });
+	anim->AddAnimation({ "walk_down", {3, 4, 5}, 4, true });
+	anim->AddAnimation({ "walk_right", {0, 1, 2}, 4, true });
+	anim->AddAnimation({ "walk_up", {0, 1, 2}, 4, true });
+	anim->AddAnimation({ "death", {6, 7, 8, 9, 10}, 3, false });
+
+	auto tr{ enemyPlayerGO->GetComponent<ge::Transform>() };
+	const glm::vec3 pos{
+		topBgPosition.x + spawnLoc.first * tileSize,
+		topBgPosition.y + spawnLoc.second * tileSize, 0.f };
+	tr->SetLocalPosition(pos);
+	tr->SetLocalScale({ 3.f, 3.f, 1.f });
+
+	auto player1BoxColl{ enemyPlayerGO->AddComponent<ge::BoxCollider>(enemyPlayerGO.get(),
+		anim->GetSingleFrameRectSize()) };
+	player1BoxColl->AssignTag("Enemy");
+
+	enemyPlayerGO->AddComponent<ge::HealthComponent>(enemyPlayerGO.get(), 1);
+	enemyPlayerGO->AddComponent<ge::ScoreComponent>(enemyPlayerGO.get(), 0);
+	auto plComp{ enemyPlayerGO->AddComponent<bombGame::PlayerComponent>(enemyPlayerGO.get(), 130.f, false) };
+	plComp->GetDamageEvent().AddObserver(soundObserver);
+	plComp->GetDeadEvent().AddObserver(soundObserver);
+	plComp->GetScoreChangeEvent().AddObserver(soundObserver);
+	plComp->GetMovedHorEvent().AddObserver(soundObserver);
+	plComp->GetMovedVertEvent().AddObserver(soundObserver);
+	// Two observers for powerup pickup event
+	plComp->GetPowerupPickedUpEvent().AddObserver(soundObserver);
+	plComp->GetPowerupPickedUpEvent().AddObserver(powerupObserver);
+
+	// NO layer
+
+	auto* enemyPlayerGORaw{ enemyPlayerGO.get() };
+	scene.Add(std::move(enemyPlayerGO));
+	return enemyPlayerGORaw;
 }
 
 std::unique_ptr<ge::GameObject> bombGame::spawnUtils::CreateBomb(LevelGrid& grid, const glm::vec3& position,
@@ -195,7 +242,7 @@ void bombGame::spawnUtils::CreateExplosionPart(ge::Scene& scene, const LevelGrid
 
 ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
 	const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
-	const glm::vec3& spawnPos, bool withoutAI)
+	const glm::vec3& spawnPos)
 {
 	auto enemyGO = std::make_unique<ge::GameObject>("GO_IceEnemy1");
 
@@ -221,17 +268,14 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 	auto enemyComp{ enemyGO->AddComponent<EnemyComponent>(enemyGO.get(), grid,
 		archetype.speed, archetype.detectionRadius, archetype.scoreValue) };
 
-	if (!withoutAI)
+	for (auto t : targets)
 	{
-		for (auto t : targets)
+		if (t && !t->MarkedForDeletion())
 		{
-			if (t && !t->MarkedForDeletion())
-			{
-				enemyComp->AddTarget(t);
-			}
+			enemyComp->AddTarget(t);
 		}
-		enemyComp->InitializeStates();
 	}
+	enemyComp->InitializeStates();
 
 	auto* enemyRaw{ enemyGO.get() };
 	scene.Add(std::move(enemyGO));
@@ -241,11 +285,11 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 
 ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
 	const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
-	int gridCol, int gridRow, bool withoutAI)
+	int gridCol, int gridRow)
 {
 	const auto gridTileMid{ grid->GetMidGridTilePointByCoord(gridCol, gridRow) };
 	const glm::vec3 spawnPos{ gridTileMid->x, gridTileMid->y, 0.f };
-	return SpawnEnemy(scene, grid, archetype, targets, spawnPos, withoutAI);
+	return SpawnEnemy(scene, grid, archetype, targets, spawnPos);
 }
 
 std::vector<ge::GameObject*> bombGame::spawnUtils::SpawnEnemiesAtExit(ge::Scene& scene, LevelGrid* grid, 

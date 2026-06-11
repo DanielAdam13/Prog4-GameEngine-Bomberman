@@ -41,9 +41,10 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "LevelLoader.h" "LevelLoader.cpp" 
   "LevelGrid.h" "LevelGrid.cpp"
   "LevelBuilder.h" "LevelBuilder.cpp" 
+  "StageLoader.h" "StageLoader.cpp"
   
   "GameStates/GameStateMachine.h" "GameStates/GameStateMachine.cpp" 
-  "GameStates/GameState.h" 
+  "GameStates/GameState.h" "GameStates/GameState.cpp"
   "GameStates/MainMenuState.h" "GameStates/MainMenuState.cpp" 
   "GameStates/GameplayState.h" "GameStates/GameplayState.cpp"
   "GameStates/VictoryState.h" "GameStates/VictoryState.cpp"
@@ -53,9 +54,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "EnemyType.h"  
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
-  "PowerupArchetypes.h" "PowerupArchetypes.cpp"    
-  "StageLoader.h" "StageLoader.cpp" 
-  "PowerupEffects.h" "PowerupEffects.cpp" "GameStates/GameState.cpp")
+  "PowerupArchetypes.h" "PowerupArchetypes.cpp"
+  "PowerupEffects.h" "PowerupEffects.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

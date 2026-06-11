@@ -16,10 +16,11 @@
 
 using namespace bombGame;
 
-PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed)
+PlayerComponent::PlayerComponent(ge::GameObject* owner, float speed, bool takesContactDamage)
 	:Component::Component(owner),
 	m_Speed{ speed },
-	m_CachedOwnerTransform{ owner->GetComponent<ge::Transform>() }
+	m_CachedOwnerTransform{ owner->GetComponent<ge::Transform>() },
+	m_TakedContactDamage{ takesContactDamage }
 {
 	// Subscribe to Health
 	m_CachedHealthComp = GetOwner()->GetComponent<ge::HealthComponent>();
@@ -206,7 +207,13 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 
 void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject* other, const ge::CollisionLayerTag& tag)
 {
-	if (tag == "Enemy" || tag == "Explosion")
+	if (tag == "Enemy" && m_TakedContactDamage)
+	{
+		// Take damage
+		if (m_CachedHealthComp)
+			m_CachedHealthComp->TakeDamage(1);
+	}
+	else if (tag == "Explosion")
 	{
 		// Take damage
 		if (m_CachedHealthComp)

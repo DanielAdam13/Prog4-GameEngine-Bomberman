@@ -4,13 +4,11 @@
 #include "Scene.h"
 #include "BombermanGame.h"
 #include "Services/ServiceLocator.h"
-#include "Services/SoundSystem.h" // for sound channels enum class
-#include "Renderer.h"
 #include "ResourceManager.h"
 #include "SoundManager.h"
-#include "SoundIds.h"
+//#include "Services/SoundSystem.h" // for sound channels enum class
+//#include "SoundIds.h"
 
-//#include "Commands/ChangeWindowSizeCommand.h"
 #include "Commands/ToggleMuteCommand.h"
 
 #include "GameObject.h"
@@ -51,8 +49,6 @@ void bombGame::MainMenuGameState::OnEnter()
 	// ---------------------
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
-	/*inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 

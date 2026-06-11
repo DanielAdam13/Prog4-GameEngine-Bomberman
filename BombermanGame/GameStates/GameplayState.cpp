@@ -181,11 +181,9 @@ void bombGame::GameplayGameState::OnEnter()
 		// !!
 		m_TrackedPlayers.push_back(player);
 
-		ge::GameObject* enemyPlayer{ spawnUtils::SpawnEnemy(gameplayScene, m_LevelGrid.get(),
-			enemyArchetypes::Get(EnemyType::Balloom),
-			m_TrackedPlayers,
-			layout.player2SpawnPoint.first, layout.player2SpawnPoint.second,
-			true) }; // TRUE flag disables EnemyComponent's AI
+		ge::GameObject* enemyPlayer{ spawnUtils::SpawnEnemyPlayerAt(gameplayScene, *m_LevelGrid,
+			layout.player2SpawnPoint, balloomSpriteSheet,
+			&bombermanSoundManager, this) };
 		m_TrackedEnemyPlayer = enemyPlayer;
 	}
 		break;
@@ -290,6 +288,8 @@ void bombGame::GameplayGameState::OnEnter()
 	{
 		followCam->AddTarget(player);
 	}
+	if (m_TrackedEnemyPlayer)
+		followCam->AddTarget(m_TrackedEnemyPlayer);
 	gameplayScene.Add(std::move(cameraGO));
 
 	// =================================================
@@ -405,6 +405,7 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 			}
 			else
 			{
+				GetBombermanGame().FailStage();
 				return std::make_unique<StageTransitionState>(GetBombermanGame());
 			}
 		}

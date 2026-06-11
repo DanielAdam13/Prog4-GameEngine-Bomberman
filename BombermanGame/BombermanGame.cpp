@@ -13,9 +13,6 @@
 
 #include "CollisionSystem.h"
 
-#include <memory>
-#include <utility>
-
 bombGame::BombermanGame::BombermanGame()
 	:m_StoredSoundSystem{ &ge::ServiceLocator::GetSoundSystem() }
 {
@@ -72,7 +69,11 @@ const bombGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() co
 
 void bombGame::BombermanGame::ClearGameSession()
 {
-	m_CurrentGameSession = {};
+	// Saves only player mode
+	m_CurrentGameSession.currentStageIndex = 0;
+	m_CurrentGameSession.playerLives = 4;
+	m_CurrentGameSession.storedPowerups = {};
+	m_CurrentGameSession.totalScore = 0;
 }
 
 void bombGame::BombermanGame::FailStage(int lossScore)

@@ -29,6 +29,9 @@ namespace bombGame
 			ge::IObserver* soundObserver, ge::IObserver* powerupObserver,
 			ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets,
 			int startingScore);
+		ge::GameObject* SpawnEnemyPlayerAt(ge::Scene& scene, LevelGrid& grid,
+			std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
+			ge::IObserver* soundObserver, ge::IObserver* powerupObserver);
 
 		// Creates the reusable Bomb Game Object and returns it as a unique_ptr
 		std::unique_ptr<ge::GameObject> CreateBomb(LevelGrid& grid, const glm::vec3& position, 
@@ -45,10 +48,10 @@ namespace bombGame
 
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
 			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
-			const glm::vec3& spawnPos, bool withoutAI = false);
+			const glm::vec3& spawnPos);
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
 			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
-			int gridCol, int gridRow, bool withoutAI = false);
+			int gridCol, int gridRow);
 
 		std::vector<ge::GameObject*> SpawnEnemiesAtExit(ge::Scene& scene, LevelGrid* grid,
 			const std::vector<stageLoader::EnemyEntry>& enemyEntries,
