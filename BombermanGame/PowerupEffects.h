@@ -16,8 +16,8 @@ namespace bombGame
 	// since this logic interacts with GameSession and Gameplay directly.
 	namespace powerupEffects
 	{
-		// Helper called from Gameplay State's Notify. Calls ApplyEffectToPlayer() and writes to game session.
-		void OnPickup(PowerupType type, const std::vector<ge::GameObject*>& players, GameSession& session);
+		// Helper called from Gameplay State's Notify. Calls ApplyEffectToPlayer().
+		void OnPickup(PowerupType type, const std::vector<ge::GameObject*>& players);
 
 		// !! Actual powerup effect applying to the player !!
 		void ApplyEffectToPlayer(ge::GameObject* player, PowerupType type);

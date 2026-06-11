@@ -49,7 +49,6 @@ std::unique_ptr<bombGame::GameState> bombGame::VictoryState::Update(float deltaT
 	m_VictoryTimer += deltaTime;
 	if (m_VictoryTimer >= m_VictoryScreenDuration)
 	{
-		GetBombermanGame().GetCurrentGameSession().currentStageIndex = 0;
 		return std::make_unique<MainMenuGameState>(GetBombermanGame());
 	}
 

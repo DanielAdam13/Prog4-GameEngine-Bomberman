@@ -28,6 +28,8 @@ bombGame::MainMenuGameState::MainMenuGameState(BombermanGame& game)
 
 void bombGame::MainMenuGameState::OnEnter()
 {
+	GetBombermanGame().ClearGameSession();
+
 	// ---------------------
 	// Load Resources
 	// ---------------------

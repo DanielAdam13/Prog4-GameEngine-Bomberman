@@ -2,6 +2,7 @@
 #include "GameState.h"
 #include "LevelGrid.h"
 #include "Camera.h"
+#include "PowerupType.h"
 #include "Observer.h" // For enemy death and powerup pickup
 
 #include <memory>
@@ -37,8 +38,10 @@ namespace bombGame
 		ge::GameObject* m_TrackedEnemyPlayer{ nullptr }; // Ref, nullptr except when Versus
 		ge::GameObject* m_TrackedTimer{ nullptr }; // Ref
 
+		std::vector<PowerupType> m_TrackedPickedPowerupsStage{};
+
 		int m_RemainingEnemyCount{ 0 };
-		bool m_StageCleared{ true };
+		bool m_StageCleared{ true }; // set to false in OnEnter's enemy creation
 
 		// Private Helper
 		bool IsAnyPlayerOnExit() const noexcept;

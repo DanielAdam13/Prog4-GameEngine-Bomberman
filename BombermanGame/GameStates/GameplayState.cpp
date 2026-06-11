@@ -377,7 +377,9 @@ void bombGame::GameplayGameState::OnExit()
 	// Just to be safe -> clear tracked data
 	m_TrackedPlayers.clear();
 	m_TrackedTimer = nullptr;
+	m_TrackedEnemyPlayer = nullptr;
 	m_RemainingEnemyCount = 0;
+	m_TrackedPickedPowerupsStage.clear();
 }
 
 std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
@@ -395,12 +397,10 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 				return false;
 			}))
 		{
-			--GetCachedGameSession().playerLives;
-
 			// Check Defeat - go into Loss State, else go into StageTransitionState -> GameplayState
 			if (GetCachedGameSession().playerLives == 0)
 			{
-				GetBombermanGame().SaveScore(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
+				GetBombermanGame().FailStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
 				return std::make_unique<LossState>(GetBombermanGame());
 			}
 			else
@@ -418,9 +418,8 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 		return nullptr;
 
 	// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
-	++GetCachedGameSession().currentStageIndex;
-
-	GetBombermanGame().SaveScore(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
+	GetBombermanGame().CompleteStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore(),
+		m_TrackedPickedPowerupsStage);
 
 	if (GetCachedGameSession().currentStageIndex >= stageLoader::GetStageCount())
 	{
@@ -474,8 +473,8 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 	{
 		// Apply a powerup to ALL (alive) tracked players
 		const auto powerupType{ sourceObj->GetComponent<PlayerComponent>()->GetLastPickedPowerupType() };
-		powerupEffects::OnPickup(powerupType, m_TrackedPlayers,
-			GetCachedGameSession());
+		powerupEffects::OnPickup(powerupType, m_TrackedPlayers);
+		m_TrackedPickedPowerupsStage.push_back(powerupType);
 	}
 		break;
 	case ge::EngineEventId::TIMER_REACHED_GOAL:

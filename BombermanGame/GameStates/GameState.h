@@ -26,7 +26,7 @@ namespace bombGame
 
 	protected:
 		BombermanGame& GetBombermanGame() noexcept;
-		GameSession& GetCachedGameSession() noexcept;
+		const GameSession& GetCachedGameSession() const noexcept;
 
 	private:
 		BombermanGame& m_Game;

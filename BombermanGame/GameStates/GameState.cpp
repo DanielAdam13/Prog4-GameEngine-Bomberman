@@ -11,7 +11,7 @@ bombGame::BombermanGame& bombGame::GameState::GetBombermanGame() noexcept
 	return m_Game;
 }
 
-bombGame::GameSession& bombGame::GameState::GetCachedGameSession() noexcept
+const bombGame::GameSession& bombGame::GameState::GetCachedGameSession() const noexcept
 {
 	return m_Game.GetCurrentGameSession();
 }

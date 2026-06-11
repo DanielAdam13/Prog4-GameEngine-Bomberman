@@ -15,7 +15,8 @@ bombGame::SkipGameplayStageCommand::SkipGameplayStageCommand(BombermanGame& game
 
 void bombGame::SkipGameplayStageCommand::Execute(float)
 {
-	++m_BomberGame.GetCurrentGameSession().currentStageIndex;
+	// Command does not save score and powerups
+	m_BomberGame.CompleteStage(0, {});
 	
 	if (m_BomberGame.GetCurrentGameSession().currentStageIndex >= stageLoader::GetStageCount())
 	{

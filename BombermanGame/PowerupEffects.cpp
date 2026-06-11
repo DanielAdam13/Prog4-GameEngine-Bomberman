@@ -4,8 +4,7 @@
 #include "Components/BombLayerComponent.h"
 #include "BombermanGame.h"
 
-void bombGame::powerupEffects::OnPickup(PowerupType type, 
-	const std::vector<ge::GameObject*>& players, GameSession& session)
+void bombGame::powerupEffects::OnPickup(PowerupType type, const std::vector<ge::GameObject*>& players)
 {
 	for (auto* p : players)
 	{
@@ -20,7 +19,6 @@ void bombGame::powerupEffects::OnPickup(PowerupType type,
 
 		ApplyEffectToPlayer(p, type);
 	}
-	session.storedPowerups.push_back(type);
 }
 
 void bombGame::powerupEffects::ApplyEffectToPlayer(ge::GameObject* player, PowerupType type)

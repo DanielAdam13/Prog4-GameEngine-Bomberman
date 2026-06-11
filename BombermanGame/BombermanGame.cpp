@@ -65,14 +65,38 @@ bombGame::GameStateMachine& bombGame::BombermanGame::GetStateMachine() noexcept
 	return m_GameStateMachine;
 }
 
-bombGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() noexcept
+const bombGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() const noexcept
 {
 	return m_CurrentGameSession;
 }
 
-void bombGame::BombermanGame::SaveScore(int finalScore)
+void bombGame::BombermanGame::ClearGameSession()
 {
-	m_CurrentGameSession.totalScore = finalScore;
+	m_CurrentGameSession = {};
+}
+
+void bombGame::BombermanGame::FailStage(int lossScore)
+{
+	--m_CurrentGameSession.playerLives;
+	m_CurrentGameSession.totalScore += lossScore;
+}
+
+void bombGame::BombermanGame::CompleteStage(int score, std::vector<PowerupType> pickedPowerups)
+{
+	// Progress stage index
+	++m_CurrentGameSession.currentStageIndex;
+	// Save score
+	m_CurrentGameSession.totalScore += score;
+	// Save powerups
+	for (auto& powerType : pickedPowerups)
+	{
+		m_CurrentGameSession.storedPowerups.push_back(powerType);
+	}
+}
+
+void bombGame::BombermanGame::SetPlayerMode(PlayerMode mode)
+{
+	m_CurrentGameSession.currentPlayerMode = mode;
 }
 
 void bombGame::BombermanGame::LoadSound()

@@ -54,8 +54,14 @@ namespace bombGame
 		ge::SoundSystem* GetStoredSoundSystem() noexcept;
 		GameStateMachine& GetStateMachine() noexcept;
 
-		GameSession& GetCurrentGameSession() noexcept;
-		void SaveScore(int finalScore);
+		// Only for reading data
+		const GameSession& GetCurrentGameSession() const noexcept;
+		
+		// Game Session modifying methods
+		void ClearGameSession();
+		void FailStage(int lossScore = 0); // Leave 0 if game is not lost
+		void CompleteStage(int score, std::vector<PowerupType> pickedPowerups);
+		void SetPlayerMode(PlayerMode mode);
 
 	private:
 		GameStateMachine m_GameStateMachine{};

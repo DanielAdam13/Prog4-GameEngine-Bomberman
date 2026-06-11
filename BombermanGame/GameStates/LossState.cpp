@@ -57,7 +57,6 @@ std::unique_ptr<bombGame::GameState> bombGame::LossState::Update(float deltaTime
 	if (m_LossTimer >= m_LossScreenDuration)
 	{
 		m_LossTimer = 0.f;
-		GetBombermanGame().GetCurrentGameSession().currentStageIndex = 0;
 		return std::make_unique<MainMenuGameState>(GetBombermanGame());
 	}
 

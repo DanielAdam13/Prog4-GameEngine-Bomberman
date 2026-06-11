@@ -13,6 +13,7 @@ namespace bombGame
 	public:
 		SkipGameplayStageCommand(BombermanGame& game);
 
+		// Command does not save score and powerups
 		virtual void Execute(float) override;
 
 	private:

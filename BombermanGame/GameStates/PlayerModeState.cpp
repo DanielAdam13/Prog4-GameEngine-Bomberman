@@ -66,7 +66,7 @@ void bombGame::PlayerModeState::OnEnter()
 	auto* singleSelComp{ singlePlayerModeGO->AddComponent<SelectableTextComponent>(singlePlayerModeGO.get(), colorWhite, colorYellow,
 		[this]() -> void
 		{
-			GetBombermanGame().GetCurrentGameSession().currentPlayerMode = PlayerMode::SinglePlayer;
+			GetBombermanGame().SetPlayerMode(PlayerMode::SinglePlayer);
 		}) };
 	m_Selectables.push_back(singleSelComp);
 	playerModeScene.Add(std::move(singlePlayerModeGO));
@@ -78,7 +78,7 @@ void bombGame::PlayerModeState::OnEnter()
 	auto* coopSelComp{ coopModeGO->AddComponent<SelectableTextComponent>(coopModeGO.get(), colorWhite, colorYellow,
 		[this]() -> void
 		{
-			GetBombermanGame().GetCurrentGameSession().currentPlayerMode = PlayerMode::Coop;
+			GetBombermanGame().SetPlayerMode(PlayerMode::Coop);
 		}) };
 	m_Selectables.push_back(coopSelComp);
 	playerModeScene.Add(std::move(coopModeGO));
@@ -90,7 +90,7 @@ void bombGame::PlayerModeState::OnEnter()
 	auto* versusSelComp{ versusModeGO->AddComponent<SelectableTextComponent>(versusModeGO.get(), colorWhite, colorYellow,
 		[this]() -> void
 		{
-			GetBombermanGame().GetCurrentGameSession().currentPlayerMode = PlayerMode::Versus;
+			GetBombermanGame().SetPlayerMode(PlayerMode::Versus);
 		}) };
 	m_Selectables.push_back(versusSelComp);
 	playerModeScene.Add(std::move(versusModeGO));
