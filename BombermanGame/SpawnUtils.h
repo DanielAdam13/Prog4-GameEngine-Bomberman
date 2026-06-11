@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <functional>
 #include <array>
+#include <utility>
 
 namespace ge
 {
@@ -19,11 +20,17 @@ namespace bombGame
 {
 	class LevelGrid;
 	struct EnemyArchetype;
+	class SoundManager; // For player
 
 	namespace spawnUtils
 	{
+		ge::GameObject* SpawnPlayerAt(ge::Scene& scene, LevelGrid& grid,
+			std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
+			SoundManager* soundManager,
+			ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets);
+
 		// Creates the reusable Bomb Game Object and returns it as a unique_ptr
-		std::unique_ptr<ge::GameObject> CreateBomb(LevelGrid* grid, const glm::vec3& position, 
+		std::unique_ptr<ge::GameObject> CreateBomb(LevelGrid& grid, const glm::vec3& position, 
 			ge::SpriteSheet* bombTexture, std::array<ge::SpriteSheet*, 3> explosionSheets, 
 			float windupTimer, int explosionArmLength);
 
@@ -37,10 +44,10 @@ namespace bombGame
 
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid, 
 			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
-			const glm::vec3& spawnPos);
+			const glm::vec3& spawnPos, bool withoutAI = false);
 		ge::GameObject* SpawnEnemy(ge::Scene& scene, LevelGrid* grid,
 			const EnemyArchetype& archetype, const std::vector<ge::GameObject*>& targets,
-			int gridCol, int gridRow);
+			int gridCol, int gridRow, bool withoutAI = false);
 
 		std::vector<ge::GameObject*> SpawnEnemiesAtExit(ge::Scene& scene, LevelGrid* grid,
 			const std::vector<stageLoader::EnemyEntry>& enemyEntries,
@@ -50,5 +57,6 @@ namespace bombGame
 		void SpawnExitAt(ge::Scene& scene, LevelGrid& grid, int col, int row, ge::Texture2D* exitdoorTexture);
 		void SpawnPowerupAt(ge::Scene& scene, LevelGrid& grid, int col, int row,
 			 PowerupType type, ge::Texture2D* powerupTexture, int score);
+
 	}
 }

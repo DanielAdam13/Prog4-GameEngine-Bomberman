@@ -34,6 +34,7 @@ namespace bombGame
 		std::unique_ptr<ge::Camera> m_GameplayCamera; // Owned
 
 		std::vector<ge::GameObject*> m_TrackedPlayers; // Ref
+		ge::GameObject* m_TrackedEnemyPlayer{ nullptr }; // Ref, nullptr except when Versus
 		ge::GameObject* m_TrackedTimer{ nullptr }; // Ref
 
 		int m_RemainingEnemyCount{ 0 };

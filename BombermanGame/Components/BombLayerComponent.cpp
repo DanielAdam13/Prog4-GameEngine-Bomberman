@@ -13,7 +13,7 @@
 #include <optional>
 #include <vector>
 
-bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid* levelGridRef,
+bombGame::BombLayerComponent::BombLayerComponent(ge::GameObject* owner, LevelGrid& levelGridRef,
 	ge::SpriteSheet* bombSheetRef, std::array<ge::SpriteSheet*, 3> explosionSheetsRef,
 	float startingWindup, int startingExplArm, int maxBombs)
 	:Component::Component(owner),
@@ -38,14 +38,14 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 			return false;
 	}
 
-	const auto bombTile{ m_LevelGridRef->GetGridTileAt(midReceivedPosition) };
+	const auto bombTile{ m_LevelGridRef.GetGridTileAt(midReceivedPosition) };
 	if (!bombTile)
 		return false;
 
 	if (!CanLayBombAt(bombTile->col, bombTile->row))
 		return false;
 
-	const auto gridTileMidPos{ m_LevelGridRef->GetMidGridTilePointAt(midReceivedPosition) };
+	const auto gridTileMidPos{ m_LevelGridRef.GetMidGridTilePointAt(midReceivedPosition) };
 
 	// Adds BombComponent to the new bomb gameobject
 	auto bomb{ spawnUtils::CreateBomb(m_LevelGridRef, {gridTileMidPos->x, gridTileMidPos->y, 0.f},
@@ -54,7 +54,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	ge::SceneManager::GetInstance().GetCurrentActiveScene()->Add(std::move(bomb));
 
 	// Register bomb to Grid AND this Layer Component
-	m_LevelGridRef->RegisterBombAt(bombTile->col, bombTile->row, rawBombGO);
+	m_LevelGridRef.RegisterBombAt(bombTile->col, bombTile->row, rawBombGO);
 	RegisterLaidBomb(rawBombGO);
 
 	m_LaidBombEvent.NotifyObservers(GameEventId::LAY_BOMB, GetOwner());
@@ -64,7 +64,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 bool bombGame::BombLayerComponent::CanLayBombAt(int tileCol, int tileRow) const noexcept
 {
 	// Can't lay on top of another bomb
-	if (m_LevelGridRef->GetBombAt(tileCol, tileRow))
+	if (m_LevelGridRef.GetBombAt(tileCol, tileRow))
 		return false;
 
 	if (static_cast<int>(m_ActiveBombs.size()) >= m_MaxBombs)

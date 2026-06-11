@@ -6,9 +6,7 @@
 #include "SceneManager.h"
 #include "LevelGrid.h"
 
-#include <utility>
-
-bombGame::BombComponent::BombComponent(ge::GameObject* owner, LevelGrid* grid, 
+bombGame::BombComponent::BombComponent(ge::GameObject* owner, LevelGrid& grid, 
 	float windupDuration, int explosionArmLength, std::array<ge::SpriteSheet*, 3>& explosionSheetRef)
 	:Component::Component{ owner },
 	m_WindUpDuration{ windupDuration },
@@ -27,14 +25,14 @@ void bombGame::BombComponent::UpdateComponent(float deltaTime)
 		m_WindupTimer = 0.f;
 
 		// Clear from Grid before despawning
-		const auto bombTile{ m_CachedGrid->GetGridTileAt(
+		const auto bombTile{ m_CachedGrid.GetGridTileAt(
 			GetOwner()->GetComponent<ge::Transform>()->GetWorldPosition()) };
 		if (bombTile)
-			m_CachedGrid->ClearBombAt(bombTile->col, bombTile->row);
+			m_CachedGrid.ClearBombAt(bombTile->col, bombTile->row);
 
 		m_ExplodedBombEvent.NotifyObservers(GameEventId::EXPLODED_BOMB, GetOwner());
 
-		spawnUtils::DetonateBombAt(*m_CachedGrid, *ge::SceneManager::GetInstance().GetCurrentActiveScene(),
+		spawnUtils::DetonateBombAt(m_CachedGrid, *ge::SceneManager::GetInstance().GetCurrentActiveScene(),
 			GetOwner()->GetComponent<ge::Transform>()->GetWorldPosition(),
 			m_ExplosionArmLength, m_ExplosionSheetsRef, m_ExplosionLifetime);
 

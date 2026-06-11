@@ -44,11 +44,12 @@
 #include "LevelGrid.h"
 #include "LevelBuilder.h"
 #include "EnemyArchetypes.h"
-#include "EnemyType.h" // for spawning enemies when timer is over
+#include "EnemyType.h" // for spawning enemies when timer is over and enemy player
 #include "PowerupArchetypes.h"
 #include "GameEvents.h"
 #include "SoundIds.h"
 #include "EngineEvents.h" // for TIMER_REACHED_GOAL event
+#include "SpriteSheet.h"
 
 #include "VictoryState.h"
 #include "LossState.h"
@@ -67,8 +68,6 @@ bombGame::GameplayGameState::GameplayGameState(BombermanGame& game)
 
 void bombGame::GameplayGameState::OnEnter()
 {
-	SoundManager& bombermanSoundManager{ GetBombermanGame().GetSoundManager() };
-
 	// =================================================
 	// Load Resources
 	// =================================================
@@ -144,98 +143,64 @@ void bombGame::GameplayGameState::OnEnter()
 	// -----------------------------------------------
 	// Players
 	// -----------------------------------------------
-	// Player 1
-	auto player1GO = std::make_unique<ge::GameObject>("P1");
-
-	auto player1Animator{ player1GO->AddComponent<ge::AnimatorComponent>(player1GO.get(), playerSpriteSheet) };
-	player1Animator->AddAnimation({ "idle", {3}, 1, false });
-	player1Animator->AddAnimation({ "walk_left", {0, 1, 2}, 10, true });
-	player1Animator->AddAnimation({ "walk_down", {3, 4, 5}, 10, true });
-	player1Animator->AddAnimation({ "walk_right", {7, 8, 9}, 10, true });
-	player1Animator->AddAnimation({ "walk_up", {10, 11, 12}, 10, true });
-	player1Animator->AddAnimation({ "death", { 14, 15, 16, 17, 18, 19, 20}, 3, false });
-
-	auto player1Tr{ player1GO->GetComponent<ge::Transform>() };
-	const glm::vec3 player1Pos{
-		topBgPosition.x + layout.player1SpawnPoint.first * tileSize,
-		topBgPosition.y + layout.player1SpawnPoint.second * tileSize, 0.f };
-	player1Tr->SetLocalPosition(player1Pos);
-	const float playerScale{ m_LevelGrid->GetTileSize() / (playerSpriteSheet->GetFrameWidth() + 1) };
-	player1Tr->SetLocalScale({ playerScale, playerScale, 1.f });
-
-	auto player1BoxColl{ player1GO->AddComponent<ge::BoxCollider>(player1GO.get(),
-		player1Animator->GetSingleFrameRectSize()) };
-	player1BoxColl->AssignTag("Player");
-
-	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 1);
-	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), 0);
-	auto player1PlayerComp{ player1GO->AddComponent<PlayerComponent>(player1GO.get(), 150.f) };
-	player1PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);
-	player1PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
-	player1PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
-	player1PlayerComp->GetMovedHorEvent().AddObserver(&bombermanSoundManager);
-	player1PlayerComp->GetMovedVertEvent().AddObserver(&bombermanSoundManager);
-	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(&bombermanSoundManager);
-
+	SoundManager& bombermanSoundManager{ GetBombermanGame().GetSoundManager() };
 	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionVertSpriteSheet, explosionHorSpriteSheet };
-	auto player1BombLayer{ player1GO->AddComponent<BombLayerComponent>(player1GO.get(), m_LevelGrid.get(), 
-		bombSpriteSheet, explosions,
-		3.f, 1, 1) };
-	player1BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
-	player1BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
 
-	//!!
-	m_TrackedPlayers.push_back(player1GO.get());
+	switch (GetBombermanGame().GetCurrentGameSession().currentPlayerMode)
+	{
+	case BombermanGame::PlayerMode::SinglePlayer:
+	{
+		ge::GameObject* player{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
+			layout.player1SpawnPoint, playerSpriteSheet,
+			&bombermanSoundManager,
+			bombSpriteSheet, explosions) };
+		// !!
+		m_TrackedPlayers.push_back(player);
+	}
+		break;
+	case BombermanGame::PlayerMode::Coop:
+	{
+		ge::GameObject* player1{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
+			layout.player1SpawnPoint, playerSpriteSheet,
+			&bombermanSoundManager,
+			bombSpriteSheet, explosions) };
+		// !!
+		m_TrackedPlayers.push_back(player1);
 
-	// Player 2
-	auto player2GO = std::make_unique<ge::GameObject>("P2");
-	
-	auto player2Animator{ player2GO->AddComponent<ge::AnimatorComponent>(player2GO.get(), balloomSpriteSheet) };
-	player2Animator->AddAnimation({ "idle", {0}, 1, false });
-	player2Animator->AddAnimation({ "walk_left", {3, 4, 5}, 4, true });
-	player2Animator->AddAnimation({ "walk_down", {3, 4, 5}, 4, true });
-	player2Animator->AddAnimation({ "walk_right", {0, 1, 2}, 4, true });
-	player2Animator->AddAnimation({ "walk_up", {0, 1, 2}, 4, true });
-	player2Animator->AddAnimation({ "death", { 6, 7, 8, 9, 10 }, 3, false });
+		ge::GameObject* player2{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
+			layout.player2SpawnPoint, playerSpriteSheet,
+			&bombermanSoundManager,
+			bombSpriteSheet, explosions) };
+		// !!
+		m_TrackedPlayers.push_back(player2);
+	}
+		break;
+	case BombermanGame::PlayerMode::Versus:
+	{
+		ge::GameObject* player{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
+			layout.player1SpawnPoint, playerSpriteSheet,
+			&bombermanSoundManager,
+			bombSpriteSheet, explosions) };
+		// !!
+		m_TrackedPlayers.push_back(player);
 
-	auto player2Tr{ player2GO->GetComponent<ge::Transform>() };
-	const glm::vec3 player2Pos{
-		topBgPosition.x + layout.player2SpawnPoint.first * tileSize,
-		topBgPosition.y + layout.player2SpawnPoint.second * tileSize, 0.f };
-	player2Tr->SetLocalPosition(player2Pos);
-	player2Tr->SetLocalScale({ 2.f, 2.f, 2.f });
-
-	auto player2BoxColl{ player2GO->AddComponent<ge::BoxCollider>(player2GO.get(),
-		player2Animator->GetSingleFrameRectSize()) };
-	player2BoxColl->AssignTag("Player");
-
-	player2GO->AddComponent<ge::HealthComponent>(player2GO.get(), 1);
-	player2GO->AddComponent<ge::ScoreComponent>(player2GO.get(), 0);
-	auto player2PlayerComp{ player2GO->AddComponent<PlayerComponent>(player2GO.get(), 120.f) };
-	player2PlayerComp->GetDamageEvent().AddObserver(&bombermanSoundManager);
-	player2PlayerComp->GetDeadEvent().AddObserver(&bombermanSoundManager);
-	player2PlayerComp->GetScoreChangeEvent().AddObserver(&bombermanSoundManager);
-	player2PlayerComp->GetMovedHorEvent().AddObserver(&bombermanSoundManager);
-	player2PlayerComp->GetMovedVertEvent().AddObserver(&bombermanSoundManager);
-	player2PlayerComp->GetPowerupPickedUpEvent().AddObserver(&bombermanSoundManager);
-
-	auto player2BombLayer{ player2GO->AddComponent<BombLayerComponent>(player2GO.get(), m_LevelGrid.get(), 
-		bombSpriteSheet, explosions,
-		3.f, 1, 2) };
-	player2BombLayer->GetLaidBombEvent().AddObserver(&bombermanSoundManager);
-	player2BombLayer->GetBombExplodedEvent().AddObserver(&bombermanSoundManager);
-
-	//!!
-	m_TrackedPlayers.push_back(player2GO.get());
+		ge::GameObject* enemyPlayer{ spawnUtils::SpawnEnemy(gameplayScene, m_LevelGrid.get(),
+			enemyArchetypes::Get(EnemyType::Balloom),
+			m_TrackedPlayers,
+			layout.player2SpawnPoint.first, layout.player2SpawnPoint.second,
+			true) }; // last TRUE flad disables EnemyComponent's AI
+		m_TrackedEnemyPlayer = enemyPlayer;
+	}
+		break;
+	}
 
 	// -------------------------------------------------
 	// Enemy Generation
 	// -------------------------------------------------
 	enemyArchetypes::InitializeArchetypes(balloomSpriteSheet, onilEnemySheet, dahlSpriteSheet, minvoSpriteSheet);
-
 	auto spawnedEnemies{ levelBuilder::GenerateEnemies(gameplayScene, *m_LevelGrid,
 		stage.enemies,
-		{ player1GO.get(), player2GO.get() }) };
+		m_TrackedPlayers) };
 
 	// Listen to ENEMY_DIED event so we can check if stage is cleared
 	for (auto* enemy : spawnedEnemies)
@@ -264,10 +229,10 @@ void bombGame::GameplayGameState::OnEnter()
 	healthDisplayGO->SetIgnoreCamera(true);
 	gameplayScene.Add(std::move(healthDisplayGO));
 
-	// ---- Score Displays ----
+	// ---- Score Displays - track player[0] since it's always shared ----
 	auto scoreDisplayGO = std::make_unique<ge::GameObject>("GO_SharedScoreDisplay");
 	scoreDisplayGO->AddComponent<ge::TextComponent>(scoreDisplayGO.get(), "00", displaysFont, colorWhite);
-	scoreDisplayGO->AddComponent<ScoreDisplayComponent>(scoreDisplayGO.get(), player1GO.get());
+	scoreDisplayGO->AddComponent<ScoreDisplayComponent>(scoreDisplayGO.get(), m_TrackedPlayers[0]);
 	scoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.5f, windowSize.second * 0.02f, 0.f });
 	scoreDisplayGO->SetIgnoreCamera(true);
@@ -316,8 +281,10 @@ void bombGame::GameplayGameState::OnEnter()
 	auto cameraGO = std::make_unique<ge::GameObject>("GO_Camera");
 	auto* followCam{ cameraGO->AddComponent<CameraPlayerFollowComponent>(
 		cameraGO.get(), m_GameplayCamera.get(), 3.f) };
-	followCam->AddTarget(player1GO.get());
-	followCam->AddTarget(player2GO.get());
+	for (auto* player : m_TrackedPlayers)
+	{
+		followCam->AddTarget(player);
+	}
 	gameplayScene.Add(std::move(cameraGO));
 
 	// =================================================
@@ -325,6 +292,24 @@ void bombGame::GameplayGameState::OnEnter()
 	// =================================================
 #pragma region CommandBinding
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	ge::GameObject* keyboardTarget;
+	ge::GameObject* controllerTarget;
+	switch (GetBombermanGame().GetCurrentGameSession().currentPlayerMode)
+	{
+	case BombermanGame::PlayerMode::SinglePlayer:
+		keyboardTarget = m_TrackedPlayers[0];
+		controllerTarget = m_TrackedPlayers[0];
+		break;
+	case BombermanGame::PlayerMode::Coop:
+		keyboardTarget = m_TrackedPlayers[0];
+		controllerTarget = m_TrackedPlayers[1];
+		break;
+	case BombermanGame::PlayerMode::Versus:
+		keyboardTarget = m_TrackedPlayers[0];
+		controllerTarget = m_TrackedEnemyPlayer;
+		break;
+	}
 
 	/*inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
@@ -340,39 +325,36 @@ void bombGame::GameplayGameState::OnEnter()
 	// First player 
 	// --------------------
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
-		std::make_unique<LayBombCommand>(player1GO.get()));
+		std::make_unique<LayBombCommand>(keyboardTarget));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
-		std::make_unique<RemoteBombDetonateCommand>(player1GO.get()));
+		std::make_unique<RemoteBombDetonateCommand>(keyboardTarget));
 	// Movement
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, -1.f, 0.f }));
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 0.f, -1.f, 0.f }));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ -1.f, 0.f, 0.f }));
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ -1.f, 0.f, 0.f }));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_S, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 0.f, 1.f, 0.f }));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player1GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 1.f, 0.f, 0.f }));
 
 	// ---------------------
 	// Second player
 	// ---------------------
 	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<LayBombCommand>(player2GO.get()));
+		std::make_unique<LayBombCommand>(controllerTarget));
 	inputManager.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
-		std::make_unique<RemoteBombDetonateCommand>(player2GO.get()));
+		std::make_unique<RemoteBombDetonateCommand>(controllerTarget));
 	// Movement
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, -1.f, 0.f }));
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 0.f, -1.f, 0.f }));
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ -1.f, 0.f, 0.f }));
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ -1.f, 0.f, 0.f }));
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadDown, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 0.f, 1.f, 0.f }));
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 0.f, 1.f, 0.f }));
 	inputManager.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(player2GO.get(), glm::vec3{ 1.f, 0.f, 0.f }));
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 1.f, 0.f, 0.f }));
 #pragma endregion
-
-	gameplayScene.Add(std::move(player1GO));
-	gameplayScene.Add(std::move(player2GO));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayNormalOST, 0.2f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Gameplay);

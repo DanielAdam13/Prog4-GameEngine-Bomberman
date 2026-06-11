@@ -24,7 +24,7 @@ namespace bombGame
         // Every Bomb Layer Component Instance shares the same component type ID
         static constexpr ge::ComponentTypeID StaticTypeID{ 12 };
 
-        BombLayerComponent(ge::GameObject* owner, LevelGrid* levelBuilder,
+        BombLayerComponent(ge::GameObject* owner, LevelGrid& levelGrid,
             ge::SpriteSheet* bombSheetRef, std::array<ge::SpriteSheet*, 3> explosionSheetsRef,
             float startingWindup = 3.f, int startingExplArm = 1, int maxBombs = 1);
         ~BombLayerComponent() override = default;
@@ -64,7 +64,7 @@ namespace bombGame
         int m_ExplosionArmLength;
         bool m_CanRemoteDetonate{ false };
 
-        LevelGrid* m_LevelGridRef; // Cached ref
+        LevelGrid& m_LevelGridRef; // Cached ref
 
         // If an observer is interested of the action that a bomb has exploded -> subscribe to this bomb exploded event, 
         // not the Bomb GO specific one

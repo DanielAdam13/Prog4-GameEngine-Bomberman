@@ -15,6 +15,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Components/BreakableWallComponent.h" "Components/BreakableWallComponent.cpp"
   "Components/PowerupComponent.h" "Components/PowerupComponent.cpp"
   "Components/CameraPlayerFollowComponent.h" "Components/CameraPlayerFollowComponent.cpp"
+  "Components/SelectableTextComponent.h" "Components/SelectableTextComponent.cpp"
  
   "Commands/DamageCommand.h" "Commands/DamageCommand.cpp"
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
@@ -24,6 +25,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/RemoteBombDetonateCommand.h" "Commands/RemoteBombDetonateCommand.cpp"
   "Commands/SkipGameplayStageCommand.h" "Commands/SkipGameplayStageCommand.cpp"
   "Commands/ToggleMuteCommand.h" "Commands/ToggleMuteCommand.cpp"
+  "Commands/HoverSelectableCommand.h" "Commands/HoverSelectableCommand.cpp" 
+  "Commands/ConfirmSelectionCommand.h" "Commands/ConfirmSelectionCommand.cpp"
 
   "SoundIds.h"
   "Services/SDLSoundSystem.h" "Services/SDLSoundSystem.cpp" 
@@ -52,7 +55,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "PowerupType.h"
   "PowerupArchetypes.h" "PowerupArchetypes.cpp"    
   "StageLoader.h" "StageLoader.cpp" 
-  "PowerupEffects.h" "PowerupEffects.cpp"  "Components/SelectableTextComponent.h" "Components/SelectableTextComponent.cpp" "Commands/HoverSelectableCommand.h" "Commands/HoverSelectableCommand.cpp" "Commands/ConfirmSelectionCommand.h" "Commands/ConfirmSelectionCommand.cpp")
+  "PowerupEffects.h" "PowerupEffects.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}
