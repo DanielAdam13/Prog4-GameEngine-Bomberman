@@ -4,7 +4,6 @@
 
 #include <memory>
 #include <glm/glm.hpp>
-#include <functional>
 #include <array>
 #include <utility>
 

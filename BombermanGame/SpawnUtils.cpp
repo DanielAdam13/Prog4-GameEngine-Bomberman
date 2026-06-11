@@ -47,17 +47,17 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	playerAnimator->AddAnimation({ "walk_right", {7, 8, 9}, 10, true });
 	playerAnimator->AddAnimation({ "walk_up", {10, 11, 12}, 10, true });
 	playerAnimator->AddAnimation({ "death", { 14, 15, 16, 17, 18, 19, 20}, 3, false });
+	playerAnimator->SetAnchor({ 0.5f, 0.5f });
 
+	auto playerPos{ grid.GetMidGridTilePointByCoord(spawnLoc.first, spawnLoc.second) };
 	auto playerTr{ playerGO->GetComponent<ge::Transform>() };
-	const glm::vec3 playerPos{
-		topBgPosition.x + spawnLoc.first * tileSize,
-		topBgPosition.y + spawnLoc.second * tileSize, 0.f };
-	playerTr->SetLocalPosition(playerPos);
+	playerTr->SetLocalPosition({ playerPos->x, playerPos->y, 0.f });
 	const float playerScale{ tileSize / (playerSheet->GetFrameWidth() + 1) };
 	playerTr->SetLocalScale({ playerScale, playerScale, 1.f });
 
 	auto playerBoxColl{ playerGO->AddComponent<ge::BoxCollider>(playerGO.get(),
-		playerAnimator->GetSingleFrameRectSize()) };
+		glm::vec2{tileSize - 2.f, tileSize - 2.f}, true,
+		glm::vec2{-tileSize * 0.5f , -tileSize * 0.5f}) };
 	playerBoxColl->AssignTag("Player");
 
 	playerGO->AddComponent<ge::HealthComponent>(playerGO.get(), 1);
@@ -99,16 +99,16 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemyPlayerAt(ge::Scene& scene, Level
 	anim->AddAnimation({ "walk_right", {0, 1, 2}, 4, true });
 	anim->AddAnimation({ "walk_up", {0, 1, 2}, 4, true });
 	anim->AddAnimation({ "death", {6, 7, 8, 9, 10}, 3, false });
+	anim->SetAnchor({ 0.5f, 0.5f });
 
+	auto pos{ grid.GetMidGridTilePointByCoord(spawnLoc.first, spawnLoc.second) };
 	auto tr{ enemyPlayerGO->GetComponent<ge::Transform>() };
-	const glm::vec3 pos{
-		topBgPosition.x + spawnLoc.first * tileSize,
-		topBgPosition.y + spawnLoc.second * tileSize, 0.f };
-	tr->SetLocalPosition(pos);
+	tr->SetLocalPosition({ pos->x, pos->y, 0.f });
 	tr->SetLocalScale({ 3.f, 3.f, 1.f });
 
 	auto player1BoxColl{ enemyPlayerGO->AddComponent<ge::BoxCollider>(enemyPlayerGO.get(),
-		anim->GetSingleFrameRectSize()) };
+		glm::vec2{tileSize - 2.f, tileSize - 2.f}, true,
+		glm::vec2{-tileSize * 0.5f , -tileSize * 0.5f}) };
 	player1BoxColl->AssignTag("Enemy");
 
 	enemyPlayerGO->AddComponent<ge::HealthComponent>(enemyPlayerGO.get(), 1);
@@ -229,10 +229,6 @@ void bombGame::spawnUtils::CreateExplosionPart(ge::Scene& scene, const LevelGrid
 
 	explosion->AddComponent<ExplosionComponent>(explosion.get(), activeTimer);
 
-	/*explosion->AddComponent<ge::BoxCollider>(explosion.get(), glm::vec2{ grid.GetTileSize(), grid.GetTileSize() },
-		true, glm::vec2{ -grid.GetTileSize() / 2, -grid.GetTileSize() / 2})
-		->AssignTag("Explosion");*/
-
 	explosion->AddComponent<ge::BoxCollider>(explosion.get(), animator->GetSingleFrameRectSize(),
 		true, glm::vec2{ -explosionSheet->GetFrameWidth() / 2, -explosionSheet->GetFrameHeight() / 2 })
 		->AssignTag("Explosion");
@@ -255,7 +251,7 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemy(ge::Scene& scene, LevelGrid* gr
 
 	auto enemy1Tr{ enemyGO->GetComponent<ge::Transform>() };
 	enemy1Tr->SetLocalPosition(spawnPos);
-	enemy1Tr->SetLocalScale({ 2.7f, 2.7f, 1.f });
+	enemy1Tr->SetLocalScale({ 3.f, 3.f, 1.f });
 
 	const float gridTileSize{ grid->GetTileSize() };
 	auto enemy1BoxColl{ enemyGO->AddComponent<ge::BoxCollider>(enemyGO.get(),
