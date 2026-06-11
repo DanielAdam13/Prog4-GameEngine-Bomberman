@@ -47,7 +47,7 @@ void bombGame::TypeNameState::OnEnter()
 
 	auto nameScreenGO = std::make_unique<ge::GameObject>("GO_SelectionScreen");
 	nameScreenGO->AddComponent<ge::Image>(nameScreenGO.get())->SetTexture(nameSelectionTexture);
-	nameScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.7f, 1.f);
+	nameScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.8f, 1.f);
 	textSelectionScene.Add(std::move(nameScreenGO));
 
 	// Object initalization:

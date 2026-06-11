@@ -31,7 +31,7 @@ void bombGame::VictoryState::OnEnter()
 	// Static object initalization:
 	auto victoryScreenGO = std::make_unique<ge::GameObject>("GO_VictoryScreen");
 	victoryScreenGO->AddComponent<ge::Image>(victoryScreenGO.get())->SetTexture(victoryTexture);
-	victoryScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.75f, 0.75f, 1.f);
+	victoryScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.8f, 1.f);
 	victoryScene.Add(std::move(victoryScreenGO));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StageWon, 0.3f, ge::SoundCategory::Music);

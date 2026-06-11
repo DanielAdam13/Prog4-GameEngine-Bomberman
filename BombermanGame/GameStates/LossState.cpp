@@ -8,9 +8,8 @@
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "Services/SoundSystem.h"
-#include "Components/TextComponent.h"
+#include "Components/Image.h"
 #include "Components/Transform.h"
-#include "Font.h"
 
 #include <utility>
 #include <SDL3/SDL_pixels.h>
@@ -24,22 +23,18 @@ bombGame::LossState::LossState(BombermanGame& game, float duration)
 void bombGame::LossState::OnEnter()
 {
 	// Resources
-	const auto lossFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 50) };
-	lossFont->SetBold(true);
-
-	//constexpr SDL_Color colorBlack{ SDL_Color{0, 0, 0, 255} };
-	constexpr SDL_Color colorRed{ SDL_Color{215, 40, 30, 255} };
+	const auto victoryTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_LossScreen.png") };
 
 	// ---------------------
 	// Initialize Scene
 	// ---------------------
-	ge::Scene& victoryScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Loss) };
+	ge::Scene& lossScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Loss) };
 
 	// Static object initalization:
-	auto lossTextGO = std::make_unique<ge::GameObject>("GO_LossText");
-	lossTextGO->AddComponent<ge::TextComponent>(lossTextGO.get(), "YOU LOST", lossFont, colorRed);
-	lossTextGO->GetComponent<ge::Transform>()->SetLocalPosition({300.f, 400.f, 0.f});
-	victoryScene.Add(std::move(lossTextGO));
+	auto lossScreenGO = std::make_unique<ge::GameObject>("GO_VictoryScreen");
+	lossScreenGO->AddComponent<ge::Image>(lossScreenGO.get())->SetTexture(victoryTexture);
+	lossScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.8f, 1.f);
+	lossScene.Add(std::move(lossScreenGO));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameLost, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Loss);

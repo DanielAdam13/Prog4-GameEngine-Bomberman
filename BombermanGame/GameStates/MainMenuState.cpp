@@ -41,7 +41,7 @@ void bombGame::MainMenuGameState::OnEnter()
 	// Static object initalization:
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_MainMenuBG");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(mainMenuTexture);
-	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.f, 3.3f, 1.f);
+	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.1f, 3.1f, 1.f);
 	mainMenuScene.Add(std::move(backgroundGO));
 
 	// ---------------------
