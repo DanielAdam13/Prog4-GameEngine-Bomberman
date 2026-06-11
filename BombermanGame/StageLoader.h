@@ -16,12 +16,18 @@ namespace bombGame
 			int count;
 		};
 
+		struct PowerupEntry
+		{
+			PowerupType type;
+			int count;
+		};
+
 		struct StageDescriptor
 		{
 			std::string layoutFile;
 			int breakableDensity;
 			std::vector<EnemyEntry> enemies;
-			PowerupType powerupType;
+			PowerupEntry powerupEntry;
 		};
 
 		const StageDescriptor& Load(size_t stageIndex);

@@ -46,14 +46,14 @@ void bombGame::levelBuilder::BuildStaticGeometry(ge::Scene& scene, const LevelGr
 }
 
 void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid, 
-	ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, PowerupType stagePowerup,
+	ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, const stageLoader::PowerupEntry& stagePowerup,
 	int breakableWallRandomnessIndex)
 {
 	static std::mt19937 gen{ std::random_device{}() };
 
 	const auto& layout{ grid.GetLevelLayout() };
 
-	// 1. Pick Exit tile
+	// 1. Collect empty tiles
 	std::vector<std::pair<int, int>> emptyTiles;
 	for (int row{ 0 }; row < layout.height; ++row)
 	{
@@ -68,33 +68,53 @@ void bombGame::levelBuilder::GenerateDynamicObjects(ge::Scene& scene, LevelGrid&
 	if (emptyTiles.empty()) // Invalid level
 		return;
 
-	std::uniform_int_distribution<size_t> pickEx(0, emptyTiles.size() - 1);
-	const auto [exitCol, exitRow] { emptyTiles[pickEx(gen)]};
+	// Shuffle to get random order; then we consume from the front
+	std::shuffle(emptyTiles.begin(), emptyTiles.end(), gen);
+	std::vector<std::pair<int, int>> reservedTiles;
 
+	// 2. Pick exit tile
+	const auto [exitCol, exitRow] { emptyTiles[0]};
 	spawnUtils::SpawnExitAt(scene, grid, exitCol, exitRow, exitDoorTexture); // Saves exit coordinate to grid internally
 	spawnUtils::SpawnBreakableWallAt(scene, grid, exitCol, exitRow, breakableWallSheet);
+	// !!
+	reservedTiles.emplace_back(exitCol, exitRow);
 
-	// 2. Pick Powerup tile
-	std::uniform_int_distribution<size_t> pickPow(0, emptyTiles.size() - 1);
-	const auto [powerCol, powerRow] { emptyTiles[pickPow(gen)] };
+	// 3. Pick Powerup tiles
+	const auto& arch{ powerupArchetypes::Get(stagePowerup.type) };
+	size_t powerupTileIdx{ 1 };
 
-	const auto& arch{ powerupArchetypes::Get(stagePowerup) };
-	spawnUtils::SpawnPowerupAt(scene, grid, powerCol, powerRow, 
-		stagePowerup, arch.texture, arch.scoreValuePicked);
-	spawnUtils::SpawnBreakableWallAt(scene, grid, powerCol, powerRow, breakableWallSheet);
+	for (int i{}; i < stagePowerup.count; ++i) 
+	{
+		if (powerupTileIdx >= emptyTiles.size()) // out of room
+			break;   
 
-	// 3. Spawn random breakable walls
+		const auto [pCol, pRow] = emptyTiles[powerupTileIdx++];
+		spawnUtils::SpawnPowerupAt(scene, grid, pCol, pRow,
+			stagePowerup.type, arch.texture, arch.scoreValuePicked);
+		spawnUtils::SpawnBreakableWallAt(scene, grid, pCol, pRow, breakableWallSheet);
+		// !!
+		reservedTiles.emplace_back(pCol, pRow);
+	}
+
+	// 4. Spawn random breakable walls
 	static std::uniform_int_distribution<size_t> dist(0, breakableWallRandomnessIndex);
+
+	auto isReserved{ [&reservedTiles](int col, int row) -> bool 
+		{
+			for (const auto& [rc, rr] : reservedTiles)
+			{
+				if (rc == col && rr == row)
+					return true;
+			}
+			return false; 
+		} };
+
 	for (int row{ 0 }; row < layout.height; ++row)
 	{
 		for (int col{ 0 }; col < layout.width; ++col)
 		{
-			// Skip exit
-			if (row == exitRow && col == exitCol)
-				continue;
-
-			// Skip powerup
-			if (row == powerRow && col == powerCol)
+			// Skip exit and powerup tiles
+			if (isReserved(col, row))
 				continue;
 
 			levelLoader::TileType currentTileType{ layout.At(col, row) };

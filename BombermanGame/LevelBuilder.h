@@ -18,6 +18,7 @@ namespace bombGame
 	namespace stageLoader
 	{
 		struct EnemyEntry;
+		struct PowerupEntry;
 	}
 
 	namespace levelBuilder
@@ -27,7 +28,7 @@ namespace bombGame
 		// Generate and push the dynamic walls to the scene and store them in the grid as a reference
 		void GenerateDynamicObjects(ge::Scene& scene, LevelGrid& grid,
 			ge::SpriteSheet* breakableWallSheet, ge::Texture2D* exitDoorTexture, 
-			PowerupType stagePowerup,
+			const stageLoader::PowerupEntry& stagePowerup,
 			int breakableWallRandomnessIndex);
 
 		std::vector<ge::GameObject*> GenerateEnemies(ge::Scene& scene, LevelGrid& grid,

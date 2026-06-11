@@ -6,9 +6,15 @@ using namespace bombGame;
 
 namespace
 {
-    static const std::vector<stageLoader::StageDescriptor> GameStages{ { "mainLevel1.txt", 6, { {EnemyType::Balloom, 6} }, PowerupType::FireUp },
-            { "mainLevel1.txt", 5, {{EnemyType::Balloom, 6}, {EnemyType::Onil, 3}}, PowerupType::BombUp },
-            { "mainLevel1.txt", 4, {{EnemyType::Balloom, 4}, {EnemyType::Onil, 2}, {EnemyType::Minvo, 2}, {EnemyType::Dall, 2}}, PowerupType::RemoteDetonate } };
+    static const std::vector<stageLoader::StageDescriptor> GameStages{ { "mainLevel1.txt", 6, 
+        {{EnemyType::Balloom, 6}}, {
+            PowerupType::FireUp, 2} },
+            { "mainLevel1.txt", 5, 
+        {{EnemyType::Balloom, 6}, {EnemyType::Onil, 3}}, 
+        {PowerupType::BombUp , 2} },
+            { "mainLevel1.txt", 4, 
+        {{EnemyType::Balloom, 4}, {EnemyType::Onil, 2}, {EnemyType::Minvo, 2}, {EnemyType::Dall, 2}}, 
+        {PowerupType::RemoteDetonate, 2} } };
 }
 
 const stageLoader::StageDescriptor& bombGame::stageLoader::Load(size_t stageIndex)

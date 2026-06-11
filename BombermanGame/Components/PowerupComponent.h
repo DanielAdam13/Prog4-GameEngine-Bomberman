@@ -23,7 +23,7 @@ namespace bombGame
 		void UpdateComponent(float) override {} // nothing
 		void RenderComponent() const override {} // nothing
 
-		// Actual powerup LOGIC
+		// Actual powerupEntry LOGIC
 		void ApplyTo(ge::GameObject* player);
 
 		// Only getters, set from creation via constructor:

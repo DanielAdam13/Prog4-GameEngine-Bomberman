@@ -129,7 +129,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// Generate Exit, Powerup, DYNAMIC WALLS
 	levelBuilder::GenerateDynamicObjects(gameplayScene, *m_LevelGrid.get(), 
 		breakableWallSheet, exitDoorTexture, 
-		stage.powerupType, stage.breakableDensity);
+		stage.powerupEntry, stage.breakableDensity);
 
 	// -----------------------------------------------
 	// Players

@@ -38,7 +38,6 @@ void bombGame::MainMenuGameState::OnEnter()
 	// ---------------------
 	ge::Scene& mainMenuScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::MainMenu) };
 
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
 	// Static object initalization:
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_MainMenuBG");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(mainMenuTexture);
@@ -74,9 +73,4 @@ void bombGame::MainMenuGameState::OnExit()
 
 	GetBombermanGame().GetSoundManager().StopAllSounds();
 	ge::SceneManager::GetInstance().RemoveSceneWithName(sceneNames::MainMenu);
-}
-
-std::unique_ptr<bombGame::GameState> bombGame::MainMenuGameState::Update(float)
-{
-	return nullptr;
 }

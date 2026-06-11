@@ -15,7 +15,7 @@ namespace bombGame
 		virtual void OnEnter() override;
 		virtual void OnExit() override;
 
-		virtual std::unique_ptr<GameState> Update(float deltaTime) override;
+		virtual std::unique_ptr<GameState> Update(float) override { return nullptr; }
 		virtual void FixedUpdate(float) override {}
 
 	private:
