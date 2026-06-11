@@ -32,7 +32,8 @@
 ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid& grid,
 	std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
 	SoundManager* soundManager, 
-	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets)
+	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets,
+	int startingScore)
 {
 	auto tileSize{ grid.GetTileSize() };
 	auto topBgPosition{ grid.GetLevelTopLeft() };
@@ -60,7 +61,7 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	player1BoxColl->AssignTag("Player");
 
 	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 1);
-	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), 0);
+	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), startingScore);
 	auto player1PlayerComp{ player1GO->AddComponent<bombGame::PlayerComponent>(player1GO.get(), 150.f) };
 	player1PlayerComp->GetDamageEvent().AddObserver(soundManager);
 	player1PlayerComp->GetDeadEvent().AddObserver(soundManager);

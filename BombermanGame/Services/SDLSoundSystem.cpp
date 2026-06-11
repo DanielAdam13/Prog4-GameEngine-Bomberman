@@ -197,8 +197,10 @@ namespace bombGame
 		for (auto* musicTr : m_MusicTrackPool) 
 			MIX_StopTrack(musicTr, 0);
 
+#ifndef __EMSCRIPTEN__
 		std::queue<PlayRequest> empty;
 		std::swap(m_PlayQueue, empty); // Empty the play queue!
+#endif
 	}
 
 	void SDLSoundSysImpl::SetMuted(bool muted)

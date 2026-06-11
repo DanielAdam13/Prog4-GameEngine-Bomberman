@@ -8,9 +8,6 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 
-#include "Commands/ConditionalCommand.h"
-#include "Commands/ChangeWindowSizeCommand.h"
-
 #include "Commands/MoveCommand.h"
 #include "Commands/LayBombCommand.h"
 #include "Commands/SwitchToTransitionStateCommand.h"
@@ -23,20 +20,14 @@
 #include "Components/Transform.h"
 #include "Components/TextComponent.h"
 #include "Components/FPSComponent.h"
-#include "Components/HealthComponent.h"
-#include "Components/ScoreComponent.h"
-#include "Components/AnimatorComponent.h"
-#include "Components/Colliders.h"
+#include "Components/ScoreComponent.h" // for score tracking and saving
 #include "Components/TimerDisplayComponent.h"
 
 #include "Components/CameraPlayerFollowComponent.h"
 #include "Components/EnemyComponent.h" // only to subscibe to dead event
 #include "Components/PlayerComponent.h"
-#include "Components/BombLayerComponent.h"
-#include "Components/HealthDisplayComponent.h"
 #include "Components/ScoreDisplayComponent.h"
 
-#include "Animation.h"
 #include "SpawnUtils.h"
 #include "SoundManager.h"
 #include "LevelLoader.h"
@@ -145,6 +136,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// -----------------------------------------------
 	SoundManager& bombermanSoundManager{ GetBombermanGame().GetSoundManager() };
 	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionVertSpriteSheet, explosionHorSpriteSheet };
+	const int stageStartScore{ GetBombermanGame().GetCurrentGameSession().totalScore };
 
 	switch (GetBombermanGame().GetCurrentGameSession().currentPlayerMode)
 	{
@@ -153,7 +145,8 @@ void bombGame::GameplayGameState::OnEnter()
 		ge::GameObject* player{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player1SpawnPoint, playerSpriteSheet,
 			&bombermanSoundManager,
-			bombSpriteSheet, explosions) };
+			bombSpriteSheet, explosions,
+			stageStartScore) };
 		// !!
 		m_TrackedPlayers.push_back(player);
 	}
@@ -163,14 +156,16 @@ void bombGame::GameplayGameState::OnEnter()
 		ge::GameObject* player1{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player1SpawnPoint, playerSpriteSheet,
 			&bombermanSoundManager,
-			bombSpriteSheet, explosions) };
+			bombSpriteSheet, explosions,
+			stageStartScore) };
 		// !!
 		m_TrackedPlayers.push_back(player1);
 
 		ge::GameObject* player2{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player2SpawnPoint, playerSpriteSheet,
 			&bombermanSoundManager,
-			bombSpriteSheet, explosions) };
+			bombSpriteSheet, explosions,
+			stageStartScore) };
 		// !!
 		m_TrackedPlayers.push_back(player2);
 	}
@@ -180,7 +175,8 @@ void bombGame::GameplayGameState::OnEnter()
 		ge::GameObject* player{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player1SpawnPoint, playerSpriteSheet,
 			&bombermanSoundManager,
-			bombSpriteSheet, explosions) };
+			bombSpriteSheet, explosions,
+			stageStartScore) };
 		// !!
 		m_TrackedPlayers.push_back(player);
 
@@ -310,9 +306,6 @@ void bombGame::GameplayGameState::OnEnter()
 		controllerTarget = m_TrackedEnemyPlayer;
 		break;
 	}
-
-	/*inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_R, ge::InputManager::InputTrigger::Up,
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));

@@ -27,7 +27,8 @@ namespace bombGame
 		ge::GameObject* SpawnPlayerAt(ge::Scene& scene, LevelGrid& grid,
 			std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
 			SoundManager* soundManager,
-			ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets);
+			ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets,
+			int startingScore);
 
 		// Creates the reusable Bomb Game Object and returns it as a unique_ptr
 		std::unique_ptr<ge::GameObject> CreateBomb(LevelGrid& grid, const glm::vec3& position, 
