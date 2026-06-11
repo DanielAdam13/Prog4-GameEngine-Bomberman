@@ -166,20 +166,20 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 	switch (eventId)
 	{
 		// !!!
-	case ge::EngineEventId::HEALTH_TAKING_DAMAGE:
-		m_DamageEvent.NotifyObservers(GameEventId::PLAYER_LOST_HEALTH, GetOwner());
+	case ge::events::EngineEventId::HEALTH_TAKING_DAMAGE:
+		m_DamageEvent.NotifyObservers(events::GameEventId::PLAYER_LOST_HEALTH, GetOwner());
 		/*GetOwner()->RemoveComponent<ge::BoxCollider>();*/
 		break;
-	case ge::EngineEventId::HEALTH_DIED:
-		m_DeadEvent.NotifyObservers(GameEventId::PLAYER_DIED, GetOwner());
+	case ge::events::EngineEventId::HEALTH_DIED:
+		m_DeadEvent.NotifyObservers(events::GameEventId::PLAYER_DIED, GetOwner());
 		m_CachedAnimator->Play("death");
 		GetOwner()->RemoveComponent<ge::BoxCollider>();
 		break;
-	case ge::EngineEventId::SCORE_CHANGED:
-		m_ScoreChangeEvent.NotifyObservers(GameEventId::PLAYER_SCORE_CHANGED, GetOwner());
+	case ge::events::EngineEventId::SCORE_CHANGED:
+		m_ScoreChangeEvent.NotifyObservers(events::GameEventId::PLAYER_SCORE_CHANGED, GetOwner());
 		break;
 		// --------
-	case ge::EngineEventId::COLLISION_ENTER:
+	case ge::events::EngineEventId::COLLISION_ENTER:
 	{
 		ge::Collider* otherColl{ other->GetComponent<ge::BoxCollider>() };
 		if (!otherColl)
@@ -192,7 +192,7 @@ void bombGame::PlayerComponent::Notify(int eventId, ge::GameObject* other)
 		OnCollisionEnter(other, tag);
 	}
 	break;
-	case ge::EngineEventId::ANIMATION_FINISHED:
+	case ge::events::EngineEventId::ANIMATION_FINISHED:
 		// This for after death animation finished
 		// do nothing for now
 		/*if (!IsAlive())
@@ -233,7 +233,7 @@ void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject* other, const ge
 			
 			// Fire the event. Actual powerup applying happens via a helper namespace and is called from
 			// Gameplay State's Notify
-			m_PowerupPickedUpEvent.NotifyObservers(GameEventId::POWERUP_PICKED_UP, GetOwner());
+			m_PowerupPickedUpEvent.NotifyObservers(events::GameEventId::POWERUP_PICKED_UP, GetOwner());
 
 			// Old
 			//powerupComp->ApplyTo(GetOwner());
@@ -299,8 +299,8 @@ void bombGame::PlayerComponent::UpdateMovementSound(float deltaTime)
 			m_MovedHorEvent.NotifyObservers(GameEventId::PLAYER_MOVED_HOR, GetOwner());*/
 
 		if (m_LastMoveDir.y != 0.f)
-			m_MovedVertEvent.NotifyObservers(GameEventId::PLAYER_MOVED_VERT, GetOwner());
+			m_MovedVertEvent.NotifyObservers(events::GameEventId::PLAYER_MOVED_VERT, GetOwner());
 		if (m_LastMoveDir.x != 0.f)
-			m_MovedHorEvent.NotifyObservers(GameEventId::PLAYER_MOVED_HOR, GetOwner());
+			m_MovedHorEvent.NotifyObservers(events::GameEventId::PLAYER_MOVED_HOR, GetOwner());
 	}
 }

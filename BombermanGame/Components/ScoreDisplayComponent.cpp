@@ -29,7 +29,7 @@ ScoreDisplayComponent::ScoreDisplayComponent(ge::GameObject* owner, ge::GameObje
 
 void ScoreDisplayComponent::Notify(int eventId, ge::GameObject*)
 {
-	if (static_cast<GameEventId>(eventId) == GameEventId::PLAYER_SCORE_CHANGED)
+	if (static_cast<events::GameEventId>(eventId) == events::GameEventId::PLAYER_SCORE_CHANGED)
 	{
 		RefreshText();
 	}

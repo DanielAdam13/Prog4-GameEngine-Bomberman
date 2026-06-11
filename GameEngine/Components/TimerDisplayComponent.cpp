@@ -29,7 +29,7 @@ void ge::TimerDisplayComponent::UpdateComponent(float deltaTime)
 		m_ActualTimer += deltaTime;
 		if (m_ActualTimer >= m_GoalTime)
 		{
-			m_ReachedGoalEvent.NotifyObservers(EngineEventId::TIMER_REACHED_GOAL, GetOwner());
+			m_ReachedGoalEvent.NotifyObservers(events::EngineEventId::TIMER_REACHED_GOAL, GetOwner());
 			m_ReachedGoal = true;
 		}
 		break;
@@ -37,7 +37,7 @@ void ge::TimerDisplayComponent::UpdateComponent(float deltaTime)
 		m_ActualTimer -= deltaTime;
 		if (m_ActualTimer <= m_GoalTime)
 		{
-			m_ReachedGoalEvent.NotifyObservers(EngineEventId::TIMER_REACHED_GOAL, GetOwner());
+			m_ReachedGoalEvent.NotifyObservers(events::EngineEventId::TIMER_REACHED_GOAL, GetOwner());
 			m_ReachedGoal = true;
 		}
 		break;

@@ -13,7 +13,7 @@ void ScoreComponent::ChangeScore(int scoreDiff)
 {
 	m_CurrentScore += scoreDiff;
 
-	m_OnScoreChangedEvent.NotifyObservers(EngineEventId::SCORE_CHANGED, GetOwner());
+	m_OnScoreChangedEvent.NotifyObservers(events::EngineEventId::SCORE_CHANGED, GetOwner());
 }
 
 int ScoreComponent::GetCurrentScore() const noexcept

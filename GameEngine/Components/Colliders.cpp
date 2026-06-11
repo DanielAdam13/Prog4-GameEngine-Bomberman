@@ -60,14 +60,14 @@ void ge::Collider::EndOverlap()
 	{
 		if (!m_PreviousOverlapping.contains(current))
 		{
-			m_OnCollisionEnterEvent.NotifyObservers(EngineEventId::COLLISION_ENTER, current->GetOwner());
+			m_OnCollisionEnterEvent.NotifyObservers(events::EngineEventId::COLLISION_ENTER, current->GetOwner());
 		}
 	}
 	for (auto* prev : m_PreviousOverlapping)
 	{
 		if (!m_CurrentOverlapping.contains(prev))
 		{
-			m_OnCollisionExitEvent.NotifyObservers(EngineEventId::COLLISION_EXIT, prev->GetOwner());
+			m_OnCollisionExitEvent.NotifyObservers(events::EngineEventId::COLLISION_EXIT, prev->GetOwner());
 		}
 	}
 }

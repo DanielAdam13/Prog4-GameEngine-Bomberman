@@ -17,7 +17,7 @@ void HealthComponent::TakeDamage(int damageAmount)
 
 	m_CurrentHealth = std::max(0, m_CurrentHealth - damageAmount);
 
-	m_OnTakingDamageEvent.NotifyObservers(EngineEventId::HEALTH_TAKING_DAMAGE, GetOwner());
+	m_OnTakingDamageEvent.NotifyObservers(events::EngineEventId::HEALTH_TAKING_DAMAGE, GetOwner());
 
 	if (m_CurrentHealth <= 0)
 		Die();
@@ -36,5 +36,5 @@ bool HealthComponent::IsDead() const noexcept
 void HealthComponent::Die()
 {
 	m_CurrentHealth = 0;
-	m_OnDeathEvent.NotifyObservers(EngineEventId::HEALTH_DIED, GetOwner());
+	m_OnDeathEvent.NotifyObservers(events::EngineEventId::HEALTH_DIED, GetOwner());
 }

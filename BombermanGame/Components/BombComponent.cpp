@@ -30,7 +30,7 @@ void bombGame::BombComponent::UpdateComponent(float deltaTime)
 		if (bombTile)
 			m_CachedGrid.ClearBombAt(bombTile->col, bombTile->row);
 
-		m_ExplodedBombEvent.NotifyObservers(GameEventId::EXPLODED_BOMB, GetOwner());
+		m_ExplodedBombEvent.NotifyObservers(events::GameEventId::EXPLODED_BOMB, GetOwner());
 
 		spawnUtils::DetonateBombAt(m_CachedGrid, *ge::SceneManager::GetInstance().GetCurrentActiveScene(),
 			GetOwner()->GetComponent<ge::Transform>()->GetWorldPosition(),

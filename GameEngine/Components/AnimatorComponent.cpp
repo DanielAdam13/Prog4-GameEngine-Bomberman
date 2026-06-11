@@ -47,7 +47,7 @@ void ge::AnimatorComponent::UpdateComponent(float deltaTime)
 
 				m_CurrentFrameIdx = static_cast<int>(m_CurrentAnimation->frames.size() - 1);
 				m_FrameTimer = 0.f;
-				m_OnAnimationFinishedEvent.NotifyObservers(EngineEventId::ANIMATION_FINISHED, GetOwner());
+				m_OnAnimationFinishedEvent.NotifyObservers(events::EngineEventId::ANIMATION_FINISHED, GetOwner());
 
 				return;
 			}

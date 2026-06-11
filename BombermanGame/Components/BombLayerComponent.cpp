@@ -57,7 +57,7 @@ bool bombGame::BombLayerComponent::TryLayBomb(const glm::vec3& position)
 	m_LevelGridRef.RegisterBombAt(bombTile->col, bombTile->row, rawBombGO);
 	RegisterLaidBomb(rawBombGO);
 
-	m_LaidBombEvent.NotifyObservers(GameEventId::LAY_BOMB, GetOwner());
+	m_LaidBombEvent.NotifyObservers(events::GameEventId::LAY_BOMB, GetOwner());
 	return true;
 }
 
@@ -115,7 +115,7 @@ void bombGame::BombLayerComponent::RegisterLaidBomb(ge::GameObject* bomb)
 
 void bombGame::BombLayerComponent::Notify(int eventId, ge::GameObject* sourceObj)
 {
-	if (static_cast<GameEventId>(eventId) == GameEventId::EXPLODED_BOMB)
+	if (static_cast<events::GameEventId>(eventId) == events::GameEventId::EXPLODED_BOMB)
 	{
 		std::erase(m_ActiveBombs, sourceObj); // Remove cached ref from Layer
 

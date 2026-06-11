@@ -30,10 +30,10 @@ HealthDisplayComponent::HealthDisplayComponent(ge::GameObject* owner, ge::GameOb
 
 void HealthDisplayComponent::Notify(int eventId, ge::GameObject*)
 {
-	switch (static_cast<GameEventId>(eventId))
+	switch (static_cast<events::GameEventId>(eventId))
 	{
-	case GameEventId::PLAYER_LOST_HEALTH:
-	case GameEventId::PLAYER_DIED:
+	case events::GameEventId::PLAYER_LOST_HEALTH:
+	case events::GameEventId::PLAYER_DIED:
 		RefreshText();
 		break;
 	default:

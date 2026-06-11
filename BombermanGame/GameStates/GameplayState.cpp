@@ -436,7 +436,7 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 {
 	switch (eventId)
 	{
-	case GameEventId::ENEMY_DIED:
+	case events::GameEventId::ENEMY_DIED:
 	{
 		// --- Stage Cleared logic ---
 		--m_RemainingEnemyCount;
@@ -470,7 +470,7 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 		}
 	}
 		break;
-	case GameEventId::POWERUP_PICKED_UP:
+	case events::GameEventId::POWERUP_PICKED_UP:
 	{
 		// Apply a powerup to ALL (alive) tracked players
 		const auto powerupType{ sourceObj->GetComponent<PlayerComponent>()->GetLastPickedPowerupType() };
@@ -478,7 +478,7 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 		m_TrackedPickedPowerupsStage.push_back(powerupType);
 	}
 		break;
-	case ge::EngineEventId::TIMER_REACHED_GOAL:
+	case ge::events::EngineEventId::TIMER_REACHED_GOAL:
 		if (sourceObj == m_TrackedTimer)
 		{
 			auto spawnedEnemies{ spawnUtils::SpawnEnemiesAtExit(*ge::SceneManager::GetInstance().GetCurrentActiveScene(),

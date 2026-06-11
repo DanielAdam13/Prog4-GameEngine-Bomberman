@@ -106,12 +106,12 @@ void bombGame::EnemyComponent::Notify(int eventId, ge::GameObject* other)
 {
 	switch (eventId)
 	{
-	case ge::EngineEventId::HEALTH_DIED:
-		m_DeadEvent.NotifyObservers(GameEventId::ENEMY_DIED, GetOwner());
+	case ge::events::EngineEventId::HEALTH_DIED:
+		m_DeadEvent.NotifyObservers(events::GameEventId::ENEMY_DIED, GetOwner());
 		m_CachedAnimator->Play("death");
 		GetOwner()->RemoveComponent<ge::BoxCollider>();
 		break;
-	case ge::EngineEventId::COLLISION_ENTER:
+	case ge::events::EngineEventId::COLLISION_ENTER:
 	{
 		ge::Collider* otherColl{ other->GetComponent<ge::BoxCollider>() };
 		if (!otherColl)
@@ -124,7 +124,7 @@ void bombGame::EnemyComponent::Notify(int eventId, ge::GameObject* other)
 		OnCollisionEnter(other, tag);
 		break;
 	}
-	case ge::EngineEventId::ANIMATION_FINISHED:
+	case ge::events::EngineEventId::ANIMATION_FINISHED:
 		if (!IsAlive())
 		{
 			GetOwner()->MarkForDeletion();
