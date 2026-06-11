@@ -31,7 +31,7 @@
 
 ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid& grid,
 	std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
-	SoundManager* soundManager, 
+	ge::IObserver* soundObserver, ge::IObserver* powerupObserver,
 	ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets,
 	int startingScore)
 {
@@ -63,18 +63,20 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	player1GO->AddComponent<ge::HealthComponent>(player1GO.get(), 1);
 	player1GO->AddComponent<ge::ScoreComponent>(player1GO.get(), startingScore);
 	auto player1PlayerComp{ player1GO->AddComponent<bombGame::PlayerComponent>(player1GO.get(), 150.f) };
-	player1PlayerComp->GetDamageEvent().AddObserver(soundManager);
-	player1PlayerComp->GetDeadEvent().AddObserver(soundManager);
-	player1PlayerComp->GetScoreChangeEvent().AddObserver(soundManager);
-	player1PlayerComp->GetMovedHorEvent().AddObserver(soundManager);
-	player1PlayerComp->GetMovedVertEvent().AddObserver(soundManager);
-	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(soundManager);
+	player1PlayerComp->GetDamageEvent().AddObserver(soundObserver);
+	player1PlayerComp->GetDeadEvent().AddObserver(soundObserver);
+	player1PlayerComp->GetScoreChangeEvent().AddObserver(soundObserver);
+	player1PlayerComp->GetMovedHorEvent().AddObserver(soundObserver);
+	player1PlayerComp->GetMovedVertEvent().AddObserver(soundObserver);
+	// Two observers for powerup pickup event
+	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(soundObserver);
+	player1PlayerComp->GetPowerupPickedUpEvent().AddObserver(powerupObserver);
 
 	auto player1BombLayer{ player1GO->AddComponent<bombGame::BombLayerComponent>(player1GO.get(), grid,
 		bombSheet, explosionSheets,
 		3.f, 1, 1) };
-	player1BombLayer->GetLaidBombEvent().AddObserver(soundManager);
-	player1BombLayer->GetBombExplodedEvent().AddObserver(soundManager);
+	player1BombLayer->GetLaidBombEvent().AddObserver(soundObserver);
+	player1BombLayer->GetBombExplodedEvent().AddObserver(soundObserver);
 
 	auto* playerGORaw{ player1GO.get() };
 	scene.Add(std::move(player1GO));

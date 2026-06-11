@@ -55,7 +55,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "PowerupType.h"
   "PowerupArchetypes.h" "PowerupArchetypes.cpp"    
   "StageLoader.h" "StageLoader.cpp" 
-  "PowerupEffects.h" "PowerupEffects.cpp")
+  "PowerupEffects.h" "PowerupEffects.cpp" "GameStates/GameState.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

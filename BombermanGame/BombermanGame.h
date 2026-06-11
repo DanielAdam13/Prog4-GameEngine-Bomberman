@@ -17,6 +17,24 @@ namespace bombGame
 {
 	class SoundManager;
 
+	enum class PlayerMode
+	{
+		SinglePlayer,
+		Coop,
+		Versus
+	};
+
+	// Stores game info since the player mode was selected and preserves it until game reset/won/lost
+	struct GameSession
+	{
+		int currentStageIndex{ 0 };
+		// Set by playermode state, used by gameplay state
+		PlayerMode currentPlayerMode{ PlayerMode::SinglePlayer };
+		int playerLives{ 4 };
+		int totalScore{ 0 };
+		std::vector<PowerupType> storedPowerups;
+	};
+
 	// Containing logic of the Bomberman Game itself
 	class BombermanGame final : public ge::IGameApplication
 	{
@@ -35,24 +53,6 @@ namespace bombGame
 		SoundManager& GetSoundManager() noexcept;
 		ge::SoundSystem* GetStoredSoundSystem() noexcept;
 		GameStateMachine& GetStateMachine() noexcept;
-
-		enum class PlayerMode
-		{
-			SinglePlayer,
-			Coop,
-			Versus
-		};
-
-		// Stores game info since the player mode was selected and preserves it until game closed
-		struct GameSession
-		{
-			int currentStageIndex{ 0 };
-			// Set by playermode state, used by gameplay state
-			PlayerMode currentPlayerMode{ PlayerMode::SinglePlayer }; 
-			int playerLives{ 4 };
-			int totalScore{ 0 };
-			std::vector<PowerupType> storedPowerups;
-		};
 
 		GameSession& GetCurrentGameSession() noexcept;
 		void SaveScore(int finalScore);

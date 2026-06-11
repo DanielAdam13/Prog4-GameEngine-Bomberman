@@ -9,6 +9,7 @@ namespace ge
 
 namespace bombGame
 {
+	// All this component does is store the type and score for a powerup GO
 	class PowerupComponent final : public ge::Component
 	{
 	public:
@@ -23,8 +24,8 @@ namespace bombGame
 		void UpdateComponent(float) override {} // nothing
 		void RenderComponent() const override {} // nothing
 
-		// Actual powerupEntry LOGIC
-		void ApplyTo(ge::GameObject* player);
+		// Old actual powerupEntry LOGIC
+		/*void ApplyTo(ge::GameObject* player);*/
 
 		// Only getters, set from creation via constructor:
 		PowerupType GetType() const noexcept { return m_Type; }

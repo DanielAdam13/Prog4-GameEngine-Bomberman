@@ -41,6 +41,7 @@
 #include "SoundIds.h"
 #include "EngineEvents.h" // for TIMER_REACHED_GOAL event
 #include "SpriteSheet.h"
+#include "PowerupEffects.h" // to Apply powerups in Notify
 
 #include "VictoryState.h"
 #include "LossState.h"
@@ -112,7 +113,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// =================================================
 	// Level Genertion
 	// =================================================
-	const stageLoader::StageDescriptor& stage{ stageLoader::Load(GetBombermanGame().GetCurrentGameSession().currentStageIndex)};
+	const stageLoader::StageDescriptor& stage{ stageLoader::Load(GetCachedGameSession().currentStageIndex)};
 
 	levelLoader::LevelLayout layout{ levelLoader::Load(
 		ge::ResourceManager::GetInstance().GetFullPath("levels/" + stage.layoutFile)) };
@@ -136,26 +137,26 @@ void bombGame::GameplayGameState::OnEnter()
 	// -----------------------------------------------
 	SoundManager& bombermanSoundManager{ GetBombermanGame().GetSoundManager() };
 	std::array<ge::SpriteSheet*, 3> explosions{ explosionCenterSpriteSheet, explosionVertSpriteSheet, explosionHorSpriteSheet };
-	const int stageStartScore{ GetBombermanGame().GetCurrentGameSession().totalScore };
+	const int stageStartScore{ GetCachedGameSession().totalScore };
 
-	switch (GetBombermanGame().GetCurrentGameSession().currentPlayerMode)
+	switch (GetCachedGameSession().currentPlayerMode)
 	{
-	case BombermanGame::PlayerMode::SinglePlayer:
+	case PlayerMode::SinglePlayer:
 	{
 		ge::GameObject* player{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player1SpawnPoint, playerSpriteSheet,
-			&bombermanSoundManager,
+			&bombermanSoundManager, this,
 			bombSpriteSheet, explosions,
 			stageStartScore) };
 		// !!
 		m_TrackedPlayers.push_back(player);
 	}
 		break;
-	case BombermanGame::PlayerMode::Coop:
+	case PlayerMode::Coop:
 	{
 		ge::GameObject* player1{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player1SpawnPoint, playerSpriteSheet,
-			&bombermanSoundManager,
+			&bombermanSoundManager, this,
 			bombSpriteSheet, explosions,
 			stageStartScore) };
 		// !!
@@ -163,18 +164,18 @@ void bombGame::GameplayGameState::OnEnter()
 
 		ge::GameObject* player2{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player2SpawnPoint, playerSpriteSheet,
-			&bombermanSoundManager,
+			&bombermanSoundManager, this,
 			bombSpriteSheet, explosions,
 			stageStartScore) };
 		// !!
 		m_TrackedPlayers.push_back(player2);
 	}
 		break;
-	case BombermanGame::PlayerMode::Versus:
+	case PlayerMode::Versus:
 	{
 		ge::GameObject* player{ spawnUtils::SpawnPlayerAt(gameplayScene, *m_LevelGrid,
 			layout.player1SpawnPoint, playerSpriteSheet,
-			&bombermanSoundManager,
+			&bombermanSoundManager, this,
 			bombSpriteSheet, explosions,
 			stageStartScore) };
 		// !!
@@ -184,10 +185,18 @@ void bombGame::GameplayGameState::OnEnter()
 			enemyArchetypes::Get(EnemyType::Balloom),
 			m_TrackedPlayers,
 			layout.player2SpawnPoint.first, layout.player2SpawnPoint.second,
-			true) }; // last TRUE flad disables EnemyComponent's AI
+			true) }; // TRUE flag disables EnemyComponent's AI
 		m_TrackedEnemyPlayer = enemyPlayer;
 	}
 		break;
+	}
+
+	// ---------
+	// Apply previous powerups to player
+	// ---------
+	for (auto player : m_TrackedPlayers)
+	{
+		powerupEffects::ApplyStoredToPlayer(player, GetCachedGameSession().storedPowerups);
 	}
 
 	// -------------------------------------------------
@@ -218,7 +227,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// ---- Lives Display - Not the same as HealthDisplay per player ----
 	auto healthDisplayGO = std::make_unique<ge::GameObject>("GO_SharedLivesDisplay");
 	healthDisplayGO->AddComponent<ge::TextComponent>(healthDisplayGO.get(), 
-		"LEFT " + std::to_string(GetBombermanGame().GetCurrentGameSession().playerLives), displaysFont, colorWhite);
+		"LEFT " + std::to_string(GetCachedGameSession().playerLives), displaysFont, colorWhite);
 	//healthDisplayGO->AddComponent<HealthDisplayComponent>(healthDisplayGO.get(), player1GO.get());
 	healthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
 		windowSize.first * 0.8f, windowSize.second * 0.02f, 0.f });
@@ -291,17 +300,17 @@ void bombGame::GameplayGameState::OnEnter()
 
 	ge::GameObject* keyboardTarget;
 	ge::GameObject* controllerTarget;
-	switch (GetBombermanGame().GetCurrentGameSession().currentPlayerMode)
+	switch (GetCachedGameSession().currentPlayerMode)
 	{
-	case BombermanGame::PlayerMode::SinglePlayer:
+	case PlayerMode::SinglePlayer:
 		keyboardTarget = m_TrackedPlayers[0];
 		controllerTarget = m_TrackedPlayers[0];
 		break;
-	case BombermanGame::PlayerMode::Coop:
+	case PlayerMode::Coop:
 		keyboardTarget = m_TrackedPlayers[0];
 		controllerTarget = m_TrackedPlayers[1];
 		break;
-	case BombermanGame::PlayerMode::Versus:
+	case PlayerMode::Versus:
 		keyboardTarget = m_TrackedPlayers[0];
 		controllerTarget = m_TrackedEnemyPlayer;
 		break;
@@ -386,10 +395,10 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 				return false;
 			}))
 		{
-			--GetBombermanGame().GetCurrentGameSession().playerLives;
+			--GetCachedGameSession().playerLives;
 
 			// Check Defeat - go into Loss State, else go into StageTransitionState -> GameplayState
-			if (GetBombermanGame().GetCurrentGameSession().playerLives == 0)
+			if (GetCachedGameSession().playerLives == 0)
 			{
 				GetBombermanGame().SaveScore(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
 				return std::make_unique<LossState>(GetBombermanGame());
@@ -409,11 +418,11 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 		return nullptr;
 
 	// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
-	++GetBombermanGame().GetCurrentGameSession().currentStageIndex;
+	++GetCachedGameSession().currentStageIndex;
 
 	GetBombermanGame().SaveScore(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
 
-	if (GetBombermanGame().GetCurrentGameSession().currentStageIndex >= stageLoader::GetStageCount())
+	if (GetCachedGameSession().currentStageIndex >= stageLoader::GetStageCount())
 	{
 		return std::make_unique<VictoryState>(GetBombermanGame());
 	}
@@ -459,6 +468,14 @@ void bombGame::GameplayGameState::Notify(int eventId, ge::GameObject* sourceObj)
 				scoreComp->ChangeScore(scorePerEnemy);
 			}
 		}
+	}
+		break;
+	case GameEventId::POWERUP_PICKED_UP:
+	{
+		// Apply a powerup to ALL (alive) tracked players
+		const auto powerupType{ sourceObj->GetComponent<PlayerComponent>()->GetLastPickedPowerupType() };
+		powerupEffects::OnPickup(powerupType, m_TrackedPlayers,
+			GetCachedGameSession());
 	}
 		break;
 	case ge::EngineEventId::TIMER_REACHED_GOAL:

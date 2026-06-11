@@ -3,6 +3,7 @@
 #include "ObservableSubject.h"
 #include "Observer.h"
 #include "Components/Colliders.h"
+#include "PowerupType.h" // used for Applying powreup from Gameplay State
 
 #include <glm/glm.hpp>
 
@@ -40,6 +41,7 @@ namespace bombGame
 		float GetSpeed() const noexcept;
 		void SetSpeed(float newSpeed) noexcept;
 		bool IsAlive() const noexcept;
+		PowerupType GetLastPickedPowerupType() const noexcept { return m_LastPickedPowerupType; }
 
 		// Used for Bomb-Laying, for more specific drop location
 		glm::vec3 GetPlayerMidPoint() const noexcept;
@@ -82,5 +84,7 @@ namespace bombGame
 		float m_StepTimer{ 0.f };
 		static constexpr float m_StepInterval{ 0.28f };
 		void UpdateMovementSound(float deltaTime);
+
+		PowerupType m_LastPickedPowerupType{};
 	};
 }

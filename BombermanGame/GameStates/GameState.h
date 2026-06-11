@@ -5,15 +5,13 @@
 namespace bombGame
 {
 	class BombermanGame;
+	struct GameSession;
 
 	class GameState
 	{
 	public:
-		GameState(BombermanGame& game)
-			:m_Game{ game }
-		{
-		}
-
+		GameState(BombermanGame& game);
+			
 		virtual ~GameState() = default;
 		GameState(const GameState&) = delete;
 		GameState& operator=(const GameState&) = delete;
@@ -27,7 +25,8 @@ namespace bombGame
 		virtual void FixedUpdate(float) = 0;
 
 	protected:
-		BombermanGame& GetBombermanGame() noexcept { return m_Game; }
+		BombermanGame& GetBombermanGame() noexcept;
+		GameSession& GetCachedGameSession() noexcept;
 
 	private:
 		BombermanGame& m_Game;

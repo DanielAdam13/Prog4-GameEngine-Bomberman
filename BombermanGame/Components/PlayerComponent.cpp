@@ -217,11 +217,19 @@ void bombGame::PlayerComponent::OnCollisionEnter(ge::GameObject* other, const ge
 		// Powerup is applied on collision
 		if (auto* powerupComp = other->GetComponent<PowerupComponent>())
 		{
-			powerupComp->ApplyTo(GetOwner());
-			m_PowerupPickedUpEvent.NotifyObservers(GameEventId::POWERUP_PICKED_UP, GetOwner());
+			m_LastPickedPowerupType = powerupComp->GetType();
 
 			if (m_CachedScoreComp)
 				m_CachedScoreComp->ChangeScore(powerupComp->GetPickupScore());
+
+			other->MarkForDeletion();
+			
+			// Fire the event. Actual powerup applying happens via a helper namespace and is called from
+			// Gameplay State's Notify
+			m_PowerupPickedUpEvent.NotifyObservers(GameEventId::POWERUP_PICKED_UP, GetOwner());
+
+			// Old
+			//powerupComp->ApplyTo(GetOwner());
 		}
 	}
 }

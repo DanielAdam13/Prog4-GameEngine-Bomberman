@@ -14,19 +14,19 @@ namespace ge
 	class Texture2D;
 	class SpriteSheet;
 	class Scene;
+	class IObserver; // for SoundManager and GameplayState subscription to player events
 }
 
 namespace bombGame
 {
 	class LevelGrid;
 	struct EnemyArchetype;
-	class SoundManager; // For player
 
 	namespace spawnUtils
 	{
 		ge::GameObject* SpawnPlayerAt(ge::Scene& scene, LevelGrid& grid,
 			std::pair<int, int> spawnLoc, ge::SpriteSheet* playerSheet,
-			SoundManager* soundManager,
+			ge::IObserver* soundObserver, ge::IObserver* powerupObserver,
 			ge::SpriteSheet* bombSheet, std::array<ge::SpriteSheet*, 3> explosionSheets,
 			int startingScore);
 

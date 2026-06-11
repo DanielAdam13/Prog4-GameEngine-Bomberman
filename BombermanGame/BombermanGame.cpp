@@ -11,8 +11,6 @@
 
 #include "SoundManager.h"
 
-#include "GameStates/MainMenuState.h"
-
 #include "CollisionSystem.h"
 
 #include <memory>
@@ -67,7 +65,7 @@ bombGame::GameStateMachine& bombGame::BombermanGame::GetStateMachine() noexcept
 	return m_GameStateMachine;
 }
 
-bombGame::BombermanGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() noexcept
+bombGame::GameSession& bombGame::BombermanGame::GetCurrentGameSession() noexcept
 {
 	return m_CurrentGameSession;
 }

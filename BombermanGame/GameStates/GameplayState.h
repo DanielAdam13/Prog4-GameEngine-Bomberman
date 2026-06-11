@@ -2,7 +2,7 @@
 #include "GameState.h"
 #include "LevelGrid.h"
 #include "Camera.h"
-#include "Observer.h" // For enemy death
+#include "Observer.h" // For enemy death and powerup pickup
 
 #include <memory>
 #include <vector>
@@ -16,7 +16,7 @@ namespace bombGame
 {
 	class BombermanGame;
 
-	class GameplayGameState final : public GameState, public ge::IObserver
+	class GameplayGameState final : public GameState, public ge::IObserver // Observes enemy death and powerup pickup
 	{
 	public:
 		GameplayGameState(BombermanGame& game);
