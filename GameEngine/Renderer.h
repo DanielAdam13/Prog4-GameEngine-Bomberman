@@ -38,7 +38,7 @@ namespace ge
 		Subject& GetOnScreenResizeEvent() noexcept;
 		std::pair<float, float> GetWindowDesignSize() const noexcept;
 
-		const Camera* const GetActiveCamera() const noexcept;
+		const Camera* GetActiveCamera() const noexcept;
 		void SetActiveCamera(Camera* camera);
 
 		void SuspendCamera();

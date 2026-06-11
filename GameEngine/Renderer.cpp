@@ -169,7 +169,7 @@ std::pair<float, float> ge::Renderer::GetWindowDesignSize() const noexcept
 	return m_ConstantDesignSize;
 }
 
-const ge::Camera* const ge::Renderer::GetActiveCamera() const noexcept
+const ge::Camera* ge::Renderer::GetActiveCamera() const noexcept
 {
 	return m_ActiveCamera;
 }

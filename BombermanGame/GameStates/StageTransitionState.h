@@ -10,7 +10,7 @@ namespace bombGame
 	class StageTransitionState final : public GameState
 	{
 	public:
-		StageTransitionState(BombermanGame& game, float duration = 2.7f);
+		StageTransitionState(BombermanGame& game, float duration = 3.f);
 
 		virtual void OnEnter() override;
 		virtual void OnExit() override;

@@ -16,7 +16,7 @@ using namespace bombGame;
 ScoreDisplayComponent::ScoreDisplayComponent(ge::GameObject* owner, ge::GameObject* trackedPlayer)
 	:Component::Component(owner),
 	m_pTrackedPlayer{ trackedPlayer },
-	m_pCachedText{ GetOwner()->GetComponent<ge::TextComponent>() }
+	m_pCachedText{ owner->GetComponent<ge::TextComponent>() }
 {
 	assert(m_pCachedText && "ScoreDisplayComponent requires a TextComponent on the same GO");
 

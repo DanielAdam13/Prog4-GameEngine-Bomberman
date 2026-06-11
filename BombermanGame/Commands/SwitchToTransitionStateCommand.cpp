@@ -1,4 +1,4 @@
-#include "SwitchToGameplayStateCommand.h"
+#include "SwitchToTransitionStateCommand.h"
 
 #include "BombermanGame.h"
 #include "GameStates/GameStateMachine.h"

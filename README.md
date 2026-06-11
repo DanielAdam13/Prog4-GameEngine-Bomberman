@@ -10,6 +10,10 @@ Minigin is a very small project using [SDL3](https://www.libsdl.org/) and [glm](
 
 Minigin can/may be used as a start project for the exam assignment in the course [Programming 4](https://youtu.be/j96Oh6vzhmg) at DAE. In that assignment students need to recreate a popular 80's arcade game with a game engine they need to program themselves. During the course we discuss several game programming patterns, using the book '[Game Programming Patterns](https://gameprogrammingpatterns.com/)' by [Robert Nystrom](https://github.com/munificent) as reading material. 
 
+# Architectural Rules
+
+- No Component can add/remove other components from its owner internally.
+
 # Game-Engine Architectural Choices
 
 Game Object <-> Component

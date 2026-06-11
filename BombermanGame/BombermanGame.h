@@ -22,7 +22,7 @@ namespace bombGame
 	{
 	public:
 		BombermanGame();
-		~BombermanGame();
+		~BombermanGame() = default;
 		BombermanGame(const BombermanGame& other) = delete;
 		BombermanGame(BombermanGame && other) = delete;
 		BombermanGame& operator=(const BombermanGame& other) = delete;
@@ -36,11 +36,21 @@ namespace bombGame
 		ge::SoundSystem* GetStoredSoundSystem() noexcept;
 		GameStateMachine& GetStateMachine() noexcept;
 
+		enum class PlayerMode
+		{
+			SinglePlayer,
+			Coop,
+			Versus
+		};
+
+		// Stores game info since the player mode was selected and preserves it until game closed
 		struct GameSession
 		{
 			int currentStageIndex{ 0 };
-			int playerLives{ 4 }; // (shared for both players)
-			int totalScore{ 0 }; // (shared for both players)
+			// Set by playermode state, used by gameplay state
+			PlayerMode currentPlayerMode{ PlayerMode::SinglePlayer }; 
+			int playerLives{ 4 };
+			int totalScore{ 0 };
 			std::vector<PowerupType> storedPowerups;
 		};
 
@@ -50,7 +60,7 @@ namespace bombGame
 	private:
 		GameStateMachine m_GameStateMachine{};
 
-		ge::SoundSystem* m_StoredSoundSystem{ nullptr };
+		ge::SoundSystem* m_StoredSoundSystem;
 		SoundManager m_BombermanSoundManager{};
 
 		void LoadSound();
@@ -60,6 +70,7 @@ namespace bombGame
 
 	namespace sceneNames
 	{
+		inline constexpr auto PlayerModeSelection{ "S_PlayerModeSelection" };
 		inline constexpr auto MainMenu{ "S_MainMenu" };
 		inline constexpr auto Gameplay{ "S_Gameplay" };
 		inline constexpr auto GameOver{ "S_GameOver" };

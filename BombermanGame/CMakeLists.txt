@@ -20,7 +20,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Commands/ScoreCommand.h"  "Commands/ScoreCommand.cpp"
   "Commands/LayBombCommand.h" "Commands/LayBombCommand.cpp"
   "Commands/MoveCommand.h" "Commands/MoveCommand.cpp"
-  "Commands/SwitchToGameplayStateCommand.h" "Commands/SwitchToGameplayStateCommand.cpp" 
+  "Commands/SwitchToTransitionStateCommand.h" "Commands/SwitchToTransitionStateCommand.cpp" 
   "Commands/RemoteBombDetonateCommand.h" "Commands/RemoteBombDetonateCommand.cpp"
   "Commands/SkipGameplayStageCommand.h" "Commands/SkipGameplayStageCommand.cpp"
   "Commands/ToggleMuteCommand.h" "Commands/ToggleMuteCommand.cpp"
@@ -46,11 +46,13 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "GameStates/VictoryState.h" "GameStates/VictoryState.cpp"
   "GameStates/LossState.h" "GameStates/LossState.cpp"
   "GameStates/StageTransitionState.h" "GameStates/StageTransitionState.cpp"
+  "GameStates/PlayerModeState.h" "GameStates/PlayerModeState.cpp"
   "EnemyType.h"  
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
   "PowerupArchetypes.h" "PowerupArchetypes.cpp"    
-   "StageLoader.h" "StageLoader.cpp" )
+  "StageLoader.h" "StageLoader.cpp" 
+  "PowerupEffects.h" "PowerupEffects.cpp"  "Components/SelectableTextComponent.h" "Components/SelectableTextComponent.cpp" "Commands/HoverSelectableCommand.h" "Commands/HoverSelectableCommand.cpp" "Commands/ConfirmSelectionCommand.h" "Commands/ConfirmSelectionCommand.cpp")
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

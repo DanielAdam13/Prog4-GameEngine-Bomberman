@@ -16,7 +16,7 @@
 #include "GameObject.h"
 #include "Components/Image.h"
 #include "Components/Transform.h"
-#include "Commands/SwitchToGameplayStateCommand.h"
+#include "Commands/SwitchToTransitionStateCommand.h"
 
 #include <utility>
 #include <memory>
@@ -61,7 +61,7 @@ void bombGame::MainMenuGameState::OnEnter()
 		std::make_unique<SwitchToTransitionCommand>(GetBombermanGame()));
 
 	// Play Sound
-	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
+	//GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
 
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::MainMenu);
 }

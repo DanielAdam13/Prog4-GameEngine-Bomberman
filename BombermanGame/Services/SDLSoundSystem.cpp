@@ -172,7 +172,6 @@ namespace bombGame
 		std::lock_guard<std::mutex> lock(m_AudioStateMutex);
 #endif // !__EMSCRIPTEN__
 
-
 		// If a sound was already registered under this id, destroy it FIRST
 		if (auto it{ m_LoadedAudios.find(id) }; it != m_LoadedAudios.end())
 		{
@@ -187,7 +186,9 @@ namespace bombGame
 
 	void SDLSoundSysImpl::StopAll()
 	{
+#ifndef __EMSCRIPTEN__
 		std::lock_guard<std::mutex> lock(m_AudioStateMutex);
+#endif 
 
 		// Stop SFX
 		for (auto* sfxTr : m_SFXPool)
@@ -204,7 +205,10 @@ namespace bombGame
 	{
 		m_Muted.store(muted);
 
+#ifndef __EMSCRIPTEN__
 		std::lock_guard<std::mutex> lock(m_AudioStateMutex);
+#endif 
+
 		for (auto* sfxTr : m_SFXPool)
 		{
 			MIX_SetTrackGain(sfxTr, muted ? 0.f : 1.f);
@@ -243,7 +247,7 @@ namespace bombGame
 		{
 #ifndef __EMSCRIPTEN__
 			std::lock_guard<std::mutex> lock(m_AudioStateMutex);
-#endif // !1
+#endif
 
 			// Already loaded:
 			const auto it{ m_LoadedAudios.find(soundId) };

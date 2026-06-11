@@ -24,8 +24,6 @@ bombGame::BombermanGame::BombermanGame()
 	ge::Renderer::GetInstance().SetWindowSize({ 800, 800 });
 }
 
-bombGame::BombermanGame::~BombermanGame() = default;
-
 void bombGame::BombermanGame::Load()
 {
 	/*ge::ServiceLocator::GetInputManager().BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,

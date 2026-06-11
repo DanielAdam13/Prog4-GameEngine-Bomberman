@@ -13,7 +13,7 @@
 
 #include "Commands/MoveCommand.h"
 #include "Commands/LayBombCommand.h"
-#include "Commands/SwitchToGameplayStateCommand.h"
+#include "Commands/SwitchToTransitionStateCommand.h"
 #include "Commands/SkipGameplayStageCommand.h"
 #include "Commands/RemoteBombDetonateCommand.h"
 #include "Commands/ToggleMuteCommand.h"
