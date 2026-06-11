@@ -5,6 +5,7 @@
 #include "Commands/ConfirmSelectionCommand.h"
 #include "SoundManager.h"
 #include "MainMenuState.h"
+#include "Commands/ToggleMuteCommand.h"
 
 #include "ResourceManager.h"
 #include "Renderer.h"
@@ -12,9 +13,11 @@
 #include "Scene.h"
 #include "SceneManager.h"
 #include "Components/TextComponent.h"
+#include "Components/Transform.h"
 #include "Services/ServiceLocator.h"
 #include "Services/InputManager.h"
 #include "GameObject.h"
+#include "Components/Image.h"
 
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_scancode.h>
@@ -27,7 +30,9 @@ bombGame::TypeNameState::TypeNameState(BombermanGame& game)
 void bombGame::TypeNameState::OnEnter()
 {
 	// Resources
-	const auto selectionFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 30) };
+	const auto nameSelectionTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_NameSelection.png") };
+
+	const auto selectionFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 40) };
 	selectionFont->SetBold(true);
 
 	constexpr SDL_Color colorWhite{ SDL_Color{220, 220, 220, 255} };
@@ -40,8 +45,13 @@ void bombGame::TypeNameState::OnEnter()
 	// ---------------------
 	ge::Scene& textSelectionScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::NameSelection) };
 
+	auto nameScreenGO = std::make_unique<ge::GameObject>("GO_SelectionScreen");
+	nameScreenGO->AddComponent<ge::Image>(nameScreenGO.get())->SetTexture(nameSelectionTexture);
+	nameScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.7f, 1.f);
+	textSelectionScene.Add(std::move(nameScreenGO));
+
 	// Object initalization:
-	const float baseX{ windowSize.first * 0.2f };
+	const float baseX{ windowSize.first * 0.3f };
 	const float baseY{ windowSize.second * 0.5f };
 	constexpr float slotSpacing{ 60.f };
 
@@ -79,6 +89,9 @@ void bombGame::TypeNameState::OnEnter()
 	// Input Binding
 	// ---------------------
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Up,
 		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(-1, 0)));

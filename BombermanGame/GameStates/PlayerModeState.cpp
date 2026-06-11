@@ -4,6 +4,7 @@
 #include "Commands/HoverSelectableCommand.h"
 #include "Commands/ConfirmSelectionCommand.h"
 #include "TypeNameState.h"
+#include "Commands/ToggleMuteCommand.h"
 
 #include "ResourceManager.h"
 #include "Renderer.h"
@@ -101,6 +102,9 @@ void bombGame::PlayerModeState::OnEnter()
 	// Input Binding
 	// ---------------------
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Up,
 		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(- 1, 0 )));

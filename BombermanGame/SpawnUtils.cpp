@@ -54,7 +54,7 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	playerTr->SetLocalScale({ playerScale, playerScale, 1.f });
 
 	auto playerBoxColl{ playerGO->AddComponent<ge::BoxCollider>(playerGO.get(),
-		glm::vec2{tileSize - 2.f, tileSize - 2.f}, true,
+		glm::vec2{tileSize - 4.f, tileSize - 4.f}, true,
 		glm::vec2{-tileSize * 0.5f , -tileSize * 0.5f}) };
 	playerBoxColl->AssignTag("Player");
 
@@ -104,7 +104,7 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemyPlayerAt(ge::Scene& scene, Level
 	tr->SetLocalScale({ 3.f, 3.f, 1.f });
 
 	auto player1BoxColl{ enemyPlayerGO->AddComponent<ge::BoxCollider>(enemyPlayerGO.get(),
-		glm::vec2{tileSize - 2.f, tileSize - 2.f}, true,
+		glm::vec2{tileSize - 4.f, tileSize - 4.f}, true,
 		glm::vec2{-tileSize * 0.5f , -tileSize * 0.5f}) };
 	player1BoxColl->AssignTag("Enemy");
 
