@@ -387,51 +387,53 @@ void bombGame::GameplayGameState::OnExit()
 
 std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 {
-	// If there are still alive enemies
-	if (!m_StageCleared)
-	{
-		// Reset GameplayNormalOST State + stage if all(1 or 2) players are dead
-		if (std::all_of(m_TrackedPlayers.begin(), m_TrackedPlayers.end(), [](ge::GameObject* player)->bool
-			{
-				auto* playerComp{ player->GetComponent<PlayerComponent>() };
-				if (playerComp && !playerComp->IsAlive())
-					return true;
-
-				return false;
-			}))
+	// Reset GameplayNormalOST State + stage if all(1 or 2) players are dead
+	if (std::all_of(m_TrackedPlayers.begin(), m_TrackedPlayers.end(), [](ge::GameObject* player)->bool
 		{
-			// Check Defeat - go into Loss State, else go into StageTransitionState -> GameplayState
-			if (GetCachedGameSession().playerLives <= 1)
-			{
-				GetBombermanGame().FailStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
-				return std::make_unique<LossState>(GetBombermanGame());
-			}
-			else
-			{
-				GetBombermanGame().FailStage();
-				return std::make_unique<StageTransitionState>(GetBombermanGame());
-			}
-		}
+			auto* playerComp{ player->GetComponent<PlayerComponent>() };
+			if (playerComp && !playerComp->IsAlive())
+				return true;
 
-		// Else, stay in this state
-		return nullptr;
-	}
-
-	// If stage is clear but no player is on the exit, stay in this state
-	if (!IsAnyPlayerOnExit())
-		return nullptr;
-
-	// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
-	GetBombermanGame().CompleteStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore(),
-		m_TrackedPickedPowerupsStage);
-
-	if (GetCachedGameSession().currentStageIndex >= stageLoader::GetStageCount())
+			return false;
+		}))
 	{
-		return std::make_unique<VictoryState>(GetBombermanGame());
+		// Check Defeat - go into Loss State, else go into StageTransitionState -> GameplayState
+		if (GetCachedGameSession().playerLives <= 1)
+		{
+			GetBombermanGame().FailStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
+			return std::make_unique<LossState>(GetBombermanGame());
+		}
+		else
+		{
+			GetBombermanGame().FailStage();
+			return std::make_unique<StageTransitionState>(GetBombermanGame());
+		}
 	}
 	else
 	{
-		return std::make_unique<StageTransitionState>(GetBombermanGame());
+		// If there are still alive enemies
+		if (!m_StageCleared)
+		{
+			// Else, stay in this state
+			return nullptr;
+		}
+
+		// If stage is clear but no player is on the exit, stay in this state
+		if (!IsAnyPlayerOnExit())
+			return nullptr;
+
+		// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
+		GetBombermanGame().CompleteStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore(),
+			m_TrackedPickedPowerupsStage);
+
+		if (GetCachedGameSession().currentStageIndex >= stageLoader::GetStageCount())
+		{
+			return std::make_unique<VictoryState>(GetBombermanGame());
+		}
+		else
+		{
+			return std::make_unique<StageTransitionState>(GetBombermanGame());
+		}
 	}
 }
 
