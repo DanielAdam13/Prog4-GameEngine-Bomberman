@@ -27,13 +27,12 @@ namespace bombGame
 		void ConfirmCurrentSelection() override;
 
 	private:
+		std::vector<SelectableTextComponent*> m_Selectables; // Ref
+		size_t m_CurrentHoverIndex{ 0 };
+
 		static constexpr size_t LetterCount{ 4 };
 		static constexpr size_t ConfirmSlotIndex{ 4 }; // last index
-
 		std::array<char, LetterCount> m_Letters{ 'A', 'A', 'A', 'A' };
-
-		std::vector<SelectableTextComponent*> m_Selectables;
-		size_t m_CurrentHoverIndex{ 0 };
 
 		// Small helper to check if slot is not confirmSlot
 		bool IsLetterSlot(size_t index) const;

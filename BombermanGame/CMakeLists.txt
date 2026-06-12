@@ -56,7 +56,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "EnemyArchetypes.h" "EnemyArchetypes.cpp" 
   "PowerupType.h"
   "PowerupArchetypes.h" "PowerupArchetypes.cpp"
-  "PowerupEffects.h" "PowerupEffects.cpp"  )
+  "PowerupEffects.h" "PowerupEffects.cpp"   )
  
 target_include_directories(${TARGET_NAME} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}

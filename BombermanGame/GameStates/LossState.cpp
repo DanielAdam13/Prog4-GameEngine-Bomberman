@@ -10,9 +10,12 @@
 #include "Services/SoundSystem.h"
 #include "Components/Image.h"
 #include "Components/Transform.h"
+#include "Components/TextComponent.h"
+#include "Renderer.h"
 
 #include <utility>
 #include <SDL3/SDL_pixels.h>
+#include <string>
 
 bombGame::LossState::LossState(BombermanGame& game, float duration)
 	:GameState::GameState(game),
@@ -25,6 +28,14 @@ void bombGame::LossState::OnEnter()
 	// Resources
 	const auto victoryTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_LossScreen.png") };
 
+	const auto bigTitleFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 70) };
+	bigTitleFont->SetBold(true);
+
+	//constexpr SDL_Color colorYellow{ SDL_Color{220, 220, 60, 255} };
+	constexpr SDL_Color colorRed{ SDL_Color{230, 30, 40, 255} };
+
+	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+
 	// ---------------------
 	// Initialize Scene
 	// ---------------------
@@ -35,6 +46,13 @@ void bombGame::LossState::OnEnter()
 	lossScreenGO->AddComponent<ge::Image>(lossScreenGO.get())->SetTexture(victoryTexture);
 	lossScreenGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.8f, 1.f);
 	lossScene.Add(std::move(lossScreenGO));
+
+	auto scoreGO = std::make_unique<ge::GameObject>("GO_ScoreText");
+	scoreGO->AddComponent<ge::TextComponent>(scoreGO.get(),
+		std::to_string(GetBombermanGame().GetCurrentGameSession().totalScore), bigTitleFont, colorRed);
+	scoreGO->GetComponent<ge::Transform>()->SetLocalPosition({ 
+		windowSize.first * 0.35f, windowSize.second * 0.55f, 0.f });
+	lossScene.Add(std::move(scoreGO));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameLost, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Loss);

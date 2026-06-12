@@ -22,11 +22,11 @@ namespace bombGame
 		virtual void FixedUpdate(float) override {}
 
 		// Methods called from commands
-		void MoveHover(std::pair<int, int> delta) override;
-		void ConfirmCurrentSelection() override;
+		virtual void MoveHover(std::pair<int, int> delta) override;
+		virtual void ConfirmCurrentSelection() override;
 
 	private:
-		std::vector<SelectableTextComponent*> m_Selectables{};
+		std::vector<SelectableTextComponent*> m_Selectables{}; // Ref
 		size_t m_CurrentHoverIndex{ 0 };
 	};
 }

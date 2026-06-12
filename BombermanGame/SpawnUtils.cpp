@@ -53,9 +53,10 @@ ge::GameObject* bombGame::spawnUtils::SpawnPlayerAt(ge::Scene& scene, LevelGrid&
 	const float playerScale{ tileSize / (playerSheet->GetFrameWidth() + 1) };
 	playerTr->SetLocalScale({ playerScale, playerScale, 1.f });
 
+	const float playerCollSize{ tileSize * 0.95f };
 	auto playerBoxColl{ playerGO->AddComponent<ge::BoxCollider>(playerGO.get(),
-		glm::vec2{tileSize - 4.f, tileSize - 4.f}, true,
-		glm::vec2{-tileSize * 0.5f , -tileSize * 0.5f}) };
+		glm::vec2{playerCollSize, playerCollSize}, true,
+		glm::vec2{-playerCollSize * 0.5f , -playerCollSize * 0.5f}) };
 	playerBoxColl->AssignTag("Player");
 
 	playerGO->AddComponent<ge::HealthComponent>(playerGO.get(), 1);
@@ -103,9 +104,10 @@ ge::GameObject* bombGame::spawnUtils::SpawnEnemyPlayerAt(ge::Scene& scene, Level
 	tr->SetLocalPosition({ pos->x, pos->y, 0.f });
 	tr->SetLocalScale({ 3.f, 3.f, 1.f });
 
+	const float collSize{ tileSize * 0.95f };
 	auto player1BoxColl{ enemyPlayerGO->AddComponent<ge::BoxCollider>(enemyPlayerGO.get(),
-		glm::vec2{tileSize - 4.f, tileSize - 4.f}, true,
-		glm::vec2{-tileSize * 0.5f , -tileSize * 0.5f}) };
+		glm::vec2{collSize, collSize}, true,
+		glm::vec2{-collSize * 0.5f , -collSize * 0.5f}) };
 	player1BoxColl->AssignTag("Enemy");
 
 	enemyPlayerGO->AddComponent<ge::HealthComponent>(enemyPlayerGO.get(), 1);
