@@ -364,8 +364,8 @@
 			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_NORTH, ControllerButton::Y);
 
 			uint32_t buttonChanges{ state.sdlButtonsCurrent ^ state.sdlButtonsPrevious };
-			buttonsPressedThisFrame = buttonChanges & state.sdlButtonsCurrent;
-			buttonsReleasedThisFrame = buttonChanges & (~state.sdlButtonsCurrent);
+			state.buttonsPressedThisFrame = buttonChanges & state.sdlButtonsCurrent;
+			state.buttonsReleasedThisFrame = buttonChanges & (~state.sdlButtonsCurrent);
 	#endif
 		}
 
@@ -405,7 +405,7 @@
 	#ifdef _WIN32
 			return m_Controllers[controllerIndex].currentState.Gamepad.wButtons & button;
 	#else
-			return m_SDLButtonsCurrent & button;
+			return m_Controllers[controllerIndex].sdlButtonsCurrent & button;
 	#endif
 		}
 
