@@ -41,7 +41,6 @@ void bombGame::MainMenuGameState::OnEnter()
 	selectionFont->SetBold(true);
 	constexpr SDL_Color colorWhite{ SDL_Color{220, 220, 220, 255} };
 	constexpr SDL_Color colorYellow{ SDL_Color{220, 220, 60, 255} };
-	constexpr SDL_Color colorRed{ SDL_Color{230, 30, 40, 255} };
 
 	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
 	

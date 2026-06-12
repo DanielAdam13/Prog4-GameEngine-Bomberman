@@ -12,6 +12,7 @@
 #include "SceneManager.h"
 #include "Components/TextComponent.h"
 #include "Components/Transform.h"
+#include "Components/Image.h"
 #include "SoundIds.h"
 #include "Services/SoundSystem.h"
 #include "GameObject.h"
@@ -29,6 +30,8 @@ bombGame::PlayerModeState::PlayerModeState(BombermanGame& game)
 void bombGame::PlayerModeState::OnEnter()
 {
 	// Resources
+	const auto blackTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BlackScreen.png") };
+
 	const auto bigTitleFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 80) };
 	bigTitleFont->SetBold(true);
 	const auto smallTitleFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 60) };
@@ -48,6 +51,11 @@ void bombGame::PlayerModeState::OnEnter()
 	ge::Scene& playerModeScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::PlayerModeSelection) };
 
 	// Object initalization:
+	auto blackBackgroundGO = std::make_unique<ge::GameObject>("GO_BlackBacgkround");
+	blackBackgroundGO->AddComponent<ge::Image>(blackBackgroundGO.get())->SetTexture(blackTexture);
+	blackBackgroundGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.8f, 1.f);
+	playerModeScene.Add(std::move(blackBackgroundGO));
+
 	auto selectionTitleGO1 = std::make_unique<ge::GameObject>("GO_SelectionTitle1");
 	selectionTitleGO1->AddComponent<ge::TextComponent>(selectionTitleGO1.get(), "SELECT", bigTitleFont, colorRed);
 	selectionTitleGO1->GetComponent<ge::Transform>()->SetLocalPosition({ 230.f, windowSize.second * 0.1f, 0.f });
