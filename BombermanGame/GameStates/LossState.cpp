@@ -50,7 +50,7 @@ void bombGame::LossState::OnEnter()
 	scoreGO->AddComponent<ge::TextComponent>(scoreGO.get(),
 		std::to_string(GetBombermanGame().GetCurrentGameSession().totalScore), bigTitleFont, colorRed);
 	scoreGO->GetComponent<ge::Transform>()->SetLocalPosition({ 
-		designSize.first * 0.35f, designSize.second * 0.55f, 0.f });
+		designSize.first * 0.4f, designSize.second * 0.65f, 0.f });
 	lossScene.Add(std::move(scoreGO));
 
 	// !! Save High Score !!

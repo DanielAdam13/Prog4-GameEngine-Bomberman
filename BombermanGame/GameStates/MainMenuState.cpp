@@ -74,7 +74,7 @@ void bombGame::MainMenuGameState::OnEnter()
 
 	auto highScoreChoiceGO = std::make_unique<ge::GameObject>("GO_HighScoresChoice");
 	highScoreChoiceGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		designSize.first * 0.3f, designSize.second * 0.77f, 0.f });
+		designSize.first * 0.28f, designSize.second * 0.77f, 0.f });
 	highScoreChoiceGO->AddComponent<ge::TextComponent>(highScoreChoiceGO.get(), "HIGH SCORES", selectionFont, colorWhite);
 	auto* highSelComp{ highScoreChoiceGO->AddComponent<SelectableTextComponent>(highScoreChoiceGO.get(), colorWhite, colorYellow,
 		[this]() -> void

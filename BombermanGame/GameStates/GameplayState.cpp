@@ -401,7 +401,7 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 			}))
 		{
 			// Check Defeat - go into Loss State, else go into StageTransitionState -> GameplayState
-			if (GetCachedGameSession().playerLives == 0)
+			if (GetCachedGameSession().playerLives <= 1)
 			{
 				GetBombermanGame().FailStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore());
 				return std::make_unique<LossState>(GetBombermanGame());

@@ -2,6 +2,7 @@
 #include "BombermanGame.h"
 #include "SoundManager.h"
 #include "Commands/SwitchToMainMenuCommand.h"
+#include "Components/Image.h"
 
 #include "SceneManager.h"
 #include "Renderer.h"
@@ -24,21 +25,29 @@ bombGame::HighScoreState::HighScoreState(BombermanGame& game)
 
 void bombGame::HighScoreState::OnEnter()
 {
-    auto& scene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::HighScores) };
+    auto& highScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::HighScores) };
    
     // --- Resources ---
+    const auto blackTexture{ ge::ResourceManager::GetInstance().LoadTexture("sprites/I_BlackScreen.png") };
+
     const auto font{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 40) };
     constexpr SDL_Color colorWhite{ 220, 220, 220, 255 };
     constexpr SDL_Color colorYellow{ 220, 220, 60, 255 };
 
     const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
+    // BG
+    auto blackBackgroundGO = std::make_unique<ge::GameObject>("GO_BlackBacgkround");
+    blackBackgroundGO->AddComponent<ge::Image>(blackBackgroundGO.get())->SetTexture(blackTexture);
+    blackBackgroundGO->GetComponent<ge::Transform>()->SetLocalScale(0.7f, 0.8f, 1.f);
+    highScene.Add(std::move(blackBackgroundGO));
+
     // Title
     auto titleGO = std::make_unique<ge::GameObject>("GO_HighScoreTitle");
     titleGO->AddComponent<ge::TextComponent>(titleGO.get(), "HIGH SCORES", font, colorYellow);
     titleGO->GetComponent<ge::Transform>()->SetLocalPosition({
         designSize.first * 0.3f, designSize.second * 0.1f, 0.f });
-    scene.Add(std::move(titleGO));
+    highScene.Add(std::move(titleGO));
 
     // Entries
     const auto& entries{ GetBombermanGame().GetHighScoreList().GetEntries() };
@@ -56,7 +65,7 @@ void bombGame::HighScoreState::OnEnter()
         rowGO->AddComponent<ge::TextComponent>(rowGO.get(), row, font, colorWhite);
         rowGO->GetComponent<ge::Transform>()->SetLocalPosition({
             designSize.first * 0.25f, baseY + i * rowSpacing, 0.f });
-        scene.Add(std::move(rowGO));
+        highScene.Add(std::move(rowGO));
     }
 
     // Input: any key returns to main menu
