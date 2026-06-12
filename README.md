@@ -12,8 +12,14 @@ Minigin can/may be used as a start project for the exam assignment in the course
 
 # Architectural Rules
 
-- No Component can add/remove other components from its owner internally.
+- Commands are intent, Components are behavior
+- Mutatation during iteation is bad - defer to a later point (Mark For Delete, Pending Additions)
+- No Component can add/remove other components from its owner internally
+- Class for state and behavior / Namespace for stateless logic
+- Data lives with the system that owns it (Stage descriptors -> stage Loader, Camera -> Gameplay State)
+- Tie a resource's lifetime to an object's lifetime - apply RAII (Obsever auto-unsubscribe, no raw pointers for ownership)
 
+---
 
 # Used Design Patterns
 
