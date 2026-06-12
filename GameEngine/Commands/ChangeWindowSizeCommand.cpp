@@ -2,7 +2,9 @@
 #include "Renderer.h"
 
 ge::ChangeWindowSizeCommand::ChangeWindowSizeCommand(const int changeSizeX, const int changeSizeY)
-	:m_OriginalSize{ Renderer::GetInstance().GetWindowSize().first, Renderer::GetInstance().GetWindowSize().second },
+	:m_OriginalSize{ 
+		static_cast<int>(Renderer::GetInstance().GetWindowDesignSize().first), 
+		static_cast<int>(Renderer::GetInstance().GetWindowDesignSize().second) },
 	m_ChangedSize{ changeSizeX, changeSizeY },
 	m_IsInChanged{ false }
 {

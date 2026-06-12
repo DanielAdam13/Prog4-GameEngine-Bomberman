@@ -31,8 +31,11 @@ void Renderer::Init(SDL_Window* window, const int windowX, const int windowY)
 		throw std::runtime_error(std::string("SDL_CreateRenderer Error: ") + SDL_GetError());
 	}
 
+	// !!
 	m_CurrentWindowSize = { windowX, windowY };
+	m_RenderScale = { 1.f, 1.f };
 	m_ConstantDesignSize = { static_cast<float>(windowX), static_cast<float>(windowY) };
+	// !!
 
 	// ---- Initialize ImGui ----
 	IMGUI_CHECKVERSION();
@@ -139,12 +142,12 @@ void ge::Renderer::RenderTextureRegion(const Texture2D& texture, const SDL_FRect
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), &srcRect, &dst);
 }
 
-std::pair<int, int> Renderer::GetWindowSize() const
-{
-	int w{}, h{};
-	SDL_GetWindowSize(m_Window, &w, &h);
-	return std::pair<int, int>(w, h);
-}
+//std::pair<int, int> Renderer::GetWindowSize() const
+//{
+//	int w{}, h{};
+//	SDL_GetWindowSize(m_Window, &w, &h);
+//	return std::pair<int, int>(w, h);
+//}
 
 void Renderer::SetWindowSize(std::pair<int, int> newSize)
 {

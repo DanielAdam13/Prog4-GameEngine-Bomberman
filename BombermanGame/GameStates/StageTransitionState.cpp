@@ -38,7 +38,7 @@ void bombGame::StageTransitionState::OnEnter()
 	stageFont->SetBold(true);
 
 	// Game Object(s)
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
 	auto blackBackgroundGO = std::make_unique<ge::GameObject>("GO_BlackBacgkround");
 	blackBackgroundGO->AddComponent<ge::Image>(blackBackgroundGO.get())->SetTexture(blackTexture);
@@ -55,7 +55,7 @@ void bombGame::StageTransitionState::OnEnter()
 	tutorial1GO->AddComponent<ge::TextComponent>(tutorial1GO.get(),
 		"D-Pad to move Player 1 | A bomb | B detonate(if)", tutFont, colorGray);
 	tutorial1GO->GetComponent<ge::Transform>()->SetLocalPosition(
-		glm::vec3{ windowSize.first * 0.05f, windowSize.second * 0.7f, 0.f });
+		glm::vec3{ designSize.first * 0.05f, designSize.second * 0.7f, 0.f });
 	tutorial1GO->SetIgnoreCamera(true);
 	transitionScene.Add(std::move(tutorial1GO));
 
@@ -63,7 +63,7 @@ void bombGame::StageTransitionState::OnEnter()
 	tutorial2GO->AddComponent<ge::TextComponent>(tutorial2GO.get(),
 		"WASD to move Player 2 | SPACE bomb | X detonate(if) ", tutFont, colorGray);
 	tutorial2GO->GetComponent<ge::Transform>()->SetLocalPosition(
-		glm::vec3{ windowSize.first * 0.05f, windowSize.second * 0.8f, 0.f });
+		glm::vec3{ designSize.first * 0.05f, designSize.second * 0.8f, 0.f });
 	tutorial2GO->SetIgnoreCamera(true);
 	transitionScene.Add(std::move(tutorial2GO));
 
@@ -71,7 +71,7 @@ void bombGame::StageTransitionState::OnEnter()
 	tutorial3GO->AddComponent<ge::TextComponent>(tutorial3GO.get(),
 		"F2 mute | F1 skip | R reset ", tutFont, colorGray);
 	tutorial3GO->GetComponent<ge::Transform>()->SetLocalPosition(
-		glm::vec3{ windowSize.first * 0.6f, windowSize.second * 0.05f, 0.f });
+		glm::vec3{ designSize.first * 0.6f, designSize.second * 0.05f, 0.f });
 	tutorial3GO->SetIgnoreCamera(true);
 	transitionScene.Add(std::move(tutorial3GO));
 	

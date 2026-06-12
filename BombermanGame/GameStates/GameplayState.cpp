@@ -13,6 +13,7 @@
 #include "Commands/SwitchToTransitionStateCommand.h"
 #include "Commands/SkipGameplayStageCommand.h"
 #include "Commands/RemoteBombDetonateCommand.h"
+#include "Commands/ChangeWindowSizeCommand.h"
 #include "Commands/ToggleMuteCommand.h"
 
 #include "GameObject.h"
@@ -96,9 +97,9 @@ void bombGame::GameplayGameState::OnEnter()
 	// --- Static objects initialization ---
 	ge::Scene& gameplayScene{ ge::SceneManager::GetInstance().CreateScene(sceneNames::Gameplay) };
 
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
-	const glm::vec3 topBgPosition{ 0.f, windowSize.second / 10.7f, 0.f };
+	const glm::vec3 topBgPosition{ 0.f, designSize.second / 10.7f, 0.f };
 	auto backgroundGO = std::make_unique<ge::GameObject>("GO_Background");
 	backgroundGO->AddComponent<ge::Image>(backgroundGO.get())->SetTexture(backgroundTexture);
 	backgroundGO->GetComponent<ge::Transform>()->SetLocalScale(3.5f, 3.5f, 1.f);
@@ -117,7 +118,7 @@ void bombGame::GameplayGameState::OnEnter()
 
 	levelLoader::LevelLayout layout{ levelLoader::Load(
 		ge::ResourceManager::GetInstance().GetFullPath("levels/" + stage.layoutFile)) };
-	const float tileSize{ (static_cast<float>(windowSize.second) - topBgPosition.y) / layout.height };
+	const float tileSize{ (static_cast<float>(designSize.second) - topBgPosition.y) / layout.height };
 	const float mapWidth{ tileSize * layout.width };
 	const float mapHeight{ tileSize * (layout.height - 1.5f) };
 
@@ -228,7 +229,7 @@ void bombGame::GameplayGameState::OnEnter()
 		"LEFT " + std::to_string(GetCachedGameSession().playerLives), displaysFont, colorWhite);
 	//healthDisplayGO->AddComponent<HealthDisplayComponent>(healthDisplayGO.get(), player1GO.get());
 	healthDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.8f, windowSize.second * 0.02f, 0.f });
+		designSize.first * 0.8f, designSize.second * 0.02f, 0.f });
 	healthDisplayGO->SetIgnoreCamera(true);
 	gameplayScene.Add(std::move(healthDisplayGO));
 
@@ -237,7 +238,7 @@ void bombGame::GameplayGameState::OnEnter()
 	scoreDisplayGO->AddComponent<ge::TextComponent>(scoreDisplayGO.get(), "00", displaysFont, colorWhite);
 	scoreDisplayGO->AddComponent<ScoreDisplayComponent>(scoreDisplayGO.get(), m_TrackedPlayers[0]);
 	scoreDisplayGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.5f, windowSize.second * 0.02f, 0.f });
+		designSize.first * 0.5f, designSize.second * 0.02f, 0.f });
 	scoreDisplayGO->SetIgnoreCamera(true);
 	gameplayScene.Add(std::move(scoreDisplayGO));
 
@@ -262,7 +263,7 @@ void bombGame::GameplayGameState::OnEnter()
 	fpsGO->AddComponent<ge::TextComponent>(fpsGO.get(), "", debugFont, colorRed);
 	fpsGO->AddComponent<ge::FPSComponent>(fpsGO.get());
 	fpsGO->GetComponent<ge::Transform>()->
-		SetLocalPosition({ 10.f, windowSize.second * 0.9f, 0.f });
+		SetLocalPosition({ 10.f, designSize.second * 0.9f, 0.f });
 	fpsGO->SetIgnoreCamera(true);
 
 	gameplayScene.Add(std::move(fpsGO));
@@ -272,8 +273,8 @@ void bombGame::GameplayGameState::OnEnter()
 	// Camera + Folow
 	// =================================================
 	m_GameplayCamera = std::make_unique<ge::Camera>(glm::vec2{
-		static_cast<float>(ge::Renderer::GetInstance().GetWindowSize().first),
-		static_cast<float>(ge::Renderer::GetInstance().GetWindowSize().second) });
+		static_cast<float>(ge::Renderer::GetInstance().GetWindowDesignSize().first),
+		static_cast<float>(ge::Renderer::GetInstance().GetWindowDesignSize().second) });
 	m_GameplayCamera->SetBounds(
 		{ topBgPosition.x, topBgPosition.y },
 		{ topBgPosition.x + mapWidth, topBgPosition.y + mapHeight }
@@ -322,6 +323,8 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<SkipGameplayStageCommand>(GetBombermanGame()));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 
 	// --------------------
 	// First player 

@@ -6,9 +6,6 @@
 #include "SoundIds.h"
 #include "ResourceManager.h"
 
-#include "Services/InputManager.h"
-#include "Commands/ChangeWindowSizeCommand.h"
-
 #include "SoundManager.h"
 
 #include "CollisionSystem.h"
@@ -21,9 +18,6 @@ bombGame::BombermanGame::BombermanGame()
 
 void bombGame::BombermanGame::Load()
 {
-	/*ge::ServiceLocator::GetInputManager().BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
-		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));*/
-
 	LoadSound();
 
 	// Collision

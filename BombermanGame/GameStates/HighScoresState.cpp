@@ -31,18 +31,18 @@ void bombGame::HighScoreState::OnEnter()
     constexpr SDL_Color colorWhite{ 220, 220, 220, 255 };
     constexpr SDL_Color colorYellow{ 220, 220, 60, 255 };
 
-    const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+    const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
     // Title
     auto titleGO = std::make_unique<ge::GameObject>("GO_HighScoreTitle");
     titleGO->AddComponent<ge::TextComponent>(titleGO.get(), "HIGH SCORES", font, colorYellow);
     titleGO->GetComponent<ge::Transform>()->SetLocalPosition({
-        windowSize.first * 0.3f, windowSize.second * 0.1f, 0.f });
+        designSize.first * 0.3f, designSize.second * 0.1f, 0.f });
     scene.Add(std::move(titleGO));
 
     // Entries
     const auto& entries{ GetBombermanGame().GetHighScoreList().GetEntries() };
-    const float baseY{ windowSize.second * 0.25f };
+    const float baseY{ designSize.second * 0.25f };
     constexpr float rowSpacing{ 50.f };
 
     for (size_t i{}; i < entries.size(); ++i) 
@@ -55,7 +55,7 @@ void bombGame::HighScoreState::OnEnter()
         auto rowGO = std::make_unique<ge::GameObject>("GO_HighScoreRow" + std::to_string(i));
         rowGO->AddComponent<ge::TextComponent>(rowGO.get(), row, font, colorWhite);
         rowGO->GetComponent<ge::Transform>()->SetLocalPosition({
-            windowSize.first * 0.3f, baseY + i * rowSpacing, 0.f });
+            designSize.first * 0.25f, baseY + i * rowSpacing, 0.f });
         scene.Add(std::move(rowGO));
     }
 

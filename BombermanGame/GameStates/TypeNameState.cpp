@@ -5,7 +5,10 @@
 #include "Commands/ConfirmSelectionCommand.h"
 #include "SoundManager.h"
 #include "MainMenuState.h"
+#include "Commands/ChangeWindowSizeCommand.h"
 #include "Commands/ToggleMuteCommand.h"
+#include "SoundIds.h"
+#include "Services/SoundSystem.h"
 
 #include "ResourceManager.h"
 #include "Renderer.h"
@@ -38,7 +41,7 @@ void bombGame::TypeNameState::OnEnter()
 	constexpr SDL_Color colorWhite{ SDL_Color{220, 220, 220, 255} };
 	constexpr SDL_Color colorYellow{ SDL_Color{220, 220, 60, 255} };
 
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
 	// ---------------------
 	// Initialize Scene
@@ -51,8 +54,8 @@ void bombGame::TypeNameState::OnEnter()
 	textSelectionScene.Add(std::move(nameScreenGO));
 
 	// Object initalization:
-	const float baseX{ windowSize.first * 0.3f };
-	const float baseY{ windowSize.second * 0.5f };
+	const float baseX{ designSize.first * 0.3f };
+	const float baseY{ designSize.second * 0.5f };
 	constexpr float slotSpacing{ 60.f };
 
 	// Letters
@@ -90,6 +93,8 @@ void bombGame::TypeNameState::OnEnter()
 	// ---------------------
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 
@@ -143,6 +148,10 @@ void bombGame::TypeNameState::MoveHover(std::pair<int, int> delta)
 		m_Selectables[m_CurrentHoverIndex]->OnExit();
 		m_CurrentHoverIndex = static_cast<size_t>(newIndex);
 		m_Selectables[m_CurrentHoverIndex]->OnHover();
+
+		// Play Sound
+		GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StepHorizontal, 0.3f, ge::SoundCategory::SFX);
+
 		return;
 	}
 
@@ -161,6 +170,9 @@ void bombGame::TypeNameState::MoveHover(std::pair<int, int> delta)
 			letter = 'Z';
 
 		m_Selectables[m_CurrentHoverIndex]->SetText(std::string(1, letter));
+
+		// Play Sound
+		GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StepVertical, 0.3f, ge::SoundCategory::SFX);
 	}
 }
 

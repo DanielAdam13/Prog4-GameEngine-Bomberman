@@ -33,7 +33,7 @@ void bombGame::LossState::OnEnter()
 	//constexpr SDL_Color colorYellow{ SDL_Color{220, 220, 60, 255} };
 	constexpr SDL_Color colorRed{ SDL_Color{230, 30, 40, 255} };
 
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 
 	// ---------------------
 	// Initialize Scene
@@ -50,7 +50,7 @@ void bombGame::LossState::OnEnter()
 	scoreGO->AddComponent<ge::TextComponent>(scoreGO.get(),
 		std::to_string(GetBombermanGame().GetCurrentGameSession().totalScore), bigTitleFont, colorRed);
 	scoreGO->GetComponent<ge::Transform>()->SetLocalPosition({ 
-		windowSize.first * 0.35f, windowSize.second * 0.55f, 0.f });
+		designSize.first * 0.35f, designSize.second * 0.55f, 0.f });
 	lossScene.Add(std::move(scoreGO));
 
 	// !! Save High Score !!

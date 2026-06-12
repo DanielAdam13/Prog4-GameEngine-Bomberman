@@ -31,7 +31,7 @@ namespace ge
 		const SDL_Color& GetBackgroundColor() const { return m_ClearColor; }
 		void SetBackgroundColor(const SDL_Color& color) { m_ClearColor = color; }
 
-		std::pair<int, int> GetWindowSize() const;
+		//std::pair<int, int> GetWindowSize() const;
 
 		void SetWindowSize(std::pair<int, int>);
 
@@ -50,7 +50,7 @@ namespace ge
 		SDL_Color m_ClearColor{};
 
 		std::pair<int, int> m_CurrentWindowSize;
-		std::pair<float, float> m_RenderScale;
+		std::pair<float, float> m_RenderScale{ 1.f, 1.f };
 		std::pair<float, float> m_ConstantDesignSize;
 	
 		Subject m_OnScreenResizeEvent;

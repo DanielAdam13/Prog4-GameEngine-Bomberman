@@ -3,6 +3,7 @@
 #include "SoundManager.h"
 #include "SoundIds.h"
 #include "Commands/ToggleMuteCommand.h"
+#include "Commands/ChangeWindowSizeCommand.h"
 #include "Components/SelectableTextComponent.h"
 #include "Commands/HoverSelectableCommand.h"
 #include "Commands/ConfirmSelectionCommand.h"
@@ -42,7 +43,7 @@ void bombGame::MainMenuGameState::OnEnter()
 	constexpr SDL_Color colorWhite{ SDL_Color{220, 220, 220, 255} };
 	constexpr SDL_Color colorYellow{ SDL_Color{220, 220, 60, 255} };
 
-	const auto windowSize{ ge::Renderer::GetInstance().GetWindowSize() };
+	const auto designSize{ ge::Renderer::GetInstance().GetWindowDesignSize() };
 	
 	// ---------------------
 	// Initialize Scene
@@ -59,7 +60,7 @@ void bombGame::MainMenuGameState::OnEnter()
 	// Selectable text
 	auto startChoiceGO = std::make_unique<ge::GameObject>("GO_StartChoice");
 	startChoiceGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.4f, windowSize.second * 0.65f, 0.f });
+		designSize.first * 0.4f, designSize.second * 0.65f, 0.f });
 	startChoiceGO->AddComponent<ge::TextComponent>(startChoiceGO.get(), "START", selectionFont, colorWhite);
 	auto* startSelComp{ startChoiceGO->AddComponent<SelectableTextComponent>(startChoiceGO.get(), colorWhite, colorYellow,
 		[this]() -> void
@@ -73,7 +74,7 @@ void bombGame::MainMenuGameState::OnEnter()
 
 	auto highScoreChoiceGO = std::make_unique<ge::GameObject>("GO_HighScoresChoice");
 	highScoreChoiceGO->GetComponent<ge::Transform>()->SetLocalPosition({
-		windowSize.first * 0.3f, windowSize.second * 0.77f, 0.f });
+		designSize.first * 0.3f, designSize.second * 0.77f, 0.f });
 	highScoreChoiceGO->AddComponent<ge::TextComponent>(highScoreChoiceGO.get(), "HIGH SCORES", selectionFont, colorWhite);
 	auto* highSelComp{ highScoreChoiceGO->AddComponent<SelectableTextComponent>(highScoreChoiceGO.get(), colorWhite, colorYellow,
 		[this]() -> void
@@ -94,6 +95,8 @@ void bombGame::MainMenuGameState::OnEnter()
 	// ---------------------
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_F11, ge::InputManager::InputTrigger::Up,
+		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_F2, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ToggleMuteCommand>(GetBombermanGame()));
 
@@ -120,7 +123,7 @@ void bombGame::MainMenuGameState::OnEnter()
 		std::make_unique<ConfirmSelectionCommand>(this));
 
 	// Play Sound
-	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.3f, ge::SoundCategory::Music);
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.2f, ge::SoundCategory::Music);
 
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::MainMenu);
 }
@@ -147,6 +150,9 @@ void bombGame::MainMenuGameState::MoveHover(std::pair<int, int> delta)
 	m_Selectables[m_CurrentHoverIndex]->OnExit();
 	m_CurrentHoverIndex = static_cast<size_t>(newIndex);
 	m_Selectables[m_CurrentHoverIndex]->OnHover();
+
+	// Play Sound
+	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StepVertical, 0.3f, ge::SoundCategory::SFX);
 }
 
 void bombGame::MainMenuGameState::ConfirmCurrentSelection()
