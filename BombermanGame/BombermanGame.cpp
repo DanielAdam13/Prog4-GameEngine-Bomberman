@@ -35,6 +35,8 @@ void bombGame::BombermanGame::Load()
 	ge::CollisionSystem::GetInstance().AddLayerTag("Powerup");
 
 	m_GameStateMachine.SetInitialState(*this);
+
+	m_HighScores.LoadFromFile(filePath::ScoreFilePath);
 }
 
 void bombGame::BombermanGame::Update(float deltaTime)
@@ -103,6 +105,15 @@ void bombGame::BombermanGame::SetPlayerMode(PlayerMode mode)
 void bombGame::BombermanGame::SetPlayerName(const std::string& newName)
 {
 	m_CurrentGameSession.name = newName;
+}
+
+void bombGame::BombermanGame::SaveEntryToHighScore()
+{
+	HighScoreEntry entry{ m_CurrentGameSession.name, m_CurrentGameSession.totalScore };
+	const bool qualified{ m_HighScores.TryInsert(entry) };
+
+	if (qualified)
+		m_HighScores.SaveToFile(filePath::ScoreFilePath);
 }
 
 void bombGame::BombermanGame::LoadSound()

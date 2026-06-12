@@ -30,7 +30,6 @@ void bombGame::LossState::OnEnter()
 
 	const auto bigTitleFont{ ge::ResourceManager::GetInstance().LoadFont("fonts/Lingua.otf", 70) };
 	bigTitleFont->SetBold(true);
-
 	//constexpr SDL_Color colorYellow{ SDL_Color{220, 220, 60, 255} };
 	constexpr SDL_Color colorRed{ SDL_Color{230, 30, 40, 255} };
 
@@ -53,6 +52,9 @@ void bombGame::LossState::OnEnter()
 	scoreGO->GetComponent<ge::Transform>()->SetLocalPosition({ 
 		windowSize.first * 0.35f, windowSize.second * 0.55f, 0.f });
 	lossScene.Add(std::move(scoreGO));
+
+	// !! Save High Score !!
+	GetBombermanGame().SaveEntryToHighScore();
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameLost, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Loss);

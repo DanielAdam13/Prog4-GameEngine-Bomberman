@@ -7,6 +7,7 @@
 #include "Commands/HoverSelectableCommand.h"
 #include "Commands/ConfirmSelectionCommand.h"
 #include "StageTransitionState.h"
+#include "HighScoresState.h"
 
 #include "GameObject.h"
 #include "Components/Image.h"
@@ -64,6 +65,7 @@ void bombGame::MainMenuGameState::OnEnter()
 	auto* startSelComp{ startChoiceGO->AddComponent<SelectableTextComponent>(startChoiceGO.get(), colorWhite, colorYellow,
 		[this]() -> void
 		{
+			// Manual Switch
 			GetBombermanGame().GetStateMachine().RequestStateTransition(
 				std::make_unique<StageTransitionState>(GetBombermanGame()));
 		}) };
@@ -77,8 +79,9 @@ void bombGame::MainMenuGameState::OnEnter()
 	auto* highSelComp{ highScoreChoiceGO->AddComponent<SelectableTextComponent>(highScoreChoiceGO.get(), colorWhite, colorYellow,
 		[this]() -> void
 		{
+			// Manual Switch
 			GetBombermanGame().GetStateMachine().RequestStateTransition(
-				std::make_unique<StageTransitionState>(GetBombermanGame()));
+				std::make_unique<HighScoreState>(GetBombermanGame()));
 		}) };
 	m_Selectables.push_back(highSelComp);
 	mainMenuScene.Add(std::move(highScoreChoiceGO));

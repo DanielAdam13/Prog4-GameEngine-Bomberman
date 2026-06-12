@@ -154,7 +154,7 @@ void bombGame::PlayerModeState::ConfirmCurrentSelection()
 
 	m_Selectables[m_CurrentHoverIndex]->OnSelected();
 
-	// Transition to next state
+	// Manual Switch
 	GetBombermanGame().GetStateMachine().RequestStateTransition(
 		std::make_unique<TypeNameState>(GetBombermanGame()));
 }

@@ -54,6 +54,9 @@ void bombGame::VictoryState::OnEnter()
 		windowSize.first * 0.35f, windowSize.second * 0.55f, 0.f });
 	victoryScene.Add(std::move(scoreGO));
 
+	// !! Save High Score !!
+	GetBombermanGame().SaveEntryToHighScore();
+
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::StageWon, 0.3f, ge::SoundCategory::Music);
 	ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::Victory);
 }

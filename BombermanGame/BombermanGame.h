@@ -3,6 +3,7 @@
 #include "GameStates/GameStateMachine.h"
 #include "SoundManager.h"
 #include "PowerupType.h"
+#include "HighScoreList.h"
 
 #include <memory>
 #include <vector>
@@ -66,6 +67,9 @@ namespace bombGame
 		void SetPlayerMode(PlayerMode mode);
 		void SetPlayerName(const std::string& newName);
 
+		HighScoreList& GetHighScoreList() noexcept { return m_HighScores; }
+		void SaveEntryToHighScore();
+
 	private:
 		GameStateMachine m_GameStateMachine{};
 
@@ -75,6 +79,8 @@ namespace bombGame
 		void LoadSound();
 
 		GameSession m_CurrentGameSession{};
+
+		HighScoreList m_HighScores{};
 	};
 
 	namespace sceneNames
@@ -82,10 +88,16 @@ namespace bombGame
 		inline constexpr auto PlayerModeSelection{ "S_PlayerModeSelection" };
 		inline constexpr auto NameSelection{ "S_NameSelection" };
 		inline constexpr auto MainMenu{ "S_MainMenu" };
+		inline constexpr auto HighScores{ "S_HighScores" };
 		inline constexpr auto Gameplay{ "S_Gameplay" };
 		inline constexpr auto GameOver{ "S_GameOver" };
 		inline constexpr auto Transition{ "S_Transition" };
 		inline constexpr auto Victory{ "S_Victory" };
 		inline constexpr auto Loss{ "S_Loss" };
+	}
+
+	namespace filePath
+	{
+		inline constexpr auto ScoreFilePath{ "scores.csv" };
 	}
 }

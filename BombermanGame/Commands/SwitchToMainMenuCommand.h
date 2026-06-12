@@ -6,10 +6,10 @@ namespace bombGame
 	class BombermanGame;
 
 	// Game-specific Command, calls RequestStateChange from the Game State Machine
-	class SwitchToTransitionCommand final : public ge::Command
+	class SwitchToMainMenuCommand final : public ge::Command
 	{
 	public:
-		SwitchToTransitionCommand(BombermanGame& game);
+		SwitchToMainMenuCommand(BombermanGame& game);
 
 		virtual void Execute(float) override;
 
