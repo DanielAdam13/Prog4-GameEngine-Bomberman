@@ -13,7 +13,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Image Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 3 };
+		static constexpr ComponentTypeID StaticTypeID{ 45 };
 
 		FPSComponent(GameObject* pOwnerPtr);
 		~FPSComponent() override = default;

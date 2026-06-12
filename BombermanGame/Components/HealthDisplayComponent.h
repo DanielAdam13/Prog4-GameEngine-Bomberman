@@ -14,7 +14,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Health Display Component Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 8 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 2 };
 
 		HealthDisplayComponent(ge::GameObject* owner, ge::GameObject* trackedPlayer);
 		~HealthDisplayComponent() override = default;

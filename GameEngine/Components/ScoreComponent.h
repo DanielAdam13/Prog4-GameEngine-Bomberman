@@ -10,7 +10,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every ScoreComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 6 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 44 };
 
 		ScoreComponent(ge::GameObject* pOwnerPtr, int startingScore);
 		virtual ~ScoreComponent() override = default;

@@ -14,7 +14,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Explosion Component Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 19 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 9 };
 
 		BreakableWallComponent(ge::GameObject* owner, float crumblingDuration);
 		~BreakableWallComponent() override = default;

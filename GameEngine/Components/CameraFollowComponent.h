@@ -13,7 +13,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Anomator Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 18 };
+		static constexpr ComponentTypeID StaticTypeID{ 42 };
 
 		CameraFollowComponent(GameObject* ownerPtr, Camera* camera, float smoothFactor = 5.f);
 		~CameraFollowComponent() override = default;

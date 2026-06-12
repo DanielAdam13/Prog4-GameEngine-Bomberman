@@ -13,7 +13,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Timer Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 22 };
+		static constexpr ComponentTypeID StaticTypeID{ 43 };
 
 		enum class TimerType
 		{

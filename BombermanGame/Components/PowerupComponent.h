@@ -15,7 +15,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every PowerupComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 20 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 8 };
 
 		PowerupComponent(ge::GameObject* owner, PowerupType type, int score);
 		~PowerupComponent() override = default;

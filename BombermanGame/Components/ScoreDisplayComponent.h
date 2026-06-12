@@ -14,7 +14,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Score Display Component Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 9 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 1 };
 
 		ScoreDisplayComponent(ge::GameObject* owner, ge::GameObject* trackedPlayer);
 		~ScoreDisplayComponent() override = default;

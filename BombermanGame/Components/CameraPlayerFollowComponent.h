@@ -17,7 +17,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Anomator Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 21 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 5 };
 
 		CameraPlayerFollowComponent(ge::GameObject* ownerPtr, ge::Camera* camera, float smoothFactor = 5.f);
 		~CameraPlayerFollowComponent() override = default;

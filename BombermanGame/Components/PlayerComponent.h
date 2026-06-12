@@ -23,7 +23,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every PlayerComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 7 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 0 };
 
 		explicit PlayerComponent(ge::GameObject* owner, float speed = 120.f, bool takesContactDamage = true);
 		~PlayerComponent() override; // does nothing, look at implementation for details

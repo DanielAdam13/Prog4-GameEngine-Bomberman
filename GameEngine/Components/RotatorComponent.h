@@ -12,7 +12,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Rotator Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 4 };
+		static constexpr ComponentTypeID StaticTypeID{ 47 };
 
 		Rotator(GameObject* pOwnerPtr, float angularSpeedDegrees = 180.f, float radius = 50.f);
 		~Rotator() override = default;

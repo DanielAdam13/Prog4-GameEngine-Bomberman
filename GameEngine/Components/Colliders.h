@@ -68,7 +68,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every BoxCollider Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 17 };
+		static constexpr ComponentTypeID StaticTypeID{ 41 };
 
 		BoxCollider(GameObject* pOwnerPtr, const glm::vec2& size, bool ignoreOwnerSize = false, const glm::vec2& localOffset = {});
 		~BoxCollider() override;
@@ -97,7 +97,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every CircleCollider Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 15 };
+		static constexpr ComponentTypeID StaticTypeID{ 40 };
 
 		CircleCollider(GameObject* pOwnerPtr, const structs::Circle& circle);
 		~CircleCollider() override;

@@ -16,7 +16,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Text Component Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 2 };
+		static constexpr ComponentTypeID StaticTypeID{ 48 };
 
 		TextComponent(GameObject* pOwnerPtr, const std::string& text = "", Font* font = nullptr, const SDL_Color& color = {255, 255, 255, 255});
 		virtual ~TextComponent() override = default;

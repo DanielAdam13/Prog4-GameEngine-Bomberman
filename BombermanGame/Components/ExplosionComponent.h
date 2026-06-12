@@ -9,7 +9,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Explosion Component Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 16 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 7 };
 
 		ExplosionComponent(ge::GameObject* owner, float explosionDuration);
 		~ExplosionComponent() override = default;

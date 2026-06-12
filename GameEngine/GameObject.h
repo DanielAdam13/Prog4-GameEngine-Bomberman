@@ -11,7 +11,7 @@
 
 namespace ge
 {
-	static constexpr size_t MAX_GO_COMPONENTS{ 40 };
+	static constexpr size_t MAX_GO_COMPONENTS{ 51 };
 
 	class GameObject final
 	{

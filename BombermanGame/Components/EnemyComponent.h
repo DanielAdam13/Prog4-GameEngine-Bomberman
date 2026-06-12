@@ -32,7 +32,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every PlayerComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 13 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 6 };
 
 		explicit EnemyComponent(ge::GameObject* owner, LevelGrid* levelGrid, float speed, float detectionRadius, int scoreValue);
 		~EnemyComponent() override = default;

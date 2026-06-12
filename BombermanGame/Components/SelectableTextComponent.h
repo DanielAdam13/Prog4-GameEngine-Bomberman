@@ -19,7 +19,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every PlayerComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 23 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 10 };
 
 		SelectableTextComponent(ge::GameObject* owner, const SDL_Color& normalColor, const SDL_Color& selectedColor,
 			std::function<void()> selectionFunction);

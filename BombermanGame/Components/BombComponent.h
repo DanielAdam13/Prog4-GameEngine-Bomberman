@@ -20,7 +20,7 @@ namespace bombGame
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Bomb Component Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 11 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 3 };
 
 		BombComponent(ge::GameObject* owner, LevelGrid& grid, 
 			float windupDuration, int explosionArmLength, std::array<ge::SpriteSheet*, 3>& explosionSheetRef);

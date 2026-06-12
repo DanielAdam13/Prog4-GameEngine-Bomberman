@@ -12,7 +12,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every HealthComponent Instance shares the same component type ID
-		static constexpr ge::ComponentTypeID StaticTypeID{ 5 };
+		static constexpr ge::ComponentTypeID StaticTypeID{ 46 };
 
 		HealthComponent(ge::GameObject* pOwnerPtr, int maxHealth);
 		virtual ~HealthComponent() override = default;

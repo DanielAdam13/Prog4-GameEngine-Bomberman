@@ -11,7 +11,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Image Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 1 };
+		static constexpr ComponentTypeID StaticTypeID{ 49 };
 
 		Image(GameObject* pOwnerPtr);
 		virtual ~Image() override = default;

@@ -11,7 +11,7 @@ namespace ge
 	public:
 		// ---- TYPE IDENTIFIER ----
 		// Every Transform Instance shares the same component type ID
-		static constexpr ComponentTypeID StaticTypeID{ 0 };
+		static constexpr ComponentTypeID StaticTypeID{ 50 };
 
 		Transform(GameObject* pOwnerPtr);
 		Transform(GameObject* pOwnerPtr, const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scale = { 1.f, 1.f, 1.f });
