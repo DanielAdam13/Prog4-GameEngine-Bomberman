@@ -10,6 +10,7 @@
 #include <Windows.h>
 #include <Xinput.h>
 #endif
+#include <array>
 
 	namespace ge
 	{
@@ -22,24 +23,23 @@
 			~InputManagerImpl();
 
 			bool ProcessInput(float deltaTime);
-			void UpdateController(unsigned int controllerIndex = 0);
+			void UpdateAllControllers();
+			void UpdateController(unsigned int controllerIndex);
 
 			// Keyboard
 			bool IsKeyDown(SDL_Scancode) const;
 
 			// Controller
-			bool IsButtonDownThisFrame(unsigned int button) const noexcept;
-			bool IsButtonUpThisFrame(unsigned int button) const noexcept;
-			bool IsButtonPressed(unsigned int button) const noexcept;
-
-			glm::vec2 GetLeftStick() const;
-			glm::vec2 GetRightStick() const;
-
-			bool IsControllerConnected() const noexcept;
+			bool IsButtonDownThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept;
+			bool IsButtonUpThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept;
+			bool IsButtonPressed(unsigned int controllerIndex, unsigned int button) const noexcept;
 
 			void BindKeyboardCommand(SDL_Scancode key, InputManager::InputTrigger trigger, std::unique_ptr<Command> command);
-			void BindControllerCommand(unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<Command> command);
-			void BindControllerStickCommand(std::unique_ptr<Command> command);
+			void BindControllerCommand(unsigned int controllerIndex,
+				unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<Command> command);
+
+			int GetControllerCount() const noexcept;
+			bool IsControllerConnected(unsigned int controllerIndex) const noexcept;
 
 			void UnbindAll();
 			void UnbindAllKeyboard();
@@ -47,25 +47,26 @@
 			void UnbindAllCommandsOfTarget(GameObject* target);
 
 		private:
-	#ifdef _WIN32
-			XINPUT_STATE m_PreviousState{};
-			XINPUT_STATE m_CurrentState{};
-		
-	#else
-			SDL_Gamepad* m_pGamepad{ nullptr };
-			uint32_t m_SDLButtonsCurrent{ 0 };
-			uint32_t m_SDLButtonsPrevious{ 0 };
-	#endif
+			struct ControllerState
+			{
+#ifdef _WIN32
+				XINPUT_STATE previousState{};
+				XINPUT_STATE currentState{};
 
-			uint32_t m_ButtonsPressedThisFrame{ 0 };
-			uint32_t m_ButtonsReleasedThisFrame{ 0 };
+#else
+				SDL_Gamepad* pGamepad{ nullptr };
+				uint32_t sdlButtonsCurrent{ 0 };
+				uint32_t sdlButtonsPrevious{ 0 };
+#endif
 
-			bool m_ControllerConnected{ false };
-			unsigned int m_ControllerIndex{ 0 };
+				uint32_t buttonsPressedThisFrame{ 0 };
+				uint32_t buttonsReleasedThisFrame{ 0 };
 
-			static constexpr float STICK_DEADZONE{ 0.1f }; // 10%
-			void ApplyRadialDeadzone(float& x, float& y, float deadzone) const;
-			static constexpr float STICK_MAX_VALUE{ 32767.f };
+				bool controllerConnected{ false };
+			};
+	
+			static constexpr unsigned int MaxControllers{ 2 };
+			std::array<ControllerState, MaxControllers> m_Controllers{};
 
 			struct KeyBoardBinding
 			{
@@ -76,6 +77,7 @@
 
 			struct ControllerBinding
 			{
+				unsigned int controllerIndex;
 				unsigned int button;
 				InputManager::InputTrigger triggerType;
 				std::unique_ptr<Command> command;
@@ -84,10 +86,8 @@
 			std::vector<KeyBoardBinding> m_KeyboardBindings{};
 			std::vector<ControllerBinding> m_ControllerBindings{};
 
-			std::unique_ptr<Command> m_LeftStickCommand{};
-
 	#ifndef _WIN32
-			void MapButton(SDL_GamepadButton sdlButton, unsigned int bit);
+			void MapButton(unsigned int controllerIndex, SDL_GamepadButton sdlButton, unsigned int bit);
 	#endif // !WIN32
 		};
 
@@ -110,41 +110,34 @@
 		{
 			return m_Impl->IsKeyDown({});
 		}
-		bool InputManager::IsButtonDownThisFrame(unsigned int button) const noexcept
+		bool InputManager::IsButtonDownThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept
 		{
-			return m_Impl->IsButtonDownThisFrame(button);
+			return m_Impl->IsButtonDownThisFrame(controllerIndex, button);
 		}
-		bool InputManager::IsButtonUpThisFrame(unsigned int button) const noexcept
+		bool InputManager::IsButtonUpThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept
 		{
-			return m_Impl->IsButtonUpThisFrame(button);
+			return m_Impl->IsButtonUpThisFrame(controllerIndex, button);
 		}
-		bool InputManager::IsButtonPressed(unsigned int button) const noexcept
+		bool InputManager::IsButtonPressed(unsigned int controllerIndex, unsigned int button) const noexcept
 		{
-			return m_Impl->IsButtonPressed(button);
+			return m_Impl->IsButtonPressed(controllerIndex, button);
 		}
-		glm::vec2 InputManager::GetLeftStick() const
+		bool InputManager::IsControllerConnected(unsigned int controllerIndex) const noexcept
 		{
-			return m_Impl->GetLeftStick();
+			return m_Impl->IsControllerConnected(controllerIndex);
 		}
-		glm::vec2 InputManager::GetRightStick() const
+		int InputManager::GetControllerCount() const noexcept
 		{
-			return m_Impl->GetRightStick();
-		}
-		bool InputManager::IsControllerConnected() const noexcept
-		{
-			return m_Impl->IsControllerConnected();
+			return m_Impl->GetControllerCount();
 		}
 		void InputManager::BindKeyboardCommand(SDL_Scancode key, InputTrigger trigger, std::unique_ptr<Command> command)
 		{
 			m_Impl->BindKeyboardCommand(key, trigger, std::move(command));
 		}
-		void InputManager::BindControllerCommand(unsigned int button, InputTrigger trigger, std::unique_ptr<Command> command)
+		void InputManager::BindControllerCommand(unsigned int controllerIndex,
+			unsigned int button, InputTrigger trigger, std::unique_ptr<Command> command)
 		{
-			m_Impl->BindControllerCommand(button, trigger, std::move(command));
-		}
-		void InputManager::BindControllerStickCommand(std::unique_ptr<Command> command)
-		{
-			m_Impl->BindControllerStickCommand(std::move(command));
+			m_Impl->BindControllerCommand(controllerIndex, button, trigger, std::move(command));
 		}
 		void InputManager::UnbindAll()
 		{
@@ -173,10 +166,13 @@
 		InputManagerImpl::~InputManagerImpl()
 		{
 	#ifndef _WIN32
-			if (m_pGamepad)
+			for (auto& c : m_Controllers)
 			{
-				SDL_CloseGamepad(m_pGamepad);
-				m_pGamepad = nullptr;
+				if (c.pGamepad)
+				{
+					SDL_CloseGamepad(c.pGamepad);
+					c.pGamepad = nullptr;
+				}
 			}
 	#endif // !WIN32
 
@@ -184,7 +180,7 @@
 
 		bool InputManagerImpl::ProcessInput(float deltaTime)
 		{
-			UpdateController(m_ControllerIndex);
+			UpdateAllControllers();
 
 			const bool* keyState{ SDL_GetKeyboardState(nullptr) };
 
@@ -220,22 +216,22 @@
 				switch (controllerBinding.triggerType)
 				{
 				case InputManager::InputTrigger::Down:
-					shouldExecute = IsButtonDownThisFrame(controllerBinding.button);
+					shouldExecute = IsButtonDownThisFrame(controllerBinding.controllerIndex,
+						controllerBinding.button);
 					break;
 				case InputManager::InputTrigger::Up:
-					shouldExecute = IsButtonUpThisFrame(controllerBinding.button);
+					shouldExecute = IsButtonUpThisFrame(controllerBinding.controllerIndex,
+						controllerBinding.button);
 					break;
 				case InputManager::InputTrigger::Pressed:
-					shouldExecute = IsButtonPressed(controllerBinding.button);
+					shouldExecute = IsButtonPressed(controllerBinding.controllerIndex,
+						controllerBinding.button);
 					break;
 				}
 
 				if (shouldExecute)
 					controllerBinding.command->Execute(deltaTime);
 			}
-
-			if (m_ControllerConnected && m_LeftStickCommand)
-				m_LeftStickCommand->Execute(deltaTime);
 	#pragma endregion
 
 			SDL_Event e;
@@ -289,76 +285,87 @@
 			return true;
 		}
 
+		void InputManagerImpl::UpdateAllControllers()
+		{
+			for (unsigned int i{}; i < MaxControllers; ++i)
+			{
+				UpdateController(i);
+			}
+		}
+
 		void InputManagerImpl::UpdateController(unsigned int controllerIndex)
 		{
-			m_ControllerIndex = controllerIndex;
-
+			auto& state{ m_Controllers[controllerIndex] };
 	#ifdef _WIN32
-			CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
-			ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
+			CopyMemory(&state.previousState, &state.currentState,
+				sizeof(XINPUT_STATE));
+			ZeroMemory(&state.currentState, sizeof(XINPUT_STATE));
 
 			// For runtime controller connection + result check
-			const DWORD result{ XInputGetState(m_ControllerIndex, &m_CurrentState) };
-			m_ControllerConnected = (result == ERROR_SUCCESS);
+			const DWORD result{ XInputGetState(controllerIndex, &state.currentState) };
+			state.controllerConnected = (result == ERROR_SUCCESS);
 
-			if (!m_ControllerConnected)
+			if (!state.controllerConnected)
 			{
 				// No controller - clear everything for next call
-				ZeroMemory(&m_PreviousState, sizeof(XINPUT_STATE));
-				m_ButtonsPressedThisFrame = 0;
-				m_ButtonsReleasedThisFrame = 0;
+				ZeroMemory(&state.previousState, sizeof(XINPUT_STATE));
+				state.buttonsPressedThisFrame = 0;
+				state.buttonsReleasedThisFrame = 0;
 				return;
 			}
 
 			// Difference between current and previous
-			auto buttonChanges{ m_CurrentState.Gamepad.wButtons ^ m_PreviousState.Gamepad.wButtons };
-			m_ButtonsPressedThisFrame = buttonChanges & m_CurrentState.Gamepad.wButtons;
-			m_ButtonsReleasedThisFrame = buttonChanges & (~m_CurrentState.Gamepad.wButtons);
+			auto buttonChanges{ state.currentState.Gamepad.wButtons ^
+				state.previousState.Gamepad.wButtons };
+			state.buttonsPressedThisFrame =
+				buttonChanges & state.currentState.Gamepad.wButtons;
+			state.buttonsReleasedThisFrame =
+				buttonChanges & (~state.currentState.Gamepad.wButtons);
 	#else
 			// Open Gamepad if not yet connected (for runtime)
-			if (!m_pGamepad)
+			if (!state.controllerConnected)
 			{
 				int count{};
 				SDL_JoystickID* gamepads{ SDL_GetGamepads(&count) };
 
 				if (gamepads && count > static_cast<int>(controllerIndex))
-					m_pGamepad = SDL_OpenGamepad(gamepads[controllerIndex]);
+					state.pGamepad = SDL_OpenGamepad(gamepads[controllerIndex]);
 
 				SDL_free(gamepads);
 			}
 
-			m_ControllerConnected = (m_pGamepad != nullptr);
-			if (!m_ControllerConnected)
+			state.controllerConnected = (state.pGamepad != nullptr);
+			if (!state.controllerConnected)
 			{
-				m_SDLButtonsCurrent = 0;
-				m_SDLButtonsPrevious = 0;
-				m_ButtonsPressedThisFrame = 0;
-				m_ButtonsReleasedThisFrame = 0;
+				state.sdlButtonsCurrent = 0;
+				state.sdlButtonsPrevious = 0;
+				state.buttonsPressedThisFrame = 0;
+				state.buttonsReleasedThisFrame = 0;
 				return;
 			}
 
-			m_SDLButtonsPrevious = m_SDLButtonsCurrent;
-			m_SDLButtonsCurrent = 0;
+			state.sdlButtonsPrevious = state.sdlButtonsCurrent;
+			state.sdlButtonsCurrent = 0;
 
 			// Map all buttons to the defined gamepad in InputManager bits
-			MapButton(SDL_GAMEPAD_BUTTON_DPAD_UP, ControllerButton::DpadUp);
-			MapButton(SDL_GAMEPAD_BUTTON_DPAD_DOWN, ControllerButton::DpadDown);
-			MapButton(SDL_GAMEPAD_BUTTON_DPAD_LEFT, ControllerButton::DpadLeft);
-			MapButton(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, ControllerButton::DpadRight);
-			MapButton(SDL_GAMEPAD_BUTTON_START, ControllerButton::Start);
-			MapButton(SDL_GAMEPAD_BUTTON_BACK, ControllerButton::Back);
-			MapButton(SDL_GAMEPAD_BUTTON_LEFT_STICK, ControllerButton::LeftThumb);
-			MapButton(SDL_GAMEPAD_BUTTON_RIGHT_STICK, ControllerButton::RightThumb);
-			MapButton(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, ControllerButton::LeftShoulder);
-			MapButton(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, ControllerButton::RightShoulder);
-			MapButton(SDL_GAMEPAD_BUTTON_SOUTH, ControllerButton::A);
-			MapButton(SDL_GAMEPAD_BUTTON_EAST, ControllerButton::B);
-			MapButton(SDL_GAMEPAD_BUTTON_WEST, ControllerButton::X);
-			MapButton(SDL_GAMEPAD_BUTTON_NORTH, ControllerButton::Y);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_DPAD_UP, ControllerButton::DpadUp);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_DPAD_DOWN, ControllerButton::DpadDown);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_DPAD_LEFT, ControllerButton::DpadLeft);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_DPAD_RIGHT, ControllerButton::DpadRight);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_START, ControllerButton::Start);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_BACK, ControllerButton::Back);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_LEFT_STICK, ControllerButton::LeftThumb);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_RIGHT_STICK, ControllerButton::RightThumb);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, ControllerButton::LeftShoulder);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, ControllerButton::RightShoulder);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_SOUTH, ControllerButton::A);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_EAST, ControllerButton::B);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_WEST, ControllerButton::X);
+			MapButton(controllerIndex, SDL_GAMEPAD_BUTTON_NORTH, ControllerButton::Y);
 
-			uint32_t buttonChanges{ m_SDLButtonsCurrent ^ m_SDLButtonsPrevious };
-			m_ButtonsPressedThisFrame = buttonChanges & m_SDLButtonsCurrent;
-			m_ButtonsReleasedThisFrame = buttonChanges & (~m_SDLButtonsCurrent);
+			uint32_t buttonChanges{ state.sdlButtonsCurrent ^ state.sdlButtonsPrevious };
+			buttonsPressedThisFrame = buttonChanges & state.sdlButtonsCurrent;
+			buttonsReleasedThisFrame = buttonChanges & (~state.sdlButtonsCurrent);
 	#endif
 		}
 
@@ -367,62 +374,39 @@
 			return false;
 		}
 
-		bool InputManagerImpl::IsButtonDownThisFrame(unsigned int button) const noexcept
+		bool InputManagerImpl::IsButtonDownThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept
 		{
-			return m_ButtonsPressedThisFrame & button;
+			return m_Controllers[controllerIndex].buttonsPressedThisFrame & button;
 		}
 
-		bool InputManagerImpl::IsButtonUpThisFrame(unsigned int button) const noexcept
+		bool InputManagerImpl::IsButtonUpThisFrame(unsigned int controllerIndex, unsigned int button) const noexcept
 		{
-			return m_ButtonsReleasedThisFrame & button;
+			return m_Controllers[controllerIndex].buttonsReleasedThisFrame & button;
 		}
 
-		bool InputManagerImpl::IsControllerConnected() const noexcept
+		int InputManagerImpl::GetControllerCount() const noexcept
 		{
-			return m_ControllerConnected;
+			int count{ 0 };
+			for (unsigned int i{}; i < MaxControllers; ++i)
+			{
+				if (IsControllerConnected(i))
+					++count;
+			}
+			return count;
 		}
 
-		bool InputManagerImpl::IsButtonPressed(unsigned int button) const noexcept
+		bool InputManagerImpl::IsControllerConnected(unsigned int controllerIndex) const noexcept
+		{
+			return m_Controllers[controllerIndex].controllerConnected;
+		}
+
+		bool InputManagerImpl::IsButtonPressed(unsigned int controllerIndex, unsigned int button) const noexcept
 		{
 	#ifdef _WIN32
-			return m_CurrentState.Gamepad.wButtons & button;
+			return m_Controllers[controllerIndex].currentState.Gamepad.wButtons & button;
 	#else
 			return m_SDLButtonsCurrent & button;
 	#endif
-		}
-
-		glm::vec2 InputManagerImpl::GetLeftStick() const
-		{
-	#ifdef _WIN32
-			// should clamp between -1.f : 1.f for safety is using in animation or physics
-			float x{ m_CurrentState.Gamepad.sThumbLX / STICK_MAX_VALUE };
-			float y{ m_CurrentState.Gamepad.sThumbLY / STICK_MAX_VALUE };
-	#else
-			if (!m_pGamepad) 
-				return { 0.f, 0.f };
-
-			float x{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_LEFTX) / STICK_MAX_VALUE };
-			float y{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_LEFTY) / STICK_MAX_VALUE };
-	#endif // WIN32
-
-			ApplyRadialDeadzone(x, y, STICK_DEADZONE);
-			return { x, y };
-		}
-
-		glm::vec2 InputManagerImpl::GetRightStick() const
-		{
-	#ifdef _WIN32
-			// should clamp between -1.f : 1.f for safety is using in animation or physics
-			float x{ m_CurrentState.Gamepad.sThumbRX / STICK_MAX_VALUE };
-			float y{ m_CurrentState.Gamepad.sThumbRY / STICK_MAX_VALUE };
-	#else
-			if (!m_pGamepad) return { 0.f, 0.f };
-			float x{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_RIGHTX) / STICK_MAX_VALUE };
-			float y{ SDL_GetGamepadAxis(m_pGamepad, SDL_GAMEPAD_AXIS_RIGHTY) / STICK_MAX_VALUE };
-	#endif // WIN32
-
-			ApplyRadialDeadzone(x, y, STICK_DEADZONE);
-			return { x, y };
 		}
 
 		void InputManagerImpl::BindKeyboardCommand(SDL_Scancode key, InputManager::InputTrigger trigger, std::unique_ptr<Command> command)
@@ -430,21 +414,16 @@
 			m_KeyboardBindings.push_back(KeyBoardBinding{ key, trigger, std::move(command) });
 		}
 
-		void InputManagerImpl::BindControllerCommand(unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<Command> command)
+		void InputManagerImpl::BindControllerCommand(unsigned int controllerIndex,
+			unsigned int button, InputManager::InputTrigger trigger, std::unique_ptr<Command> command)
 		{
-			m_ControllerBindings.push_back(ControllerBinding{ button, trigger, std::move(command) });
-		}
-
-		void InputManagerImpl::BindControllerStickCommand(std::unique_ptr<Command> command)
-		{
-			m_LeftStickCommand = std::move(command);
+			m_ControllerBindings.push_back(ControllerBinding{ controllerIndex, button, trigger, std::move(command) });
 		}
 
 		void InputManagerImpl::UnbindAll()
 		{
 			m_KeyboardBindings.clear();
 			m_ControllerBindings.clear();
-			m_LeftStickCommand.reset();
 		}
 
 		void InputManagerImpl::UnbindAllKeyboard()
@@ -455,7 +434,6 @@
 		void InputManagerImpl::UnbindAllController()
 		{
 			m_ControllerBindings.clear();
-			m_LeftStickCommand.reset();
 		}
 
 		void InputManagerImpl::UnbindAllCommandsOfTarget(GameObject* target)
@@ -473,37 +451,14 @@
 					const auto* command{ binding.command.get() };
 					return command && command->GetCommandTarget() == target;
 				});
-
-			// Unbind Controller Stick
-			if (m_LeftStickCommand)
-			{
-				const auto* command{ m_LeftStickCommand.get() };
-				if (command && command->GetCommandTarget() == target)
-					m_LeftStickCommand.reset();
-			}
-		}
-
-		void InputManagerImpl::ApplyRadialDeadzone(float& x, float& y, float deadzone) const
-		{
-			const float magnitude{ std::sqrt(x * x + y * y) };
-			if (magnitude < deadzone)
-			{
-				x = 0.f;
-				y = 0.f;
-				return;
-			}
-
-			// Apply deadzone
-			const float scale{ (magnitude - deadzone) / (1.f - deadzone) / magnitude };
-			x *= scale;
-			y *= scale;
 		}
 
 	#ifndef _WIN32
-		void InputManagerImpl::MapButton(SDL_GamepadButton sdlButton, unsigned int bit)
+		void InputManagerImpl::MapButton(unsigned int controllerIndex, SDL_GamepadButton sdlButton, unsigned int bit)
 		{
-			if (SDL_GetGamepadButton(m_pGamepad, sdlButton))
-				m_SDLButtonsCurrent |= bit;
+			auto& state{ m_Controllers[controllerIndex] };
+			if (SDL_GetGamepadButton(state.pGamepad, sdlButton))
+				state.sdlButtonsCurrent |= bit;
 		}
 	#endif // !WIN32
 	}

@@ -1,5 +1,7 @@
 #pragma once
 #include "Commands/Command.h"
+#include "ISelectableNavigator.h"
+
 #include <utility>
 
 namespace bombGame
@@ -10,12 +12,12 @@ namespace bombGame
 	class HoverSelectableCommand final : public ge::Command
 	{
 	public:
-		HoverSelectableCommand(GameState* state, std::pair<int,int> delta);
+		HoverSelectableCommand(ge::ISelectableNavigator* nav, std::pair<int,int> delta);
 
 		virtual void Execute(float) override;
 
 	private:
-		GameState* m_GameState;
+		ge::ISelectableNavigator* m_Navigator;
 		const std::pair<int, int> m_Delta;
 	};
 }

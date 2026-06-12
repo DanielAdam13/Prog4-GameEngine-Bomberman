@@ -1,5 +1,6 @@
 #pragma once
 #include "Commands/Command.h"
+#include "ISelectableNavigator.h"
 
 namespace bombGame
 {
@@ -9,11 +10,11 @@ namespace bombGame
 	class ConfirmSelectionCommand final : public ge::Command
 	{
 	public:
-		ConfirmSelectionCommand(GameState* state);
+		ConfirmSelectionCommand(ge::ISelectableNavigator* nav);
 
 		virtual void Execute(float) override;
 
 	private:
-		GameState* m_GameState;
+		ge::ISelectableNavigator* m_Navigator;
 	};
 }

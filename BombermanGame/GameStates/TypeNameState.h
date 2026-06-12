@@ -1,5 +1,6 @@
 #pragma once
 #include "GameState.h"
+#include "ISelectableNavigator.h"
 
 #include <vector>
 #include <utility>
@@ -11,7 +12,7 @@ namespace bombGame
 	class BombermanGame;
 	class SelectableTextComponent;
 
-	class TypeNameState final : public GameState
+	class TypeNameState final : public GameState, public ge::ISelectableNavigator
 	{
 	public:
 		TypeNameState(BombermanGame& game);
@@ -23,8 +24,8 @@ namespace bombGame
 		virtual void FixedUpdate(float) override {}
 
 		// Methods called from commands
-		void MoveHover(std::pair<int, int> delta) override;
-		void ConfirmCurrentSelection() override;
+		virtual void MoveHover(std::pair<int, int> delta) override;
+		virtual void ConfirmCurrentSelection() override;
 
 	private:
 		std::vector<SelectableTextComponent*> m_Selectables; // Ref

@@ -47,5 +47,8 @@ namespace bombGame
 		bool IsAnyPlayerOnExit() const noexcept;
 
 		static inline constexpr float GameplayTime{ 180.f };
+
+		void BindKeyboardForPlayer(ge::GameObject* player);
+		void BindControllerForPlayer(unsigned int controllerIdx, ge::GameObject* player);
 	};
 }

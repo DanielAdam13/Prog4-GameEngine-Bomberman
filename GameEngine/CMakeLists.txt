@@ -45,7 +45,7 @@ add_library(gameEngine_lib STATIC
   "SpriteSheet.h" "SpriteSheet.cpp"
   "Animation.h" 
   "Camera.h" "Camera.cpp" 
-  "ISelectable.h" )
+  "ISelectable.h"  "ISelectableNavigator.h")
 
 target_compile_features(gameEngine_lib PUBLIC cxx_std_20)
 

@@ -1,13 +1,13 @@
 #include "ConfirmSelectionCommand.h"
 #include "GameStates/GameState.h"
 
-bombGame::ConfirmSelectionCommand::ConfirmSelectionCommand(GameState* state)
+bombGame::ConfirmSelectionCommand::ConfirmSelectionCommand(ge::ISelectableNavigator* nav)
 	:Command::Command(),
-	m_GameState{ state }
+	m_Navigator{ nav }
 {
 }
 
 void bombGame::ConfirmSelectionCommand::Execute(float)
 {
-	m_GameState->ConfirmCurrentSelection();
+	m_Navigator->ConfirmCurrentSelection();
 }

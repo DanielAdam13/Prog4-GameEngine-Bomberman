@@ -73,7 +73,7 @@ void bombGame::HighScoreState::OnEnter()
 
     im.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
         std::make_unique<SwitchToMainMenuCommand>(GetBombermanGame()));
-    im.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
+    im.BindControllerCommand(0, ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
         std::make_unique<SwitchToMainMenuCommand>(GetBombermanGame()));
 
     ge::SceneManager::GetInstance().SwitchToSceneWithName(sceneNames::HighScores);

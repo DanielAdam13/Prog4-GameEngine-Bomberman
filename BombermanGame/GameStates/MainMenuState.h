@@ -1,5 +1,6 @@
 #pragma once
 #include "GameState.h"
+#include "ISelectableNavigator.h"
 
 #include <memory>
 #include <vector>
@@ -10,7 +11,7 @@ namespace bombGame
 	class BombermanGame;
 	class SelectableTextComponent;
 
-	class MainMenuGameState final : public GameState
+	class MainMenuGameState final : public GameState, public ge::ISelectableNavigator
 	{
 	public:
 		MainMenuGameState(BombermanGame& game);

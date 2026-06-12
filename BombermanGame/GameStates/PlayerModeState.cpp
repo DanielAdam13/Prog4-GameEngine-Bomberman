@@ -125,11 +125,11 @@ void bombGame::PlayerModeState::OnEnter()
 	inputManager.BindKeyboardCommand(SDL_SCANCODE_E, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ConfirmSelectionCommand>(this));
 
-	inputManager.BindControllerCommand(ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Up,
+	inputManager.BindControllerCommand(0, ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Up,
 		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(-1, 0)));
-	inputManager.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Up,
+	inputManager.BindControllerCommand(0, ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Up,
 		std::make_unique<HoverSelectableCommand>(this, std::make_pair<int, int>(1, 0)));
-	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
+	inputManager.BindControllerCommand(0, ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
 		std::make_unique<ConfirmSelectionCommand>(this));
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::MainMenuOST, 0.2f, ge::SoundCategory::Music);

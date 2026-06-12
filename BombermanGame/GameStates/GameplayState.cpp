@@ -36,7 +36,7 @@
 #include "LevelGrid.h"
 #include "LevelBuilder.h"
 #include "EnemyArchetypes.h"
-#include "EnemyType.h" // for spawning enemies when timer is over and enemy player
+#include "EnemyType.h" // for spawning enemies when timer is over and enemy controllerTarget
 #include "PowerupArchetypes.h"
 #include "GameEvents.h"
 #include "SoundIds.h"
@@ -191,7 +191,7 @@ void bombGame::GameplayGameState::OnEnter()
 	}
 
 	// ---------
-	// Apply previous powerups to player
+	// Apply previous powerups to controllerTarget
 	// ---------
 	for (auto player : m_TrackedPlayers)
 	{
@@ -223,7 +223,7 @@ void bombGame::GameplayGameState::OnEnter()
 	// -------------------------------------------------
 	// Dynamic Text Objects
 	// -------------------------------------------------
-	// ---- Lives Display - Not the same as HealthDisplay per player ----
+	// ---- Lives Display - Not the same as HealthDisplay per controllerTarget ----
 	auto healthDisplayGO = std::make_unique<ge::GameObject>("GO_SharedLivesDisplay");
 	healthDisplayGO->AddComponent<ge::TextComponent>(healthDisplayGO.get(), 
 		"LEFT " + std::to_string(GetCachedGameSession().playerLives), displaysFont, colorWhite);
@@ -233,7 +233,7 @@ void bombGame::GameplayGameState::OnEnter()
 	healthDisplayGO->SetIgnoreCamera(true);
 	gameplayScene.Add(std::move(healthDisplayGO));
 
-	// ---- Score Displays - track player[0] since it's always shared ----
+	// ---- Score Displays - track controllerTarget[0] since it's always shared ----
 	auto scoreDisplayGO = std::make_unique<ge::GameObject>("GO_SharedScoreDisplay");
 	scoreDisplayGO->AddComponent<ge::TextComponent>(scoreDisplayGO.get(), "00", displaysFont, colorWhite);
 	scoreDisplayGO->AddComponent<ScoreDisplayComponent>(scoreDisplayGO.get(), m_TrackedPlayers[0]);
@@ -299,21 +299,40 @@ void bombGame::GameplayGameState::OnEnter()
 #pragma region CommandBinding
 	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
 
-	ge::GameObject* keyboardTarget;
-	ge::GameObject* controllerTarget;
+	ge::GameObject* keyboardTarget{ nullptr };
+	ge::GameObject* controllerTarget0{ nullptr };
+	ge::GameObject* controllerTarget1{ nullptr };
+
+	const int numControllers{ inputManager.GetControllerCount() };
 	switch (GetCachedGameSession().currentPlayerMode)
 	{
 	case PlayerMode::SinglePlayer:
 		keyboardTarget = m_TrackedPlayers[0];
-		controllerTarget = m_TrackedPlayers[0];
+		controllerTarget0 = m_TrackedPlayers[0];
 		break;
 	case PlayerMode::Coop:
-		keyboardTarget = m_TrackedPlayers[0];
-		controllerTarget = m_TrackedPlayers[1];
+		if (numControllers >= 2)
+		{
+			controllerTarget0 = m_TrackedPlayers[0];
+			controllerTarget1 = m_TrackedPlayers[1];
+		}
+		else
+		{
+			keyboardTarget = m_TrackedPlayers[0];
+			controllerTarget0 = m_TrackedPlayers[1];
+		}
 		break;
 	case PlayerMode::Versus:
-		keyboardTarget = m_TrackedPlayers[0];
-		controllerTarget = m_TrackedEnemyPlayer;
+		if (numControllers >= 2)
+		{
+			controllerTarget0 = m_TrackedPlayers[0];
+			controllerTarget1 = m_TrackedEnemyPlayer;
+		}
+		else
+		{
+			keyboardTarget = m_TrackedPlayers[0];
+			controllerTarget0 = m_TrackedEnemyPlayer;
+		}
 		break;
 	}
 
@@ -327,38 +346,18 @@ void bombGame::GameplayGameState::OnEnter()
 		std::make_unique<ge::ChangeWindowSizeCommand>(1200, 1200));
 
 	// --------------------
-	// First player 
+	// Keyboard
 	// --------------------
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
-		std::make_unique<LayBombCommand>(keyboardTarget));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
-		std::make_unique<RemoteBombDetonateCommand>(keyboardTarget));
-	// Movement
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 0.f, -1.f, 0.f }));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ -1.f, 0.f, 0.f }));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_S, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 0.f, 1.f, 0.f }));
-	inputManager.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 1.f, 0.f, 0.f }));
+	if (keyboardTarget) 
+		BindKeyboardForPlayer(keyboardTarget); 
 
 	// ---------------------
-	// Second player
+	// Controller
 	// ---------------------
-	inputManager.BindControllerCommand(ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
-		std::make_unique<LayBombCommand>(controllerTarget));
-	inputManager.BindControllerCommand(ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
-		std::make_unique<RemoteBombDetonateCommand>(controllerTarget));
-	// Movement
-	inputManager.BindControllerCommand(ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 0.f, -1.f, 0.f }));
-	inputManager.BindControllerCommand(ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ -1.f, 0.f, 0.f }));
-	inputManager.BindControllerCommand(ge::ControllerButton::DpadDown, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 0.f, 1.f, 0.f }));
-	inputManager.BindControllerCommand(ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Pressed,
-		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 1.f, 0.f, 0.f }));
+	if (controllerTarget0)
+		BindControllerForPlayer(0, controllerTarget0);
+	if (controllerTarget1) 
+		BindControllerForPlayer(1, controllerTarget1);
 #pragma endregion
 
 	GetBombermanGame().GetStoredSoundSystem()->Play(SoundIds::GameplayNormalOST, 0.2f, ge::SoundCategory::Music);
@@ -418,11 +417,11 @@ std::unique_ptr<bombGame::GameState> bombGame::GameplayGameState::Update(float)
 			return nullptr;
 		}
 
-		// If stage is clear but no player is on the exit, stay in this state
+		// If stage is clear but no controllerTarget is on the exit, stay in this state
 		if (!IsAnyPlayerOnExit())
 			return nullptr;
 
-		// If stage is clear AND player is on exit -> Progress gameplay + reset gameplay or go to victory
+		// If stage is clear AND controllerTarget is on exit -> Progress gameplay + reset gameplay or go to victory
 		GetBombermanGame().CompleteStage(m_TrackedPlayers[0]->GetComponent<ge::ScoreComponent>()->GetCurrentScore(),
 			m_TrackedPickedPowerupsStage);
 
@@ -523,4 +522,42 @@ bool bombGame::GameplayGameState::IsAnyPlayerOnExit() const noexcept
 	}
 
 	return false;
+}
+
+void bombGame::GameplayGameState::BindKeyboardForPlayer(ge::GameObject* keyboardTarget)
+{
+	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_SPACE, ge::InputManager::InputTrigger::Up,
+		std::make_unique<LayBombCommand>(keyboardTarget));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_X, ge::InputManager::InputTrigger::Up,
+		std::make_unique<RemoteBombDetonateCommand>(keyboardTarget));
+	// Movement
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_W, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 0.f, -1.f, 0.f }));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_A, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ -1.f, 0.f, 0.f }));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_S, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 0.f, 1.f, 0.f }));
+	inputManager.BindKeyboardCommand(SDL_SCANCODE_D, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(keyboardTarget, glm::vec3{ 1.f, 0.f, 0.f }));
+}
+
+void bombGame::GameplayGameState::BindControllerForPlayer(unsigned int controllerIdx, ge::GameObject* controllerTarget)
+{
+	auto& inputManager{ ge::ServiceLocator::GetInputManager() };
+
+	inputManager.BindControllerCommand(controllerIdx, ge::ControllerButton::A, ge::InputManager::InputTrigger::Up,
+		std::make_unique<LayBombCommand>(controllerTarget));
+	inputManager.BindControllerCommand(controllerIdx, ge::ControllerButton::B, ge::InputManager::InputTrigger::Up,
+		std::make_unique<RemoteBombDetonateCommand>(controllerTarget));
+	// Movement
+	inputManager.BindControllerCommand(controllerIdx, ge::ControllerButton::DpadUp, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 0.f, -1.f, 0.f }));
+	inputManager.BindControllerCommand(controllerIdx, ge::ControllerButton::DpadLeft, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ -1.f, 0.f, 0.f }));
+	inputManager.BindControllerCommand(controllerIdx, ge::ControllerButton::DpadDown, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 0.f, 1.f, 0.f }));
+	inputManager.BindControllerCommand(controllerIdx, ge::ControllerButton::DpadRight, ge::InputManager::InputTrigger::Pressed,
+		std::make_unique<MoveCommand>(controllerTarget, glm::vec3{ 1.f, 0.f, 0.f }));
 }
