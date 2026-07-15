@@ -1,7 +1,4 @@
-﻿## Link to GitHub repo:
-https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
-
-## Web Build:
+﻿## Web Build:
 https://danieladam13.github.io/Prog4-GameEngine-Bomberman/
 
 # Architectural Rules
@@ -117,6 +114,9 @@ This method is then called from the Enemy Component when a target tile is reache
 
 The enemy is moving between centers of the tile.
 When a target is reached, the position is clamped to the mid point to prevent overshooting.
+
+## Link to GitHub repo:
+https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
 
 ## Windows version
 
