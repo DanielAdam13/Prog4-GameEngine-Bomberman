@@ -1,6 +1,11 @@
 ﻿## Web Build:
 https://danieladam13.github.io/Prog4-GameEngine-Bomberman/
 
+## Up to date Game Engine is on
+
+https://github.com/DanielAdam13/GameEngine
+
+
 # Architectural Rules
 
 - Commands are intent, Components are behavior
@@ -93,7 +98,7 @@ Exact mapping in code:
 The Enemy State base class provides protected helpers - FindClosestPlayerInRange, CollectWalkableNeighbors, GetSourceEnemyComponent, GetSourceTransform.
 These are all reused in every derived Enemy State.
 
-# Bomberman Architectural Choices
+# Important Architectural Choices
 
 ### The Bomb Laying problem
 
@@ -114,9 +119,6 @@ This method is then called from the Enemy Component when a target tile is reache
 
 The enemy is moving between centers of the tile.
 When a target is reached, the position is clamped to the mid point to prevent overshooting.
-
-## Link to GitHub repo:
-https://github.com/DanielAdam13/Prog4-GameEngine-Bomberman
 
 ## Windows version
 
